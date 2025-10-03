@@ -1,21 +1,23 @@
 const express = require("express");
-const { default: mongoose } = require("mongoose");
-require("dot.env").config();
+require("dotenv").config();
+const dbConnect = require("./config/dbconnect");
+const initRoutes = require("./routes");
 const port = process.env.PORT || 3000;
 
-const server = express();
-
-mongoose.connect("mongodb://localhost:27017/").then(() => {
-  console.log("Connected to MongoDB");
-});
+const app = express();
 
 // Middleware
 
 // Parse JSON bodies (as sent by API clients)
-server.use(express.json());
+app.use(express.json());
 // Parse URL-encoded bodies (as sent by HTML forms)
-server.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
-server.listen(port, () => {
+// DB Connection
+dbConnect();
+// Create sub route for the API
+initRoutes(app);
+
+app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
