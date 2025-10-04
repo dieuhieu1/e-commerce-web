@@ -1,4 +1,5 @@
-const mongoose = require("mongoose"); // Erase if already required
+const { default: mongoose } = require("mongoose");
+const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 // Declare the Schema of the Mongo model
 var userSchema = new mongoose.Schema(
@@ -49,7 +50,7 @@ var userSchema = new mongoose.Schema(
       type: String,
     },
     // Token send to email when user forgot or change password
-    passwordToken: {
+    passwordResetToken: {
       type: String,
     },
     passwordResetExpires: {
@@ -69,5 +70,26 @@ userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
+
+// Add method to instance of model
+userSchema.methods = {
+  isCorrectPassword: async function (userPassword) {
+    const hashedPassword = this.password;
+    return await bcrypt.compare(userPassword, hashedPassword);
+  },
+  createPasswordChangedToken: function () {
+    // Create token reset
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetTokenHash = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+    this.passwordResetToken = resetTokenHash;
+    // Assign time expire to 15m change to miliseconds
+    this.passwordResetExpires = Date.now() + 15 * 60 * 1000;
+    return resetToken;
+  },
+};
+
 //Export the model
 module.exports = mongoose.model("User", userSchema);
