@@ -24,9 +24,9 @@ const register = asyncHandler(async (req, res) => {
   } else {
     const newUser = await User.create(req.body);
     return res.status(200).json({
-      sucess: newUser ? true : false,
+      success: newUser ? true : false,
       message: newUser
-        ? "Register is sucessfully. Please go to login page!"
+        ? "Register is successfully. Please go to login page!"
         : "Something went wrong!",
     });
   }
@@ -61,15 +61,16 @@ const login = asyncHandler(async (req, res) => {
     password: hashedPassword,
     role,
     _id: userId,
+    refreshToken,
     ...userData
   } = user.toObject();
   // Generate accessToken and refreshToken
   const accessToken = generateAccessToken(userId, role);
-  const refreshToken = generateRefreshToken(userId, role);
+  const newRefreshToken = generateRefreshToken(userId, role);
   // Save refreshToken to the DB
   await User.findByIdAndUpdate(userId, { refreshToken }, { new: true });
   // Save refreshToken into Cookie
-  res.cookie("refreshToken", refreshToken, {
+  res.cookie("refreshToken", newRefreshToken, {
     httpOnly: true,
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
@@ -83,14 +84,12 @@ const login = asyncHandler(async (req, res) => {
 
 // API Get Current User
 const getCurrentUser = asyncHandler(async (req, res) => {
-  const { userId } = req.user;
+  const { _id } = req.user;
 
-  const user = await User.findById(userId).select(
-    "-refreshToken -role -password"
-  );
+  const user = await User.findById(_id).select("-refreshToken -role -password");
 
   return res.status(200).json({
-    sucess: true,
+    success: user ? true : false,
     result: user ? user : "User not found!",
   });
 });
@@ -102,7 +101,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
   if (!refreshToken) {
     return res.status(401).json({
-      sucess: false,
+      success: false,
       message: "No fresh token in cookie",
     });
   }
@@ -121,7 +120,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       if (err) {
         return res
           .status(403)
-          .json({ sucess: false, message: "Refresh token expired" });
+          .json({ success: false, message: "Refresh token expired" });
       }
       // If not error, generate access token then return response success
       const newAccessToken = generateAccessToken(user._id, user.role);
@@ -159,19 +158,18 @@ const logout = asyncHandler(async (req, res) => {
     .json({ success: true, message: "Logout successfully!" });
 });
 
-// Forgot Password WorkFlow
-// Step 1: Client sent Email
-// Step 2: Server check email is valid ?
 // Step 3: User check mail, click to link
 // Type into input in Client and sent to server combine with the new password
 // Step 4: Server get the new password and reset password token then check
 // If valid, create new hash password replace in db
 // Then return response change password successfully
-
+// Forgot Password WorkFlow
 const forgotPassword = asyncHandler(async (req, res) => {
+  // Step 1: Client sent Email
   const { email } = req.body;
 
   if (!email) throw new Error("Missing email in request!");
+  // Step 2: Server check email is valid ?
   const user = await User.findOne({ email });
 
   if (!user) {
@@ -221,8 +219,8 @@ const resetPassword = asyncHandler(async (req, res) => {
   // HashedPassword will be gen before save
   user.password = password;
   // Re-assign neccessary field
-  user.resetPasswordToken = undefined;
-  user.passwordResetExpires = undefined;
+  user.passwordResetToken = "";
+  user.passwordResetExpires = "";
   user.passwordChangedAt = Date.now();
 
   await user.save();
@@ -230,6 +228,67 @@ const resetPassword = asyncHandler(async (req, res) => {
   return res.status(200).json({
     success: true,
     message: "Updated new password!",
+  });
+});
+
+const getAllUsers = asyncHandler(async (req, res) => {
+  const response = await User.find().select("-refreshToken -password -role");
+  return res.status(200).json({
+    success: response ? true : false,
+    users: response,
+  });
+});
+
+const deleteUser = asyncHandler(async (req, res) => {
+  const { _id } = req.params;
+
+  if (!_id) throw new Error("missing input");
+
+  const response = await User.findByIdAndDelete({ _id });
+
+  return res.status(200).json({
+    success: response ? true : false,
+    message: response
+      ? `User with email: ${response.email} deleted successfully!`
+      : "Something went wrong!",
+  });
+});
+
+const updateUser = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+
+  if (!_id || Object.keys(req.body).length === 0) {
+    throw new Error("Missing input");
+  }
+
+  const response = await User.findByIdAndUpdate({ _id }, req.body).select(
+    "-role -password -refreshToken"
+  );
+
+  return res.status(200).json({
+    success: response ? true : false,
+    message: response
+      ? `User with email: ${response.email} updated successfully!`
+      : "Something went wrong!",
+  });
+});
+
+const updateUserByAdmin = asyncHandler(async (req, res) => {
+  const { _id } = req.params;
+
+  if (!_id || Object.keys(req.body).length === 0) {
+    throw new Error("Missing input");
+  }
+
+  const response = await User.findByIdAndUpdate({ _id }, req.body).select(
+    "-role -password -refreshToken"
+  );
+
+  return res.status(200).json({
+    success: response ? true : false,
+    message: response
+      ? `User with email: ${response.email} updated successfully!`
+      : "Something went wrong!",
   });
 });
 module.exports = {
@@ -240,4 +299,9 @@ module.exports = {
   logout,
   forgotPassword,
   resetPassword,
+  getAllUsers,
+  deleteUser,
+  updateUser,
+  updateUser,
+  updateUserByAdmin,
 };
