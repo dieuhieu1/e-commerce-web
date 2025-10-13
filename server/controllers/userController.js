@@ -20,7 +20,7 @@ const register = asyncHandler(async (req, res) => {
   // Check is user email existed
   const existedEmail = await User.findOne({ email: email });
   if (existedEmail) {
-    throw new Error("This email has already existed!");
+    throw new Error("This email has already in use!");
   } else {
     const newUser = await User.create(req.body);
     return res.status(200).json({
@@ -170,16 +170,16 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
   if (!email) throw new Error("Missing email in request!");
   // Step 2: Server check email is valid ?
-  const user = await User.findOne({ email });
+  const existingUser = await User.findOne({ email });
 
-  if (!user) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid user email!",
-    });
+  if (!existingUser) {
+    return res
+      .status(400)
+      .send({ error: "No user found for this email address." });
   }
-  const resetToken = user.createPasswordChangedToken();
-  await user.save();
+
+  const resetToken = existingUser.createPasswordChangedToken();
+  await existingUser.save();
   // Create html template for mail
   const html = `
       <p>You requested a password reset. So:</p>
@@ -196,7 +196,8 @@ const forgotPassword = asyncHandler(async (req, res) => {
   // Return result
   return res.status(200).json({
     success: true,
-    message: " Password reset email sent! Please go to email to check it",
+    message:
+      " Password reset link have already sent! Please go to email to check it",
   });
 });
 
@@ -227,7 +228,8 @@ const resetPassword = asyncHandler(async (req, res) => {
 
   return res.status(200).json({
     success: true,
-    message: "Updated new password!",
+    message:
+      "Password changed successfully! Please login with your new password.",
   });
 });
 
@@ -291,6 +293,66 @@ const updateUserByAdmin = asyncHandler(async (req, res) => {
       : "Something went wrong!",
   });
 });
+
+const updateUserAddress = asyncHandler(async (req, res) => {
+  const { _id: userId } = req.user;
+
+  if (!req.body.address) {
+    throw new Error("Missing inputs! Please check your request");
+  }
+
+  const response = await User.findByIdAndUpdate(
+    { _id: userId },
+    { $push: { address: req.body.address } },
+    { new: true }
+  ).select("-password -role -refreshToken");
+
+  return res.status(200).json({
+    success: response ? true : false,
+    updatedUser: response
+      ? response
+      : "Something went wrong! Cannot updated user info",
+  });
+});
+
+const updateUserCart = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  const { productId, quantity, color } = req.body;
+  console.log(req.body);
+
+  if (!productId || !quantity || !color) {
+    throw new Error("Missing Input! Check your request params");
+  }
+
+  const user = await User.findById(_id);
+  const userCart = user.cart;
+  console.log(userCart);
+
+  const productAlreadyInCart = userCart.find(
+    (item) =>
+      item.productId.toString() === productId.toString() && item.color === color
+  );
+
+  if (productAlreadyInCart) {
+    productAlreadyInCart.quantity += +quantity;
+  } else {
+    const newProduct = {
+      productId: productId,
+      quantity: quantity,
+      color: color,
+    };
+    user.cart.push(newProduct);
+  }
+
+  const updatedUser = await user.save();
+  return res.status(200).json({
+    success: updatedUser ? true : false,
+    message: "Updated User Cart Successfully!",
+    result: updatedUser
+      ? updatedUser
+      : "Something went wrong! Cannot updated user cart.",
+  });
+});
 module.exports = {
   register,
   login,
@@ -304,4 +366,6 @@ module.exports = {
   updateUser,
   updateUser,
   updateUserByAdmin,
+  updateUserAddress,
+  updateUserCart,
 };

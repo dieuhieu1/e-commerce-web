@@ -1,4 +1,4 @@
-const productRouter = require("express").Router();
+const userRouter = require("express").Router();
 const userController = require("../controllers/userController");
 const { verifyAccessToken, isAdmin } = require("../middlewares/verifyToken");
 const {
@@ -13,21 +13,26 @@ const {
   deleteUser,
   updateUser,
   updateUserByAdmin,
+  updateUserAddress,
+  updateUserCart,
 } = userController;
 
-productRouter.post("/register", register);
-productRouter.post("/login", login);
-productRouter.post("/refreshtoken", refreshAccessToken);
-productRouter.post("/logout", logout);
-productRouter.post("/forgot-password", forgotPassword);
-productRouter.post("/forgot-password/reset-password", resetPassword);
+userRouter.post("/register", register);
+userRouter.post("/login", login);
+userRouter.post("/refreshtoken", refreshAccessToken);
+userRouter.post("/logout", logout);
+userRouter.post("/forgot-password", forgotPassword);
+userRouter.post("/forgot-password/reset-password", resetPassword);
 
-productRouter.get("/current", verifyAccessToken, getCurrentUser);
-productRouter.get("/", verifyAccessToken, isAdmin, getAllUsers);
+userRouter.get("/current", verifyAccessToken, getCurrentUser);
+userRouter.get("/", verifyAccessToken, isAdmin, getAllUsers);
 
-productRouter.put("/current", verifyAccessToken, updateUser);
-productRouter.put("/:uid", verifyAccessToken, isAdmin, updateUserByAdmin);
+userRouter.put("/current", verifyAccessToken, updateUser);
+userRouter.put("/address", verifyAccessToken, updateUserAddress);
+userRouter.put("/cart", verifyAccessToken, updateUserCart);
 
-productRouter.delete("/:uid", verifyAccessToken, isAdmin, deleteUser);
+userRouter.put("/:uid", verifyAccessToken, isAdmin, updateUserByAdmin);
 
-module.exports = productRouter;
+userRouter.delete("/:uid", verifyAccessToken, isAdmin, deleteUser);
+
+module.exports = userRouter;

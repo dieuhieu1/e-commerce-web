@@ -3,12 +3,18 @@ require("dotenv").config();
 const dbConnect = require("./config/dbconnect");
 const initRoutes = require("./routes");
 const cookerParser = require("cookie-parser");
+const cors = require("cors");
 const port = process.env.PORT || 3000;
 
 const app = express();
 
 // Middleware
-
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    methods: ["POST", "PUT", "DELETE", "GET"],
+  })
+);
 // Parse Cookie bodies
 app.use(cookerParser());
 // Parse JSON bodies (as sent by API clients)

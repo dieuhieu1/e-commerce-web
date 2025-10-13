@@ -7,13 +7,26 @@ const {
   updateProduct,
   deleteProduct,
   ratingProduct,
+  uploadProductImages,
 } = require("../controllers/productController");
 
+const { uploadCloud: uploader } = require("../config/cloudinary.config");
+// POST /api/products
 productRouter.post("/", verifyAccessToken, isAdmin, createNewProduct);
+
+// GET /api/products
 productRouter.get("/", getProducts);
 
+// GET /api/products/:id
 productRouter.get("/:pid", getProduct);
+
+// PUT /api/products/:id
 productRouter.put("/:pid", updateProduct);
+
+// PUT /api/products/rating/:id
+productRouter.put("/rating/:pid", verifyAccessToken, ratingProduct);
+
+// DELETE /api/products/:id
 productRouter.delete("/:pid", verifyAccessToken, isAdmin, deleteProduct);
-productRouter.put("/:id/rating", verifyAccessToken, ratingProduct);
+
 module.exports = productRouter;

@@ -30,12 +30,15 @@ var userSchema = new mongoose.Schema(
       type: String,
       default: "user",
     },
-    cart: {
-      type: Array,
-      default: [],
-    },
+    cart: [
+      {
+        productId: { type: mongoose.Types.ObjectId, ref: "Product" },
+        quantity: Number,
+        color: String,
+      },
+    ],
     // Save Array of Ids from Address
-    address: [{ type: mongoose.Types.ObjectId, ref: "Address" }],
+    address: { type: Array, default: [] },
     // Save Array of Ids from Product
     wishlist: [{ type: mongoose.Types.ObjectId, ref: "Product" }],
     // Is this account user locked ?

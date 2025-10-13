@@ -1,13 +1,14 @@
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
-
+const { cloudinary } = require("../config/cloudinary.config");
 const Product = require("../models/Product");
+
 const createNewProduct = asyncHandler(async (req, res) => {
   if (Object.keys(req.body).length === 0) {
     throw new Error("Missing Inputs!");
   }
   // Slugify
-  if (req.body || req.body.title) {
+  if (req.body || req.body.title || req.body.images) {
     req.body.slug = slugify(req.body.title);
   }
   const newProduct = await Product.create(req.body);
@@ -93,9 +94,7 @@ const getProducts = asyncHandler(async (req, res) => {
         limit: limit,
         totalPages: Math.ceil(totalCounts / limit),
       },
-      data: {
-        products: response ? response : [],
-      },
+      products: response ? response : [],
     });
   } catch (err) {
     throw new Error(err);
@@ -106,8 +105,11 @@ const updateProduct = asyncHandler(async (req, res) => {
   const { pid } = req.params;
 
   if (!pid) throw new Error("Missing product id! Please check your request!");
+  console.log(req.body);
 
-  if (req.body || req.body.title) {
+  if (req.body && req.body.title) {
+    console.log("abc");
+
     const productTitle = req.body.title;
     req.body.slug = slugify(productTitle);
   }
@@ -192,9 +194,6 @@ const ratingProduct = asyncHandler(async (req, res) => {
   });
 });
 
-const deleteRating = asyncHandler(async (req, res) => {
-  // const {id: }
-});
 module.exports = {
   createNewProduct,
   getProduct,
