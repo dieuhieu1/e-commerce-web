@@ -7,29 +7,90 @@ const {
   generateRefreshToken,
 } = require("../middlewares/jwt");
 const { sendMail } = require("../ultils/sendMail");
+const { verifyEmailHTML, forgotPasswordHTML } = require("../ultils/constants");
 
 // API Register
 const register = asyncHandler(async (req, res) => {
-  const { email, password, firstname, lastname } = req.body;
-  if (!email || !password || !firstname || !lastname) {
-    return res.status(400).json({
-      success: false,
-      message: "Missing inputs",
-    });
+  const { email, firstname, lastname, password, mobile } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: "You must enter an email address." });
   }
+
+  if (!firstname || !lastname) {
+    return res.status(400).json({ error: "You must enter your full name." });
+  }
+
+  if (!password) {
+    return res.status(400).json({ error: "You must enter a password." });
+  }
+  if (!mobile) {
+    return res.status(400).json({ error: "You must enter a mobile." });
+  }
+
   // Check is user email existed
   const existedEmail = await User.findOne({ email: email });
-  if (existedEmail) {
+
+  if (existedEmail && existedEmail.isVerified) {
     throw new Error("This email has already in use!");
-  } else {
-    const newUser = await User.create(req.body);
-    return res.status(200).json({
-      success: newUser ? true : false,
-      message: newUser
-        ? "Register is successfully. Please go to login page!"
-        : "Something went wrong!",
-    });
   }
+  // If email existed but not verified, remove that user and create new one
+  if (existedEmail && !existedEmail.isVerified) {
+    await User.findByIdAndDelete({ _id: existedEmail._id });
+  }
+  // If not create new user
+  const newUser = new User(req.body);
+  const verificationToken = newUser.createEmailVerificationToken();
+  await newUser.save();
+
+  const data = {
+    email: email,
+    html: verifyEmailHTML(verificationToken),
+    subject: "Digital World Email Verification",
+  };
+  const result = await sendMail(data);
+  if (result) {
+    return res.status(200).json({
+      success: true,
+      message: "Verification email sent. Please check your email box.",
+    });
+  } else {
+    newUser.emailVerificationToken = undefined;
+    newUser.emailVerificationExpires = undefined;
+    await newUser.save();
+
+    console.error(error);
+    throw new Error("Email could not be sent. Please try registering again.");
+  }
+});
+
+const verifyEmail = asyncHandler(async (req, res) => {
+  const { token: verificationToken } = req.params;
+  console.log(req.params);
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(verificationToken)
+    .digest("hex");
+
+  const user = await User.findOne({
+    emailVerificationToken: hashedToken,
+    emailVerificationExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return res.redirect(
+      `${process.env.CLIENT_URL}/verify-email?verification=failed`
+    );
+  }
+
+  user.isVerified = true;
+  user.emailVerificationToken = undefined;
+  user.emailVerificationExpires = undefined;
+
+  await user.save();
+
+  return res.redirect(
+    `${process.env.CLIENT_URL}/verify-email?verification=success`
+  );
 });
 
 // API Login
@@ -55,6 +116,9 @@ const login = asyncHandler(async (req, res) => {
     return res
       .status(400)
       .json({ success: false, message: "Invalid credentials" });
+  }
+  if (!user.isVerified) {
+    throw new Error("Account has not been verified. Please check your email.");
   }
   // Convert to basic Object then destructuring
   const {
@@ -178,31 +242,28 @@ const forgotPassword = asyncHandler(async (req, res) => {
       .send({ error: "No user found for this email address." });
   }
 
-  const resetToken = existingUser.createPasswordChangedToken();
+  const resetToken = existingUser.createPasswordResetToken();
   await existingUser.save();
   // Create html template for mail
-  const html = `
-      <p>You requested a password reset. So:</p>
-      <p>Click here to reset your password: <a href="${process.env.URL_SERVER}/api/user/forgot-password/reset-password/${resetToken}">${process.env.URL_SERVER}</a></p>
-      <p>This link expires in 15 minutes.</p>
-    `;
 
   const data = {
     email: email,
-    html: html,
+    html: forgotPasswordHTML(resetToken),
+    subject: "Forgot password",
   };
   // Send mail to user email have the reset password link
   const result = await sendMail(data);
   // Return result
   return res.status(200).json({
     success: true,
-    message:
-      " Password reset link have already sent! Please go to email to check it",
+    message: result.response?.includes("OK")
+      ? " Password reset link have already sent! Please go to your email to check it"
+      : "Something went wrong! Email not sent",
   });
 });
 
 const resetPassword = asyncHandler(async (req, res) => {
-  const { password, resetToken } = req.body;
+  const { newPassword, resetToken } = req.body;
   // Hash Reset Token
   const resetPasswordToken = crypto
     .createHash("sha256")
@@ -218,7 +279,7 @@ const resetPassword = asyncHandler(async (req, res) => {
     throw new Error("Invalid reset token");
   }
   // HashedPassword will be gen before save
-  user.password = password;
+  user.password = newPassword;
   // Re-assign neccessary field
   user.passwordResetToken = "";
   user.passwordResetExpires = "";
@@ -368,4 +429,5 @@ module.exports = {
   updateUserByAdmin,
   updateUserAddress,
   updateUserCart,
+  verifyEmail,
 };

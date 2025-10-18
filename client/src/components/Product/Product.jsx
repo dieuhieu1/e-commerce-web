@@ -1,16 +1,19 @@
 import { formatMoney } from "@/ultils/helpers";
 import React, { useState } from "react";
-import StarRating from "./StarRating";
-import SelectOption from "./SelectOption";
+import StarRating from "../StarRating";
+import SelectOption from "../SelectOption";
 import { AiFillEye } from "react-icons/ai";
 import { IoMenu } from "react-icons/io5";
 import { BsFillSuitHeartFill } from "react-icons/bs";
-const Product = ({ productData, isNew }) => {
+import { Link } from "react-router-dom";
+const Product = ({ productData, isNew, normal }) => {
   const { thumb, slug, title, price, totalRatings } = productData;
 
   const [isShowOption, setIsShowOption] = useState(false);
+
+  // Chi-tiet-san-pham
   return (
-    <div
+    <Link
       className="w-full text-base"
       onMouseEnter={(e) => {
         e.stopPropagation();
@@ -20,6 +23,9 @@ const Product = ({ productData, isNew }) => {
         e.stopPropagation();
         setIsShowOption(false);
       }}
+      to={`/${productData?.category?.toLowerCase()}/${productData?._id}/${
+        productData?.title
+      }`}
     >
       <div
         className=" relative w-full border border-stone-200 p-[15px] flex flex-col items-center rounded-md overflow-hidden bg-white 
@@ -45,13 +51,15 @@ const Product = ({ productData, isNew }) => {
             className="w-[274px] h-[274px] object-cover"
           />
           {/* Nhãn NEW ở góc phải */}
-          <span
-            className={`absolute top-[-5px] right-0  text-white text-[12px] font-semibold w-30 py-2 rounded-tr-md rounded-bl-md shadow flex justify-center float-left ${
-              isNew ? "bg-red-500" : "bg-blue-500"
-            }`}
-          >
-            {isNew ? "NEW" : "TRENDING"}
-          </span>
+          {!normal && (
+            <span
+              className={`absolute top-[-5px] right-0  text-white text-[12px] font-semibold w-30 py-2 rounded-tr-md rounded-bl-md shadow flex justify-center float-left ${
+                isNew ? "bg-red-500" : "bg-blue-500"
+              }`}
+            >
+              {isNew ? "NEW" : "TRENDING"}
+            </span>
+          )}
         </div>
         <div className="flex flex-col mt-[15px] items-start w-full">
           <span className="line-clamp-1">{title}</span>
@@ -59,7 +67,7 @@ const Product = ({ productData, isNew }) => {
           <span>{formatMoney(price)} VND </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

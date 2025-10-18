@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useAuthStore } from "./zustand/useAuthStore";
 
 // Add a request interceptor
 const instance = axios.create({
@@ -8,6 +9,11 @@ const instance = axios.create({
 instance.interceptors.request.use(
   function (config) {
     // Do something before request is sent
+    const token = useAuthStore.getState().accessToken;
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   function (error) {
@@ -26,7 +32,7 @@ instance.interceptors.response.use(
   function (error) {
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
-    return error.data;
+    return error.response.data;
   }
 );
 

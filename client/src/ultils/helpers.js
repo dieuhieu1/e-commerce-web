@@ -1,9 +1,111 @@
 export const createSlug = (string) =>
   string
     .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\ue0300-\u036f]/g, "")
-    .split(" ")
-    .join("-");
-export const formatMoney = (number) =>
-  Number(number.toFixed(1)).toLocaleString("vi-VN");
+    .normalize("NFD") // tách các ký tự có dấu thành ký tự + dấu riêng biệt
+    .replace(/[\u0300-\u036f]/g, "") // xóa các dấu thanh, dấu mũ, dấu móc
+    .replace(/đ/g, "d") // thay đ -> d
+    .replace(/[^a-z0-9\s-]/g, "") // loại bỏ ký tự đặc biệt
+    .trim() // xóa khoảng trắng đầu cuối
+    .replace(/\s+/g, "-"); // thay khoảng trắng bằng dấu gạch ngang
+
+export const formatMoney = (number) => {
+  return Number(number.toFixed(1)).toLocaleString("en-US");
+};
+export const validate = (payload, setInvalidFields) => {
+  let invalids = 0;
+  const newInvalids = [];
+
+  for (const [key, value] of Object.entries(payload)) {
+    const trimmedValue = value?.trim?.() || "";
+
+    // Kiểm tra rỗng
+    if (!trimmedValue) {
+      invalids++;
+      newInvalids.push({
+        name: key,
+        message: "This field is required",
+      });
+      continue;
+    }
+
+    // Xử lý theo từng trường cụ thể
+    switch (key) {
+      case "email": {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(trimmedValue)) {
+          invalids++;
+          newInvalids.push({
+            name: key,
+            message: "Invalid email format",
+          });
+        }
+        break;
+      }
+
+      case "password": {
+        if (trimmedValue.length < 6) {
+          invalids++;
+          newInvalids.push({
+            name: key,
+            message: "Password must be at least 6 characters",
+          });
+        }
+        // else if (!/[A-Z]/.test(trimmedValue)) {
+        //   invalids++;
+        //   newInvalids.push({
+        //     name: key,
+        //     message: "Password must contain at least one uppercase letter",
+        //   });
+        // } else if (!/[0-9]/.test(trimmedValue)) {
+        //   invalids++;
+        //   newInvalids.push({
+        //     name: key,
+        //     message: "Password must contain at least one number",
+        //   });
+        // }
+        break;
+      }
+
+      case "confirmPassword": {
+        if (trimmedValue !== payload.password) {
+          invalids++;
+          newInvalids.push({
+            name: key,
+            message: "Passwords do not match",
+          });
+        }
+        break;
+      }
+
+      case "mobile": {
+        const phoneRegex = /^[0-9]{9,11}$/;
+        if (!phoneRegex.test(trimmedValue)) {
+          invalids++;
+          newInvalids.push({
+            name: key,
+            message: "Invalid phone number format",
+          });
+        }
+        break;
+      }
+
+      case "firstname":
+      case "lastname": {
+        if (trimmedValue.length < 2) {
+          invalids++;
+          newInvalids.push({
+            name: key,
+            message: "Name must be at least 2 characters long",
+          });
+        }
+        break;
+      }
+
+      default:
+        break;
+    }
+  }
+
+  setInvalidFields(newInvalids);
+  return invalids;
+};

@@ -5,7 +5,10 @@
   --font-main: "Poppins", "sans-serif";
   --color-main: #ee3131;
   --width-main: 1220px;
+  --bg-main-color: #ee3131;
+  --color-overlay: rgba(0, 0, 0, 0.5);
 }
+
 body {
   font-family: var(--font-main);
 }
@@ -33,10 +36,79 @@ body {
     opacity: 0;
   }
 }
+@keyframes slide-right-fade {
+  0% {
+    -webkit-transform: translateX(-1000px);
+    transform: translateX(-1000px);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes slide-left-fade {
+  100% {
+    -webkit-transform: translateX(-1000px);
+    transform: translateX(-1000px);
+    opacity: 0;
+  }
+  0% {
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in {
+  animation: fade-in 0.2s ease-in-out;
+}
 .animate-slide-top {
   animation: slide-top-fade 0.3s ease-in-out forwards;
 }
 
 .animate-slide-bottom {
   animation: slide-bottom-fade 0.3s ease-in-out forwards;
+}
+.animate-slide-in {
+  animation: slide-right-fade 0.3s ease-in-out forwards;
+}
+.animate-slide-out {
+  animation: slide-left-fade 0.3s ease-in-out forwards;
+}
+@layer utilities {
+  .bg-main {
+    background-color: var(--color-main);
+  }
+  .bg-overlay {
+    background-color: var(--color-overlay);
+  }
+  .flex-2 {
+    flex: 2 2 0%;
+  }
+  .flex-3 {
+    flex: 3 3 0%;
+  }
+  .flex-4 {
+    flex: 4 4 0%;
+  }
+  .flex-5 {
+    flex: 5 5 0%;
+  }
+  .flex-6 {
+    flex: 6 6 0%;
+  }
+  .flex-7 {
+    flex: 7 7 0%;
+  }
 }

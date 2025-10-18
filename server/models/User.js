@@ -59,6 +59,9 @@ var userSchema = new mongoose.Schema(
     passwordResetExpires: {
       type: String,
     },
+    isVerified: { type: Boolean, default: false },
+    emailVerificationToken: String,
+    emailVerificationExpires: Date,
   },
   { timestamps: true }
 );
@@ -73,24 +76,40 @@ userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
-
+// TTL index to auto delete unverified users after 24 hours
+userSchema.index(
+  { createdAt: 1 },
+  {
+    expireAfterSeconds: 86400,
+    partialFilterExpression: { isVerified: false },
+  }
+);
 // Add method to instance of model
 userSchema.methods = {
   isCorrectPassword: async function (userPassword) {
     const hashedPassword = this.password;
     return await bcrypt.compare(userPassword, hashedPassword);
   },
-  createPasswordChangedToken: function () {
-    // Create token reset
-    const resetToken = crypto.randomBytes(32).toString("hex");
-    const resetTokenHash = crypto
-      .createHash("sha256")
-      .update(resetToken)
-      .digest("hex");
-    this.passwordResetToken = resetTokenHash;
-    // Assign time expire to 15m change to miliseconds
-    this.passwordResetExpires = Date.now() + 15 * 60 * 1000;
-    return resetToken;
+
+  generateToken: function (tokenField, expiresField) {
+    // 1. Create token reset
+    const token = crypto.randomBytes(32).toString("hex");
+    // 2. Hash token reset and save to DB
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+    // 3. Set time expire
+    this[tokenField] = hashedToken;
+    this[expiresField] = Date.now() + 15 * 60 * 1000;
+
+    return token;
+  },
+  createEmailVerificationToken: function () {
+    return this.generateToken(
+      "emailVerificationToken",
+      "emailVerificationExpires"
+    );
+  },
+  createPasswordResetToken: function () {
+    return this.generateToken("passwordResetToken", "passwordResetExpires");
   },
 };
 

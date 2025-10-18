@@ -24,11 +24,11 @@ const getProduct = asyncHandler(async (req, res) => {
 
   if (!pid) throw new Error("Missing product id! Please check your request!");
 
-  const product = await Product.findById({ _id: pid });
+  const product = await Product.findById(pid);
 
   return res.status(200).json({
     success: product ? true : false,
-    result: product ? product : `Cannot get the product with the id ${pid}`,
+    product: product ? product : `Cannot get the product with the id ${pid}`,
   });
 });
 
@@ -52,6 +52,8 @@ const getProducts = asyncHandler(async (req, res) => {
 
   if (queryObj?.title)
     formattedQueries.title = { $regex: queryObj.title, $options: "i" };
+  if (queryObj?.category)
+    formattedQueries.category = { $regex: queryObj.category, $options: "i" };
   // Create query but not execute --> Adding more condition of sorting and pagination
   let query = Product.find(formattedQueries);
 

@@ -15,14 +15,16 @@ const {
   updateUserByAdmin,
   updateUserAddress,
   updateUserCart,
+  verifyEmail,
 } = userController;
 
 userRouter.post("/register", register);
+userRouter.get("/verify-email/:token", verifyEmail);
 userRouter.post("/login", login);
 userRouter.post("/refreshtoken", refreshAccessToken);
 userRouter.post("/logout", logout);
 userRouter.post("/forgot-password", forgotPassword);
-userRouter.post("/forgot-password/reset-password", resetPassword);
+userRouter.post("/reset-password", resetPassword);
 
 userRouter.get("/current", verifyAccessToken, getCurrentUser);
 userRouter.get("/", verifyAccessToken, isAdmin, getAllUsers);
