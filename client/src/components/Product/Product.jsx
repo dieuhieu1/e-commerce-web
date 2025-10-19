@@ -30,9 +30,9 @@ const Product = ({ productData, isNew, normal }) => {
       <div
         className=" relative w-full border border-stone-200 p-[15px] flex flex-col items-center rounded-md overflow-hidden bg-white 
              transition-transform duration-300 ease-in-out 
-             hover:scale-110 hover:shadow-lg cursor-pointer "
+             hover:scale-110 hover:shadow-lg cursor-pointer mb-[30px]"
       >
-        <div className="relative w-full">
+        <div className="relative w-full flex justify-center">
           <div
             className={`absolute bottom-0 left-0 right-0  flex justify-center gap-2 ${
               isShowOption ? "animate-slide-top" : "animate-slide-bottom"
@@ -48,7 +48,7 @@ const Product = ({ productData, isNew, normal }) => {
               "https://www.allaboardeducators.com/images/productimages/1.jpg"
             }
             alt={slug}
-            className="w-[274px] h-[274px] object-cover"
+            className="w-[248px] h-[248px] object-cover"
           />
           {/* Nhãn NEW ở góc phải */}
           {!normal && (
@@ -61,7 +61,7 @@ const Product = ({ productData, isNew, normal }) => {
             </span>
           )}
         </div>
-        <div className="flex flex-col mt-[15px] items-start w-full">
+        <div className="flex flex-col mt-[15px] items-center w-full">
           <span className="line-clamp-1">{title}</span>
           <StarRating rating={totalRatings} />
           <span>{formatMoney(price)} VND </span>

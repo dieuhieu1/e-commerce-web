@@ -8,7 +8,6 @@ import {
 
 export const useProductStore = create((set, get) => ({
   products: [],
-  productsByCategory: {},
   selectedProduct: null,
   isLoading: false,
   bestSellers: [],
@@ -31,39 +30,7 @@ export const useProductStore = create((set, get) => ({
       return [];
     }
   },
-  fetchProductsByCategory: async (category) => {
-    const { productsByCategory } = get();
 
-    // Nếu đã có cache thì trả về luôn
-    if (productsByCategory[category]) {
-      return productsByCategory[category];
-    }
-
-    set({ isLoading: true });
-    try {
-      const response = await apiGetProducts({ category });
-      const { products } = response;
-      console.log(products);
-
-      // Lưu cache
-      set({
-        productsByCategory: {
-          ...productsByCategory,
-          [category]: products,
-        },
-        isLoading: false,
-      });
-
-      return products;
-    } catch (error) {
-      console.error("Error fetching products by category:", error);
-      toast.error(
-        error?.response?.data?.message || "Failed to fetch products!"
-      );
-      set({ isLoading: false });
-      return [];
-    }
-  },
   fetchBestSellers: async () => {
     set({ isLoading: true });
     try {

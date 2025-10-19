@@ -49,13 +49,23 @@ const getProducts = asyncHandler(async (req, res) => {
     (match) => `$${match}`
   );
   const formattedQueries = JSON.parse(queryString);
+  let colorQueryObject = {};
 
   if (queryObj?.title)
     formattedQueries.title = { $regex: queryObj.title, $options: "i" };
   if (queryObj?.category)
     formattedQueries.category = { $regex: queryObj.category, $options: "i" };
+  if (queryObj?.color) {
+    delete formattedQueries.color;
+    const colorArr = queryObj.color?.split(",");
+    const colorQuery = colorArr.map((el) => ({
+      color: { $regex: el, $options: "iu" },
+    }));
+    colorQueryObject = { $or: colorQuery };
+  }
+  const queries = { ...colorQueryObject, ...formattedQueries };
   // Create query but not execute --> Adding more condition of sorting and pagination
-  let query = Product.find(formattedQueries);
+  let query = Product.find(queries);
 
   // 2. Sorting
   if (req.query.sort) {
@@ -86,7 +96,7 @@ const getProducts = asyncHandler(async (req, res) => {
     const response = await query;
 
     // Đếm tổng số bản ghi với cùng điều kiện filter
-    const totalCounts = await Product.countDocuments(query.getQuery());
+    const totalCounts = await Product.find(query).countDocuments();
 
     return res.status(200).json({
       success: response ? true : false,

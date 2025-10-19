@@ -1,6 +1,4 @@
 import React, { useEffect } from "react";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
 import { useProductStore } from "@/lib/zustand/useProductStore";
 import { useParams } from "react-router-dom";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -8,12 +6,12 @@ import ImageZoom from "@/components/UI/ImageZoom";
 import Carousel from "@/components/Carousel";
 import Button from "@/components/UI/Button";
 import QuantitySelection from "@/components/UI/QuantitySelection";
-import ProductInfo from "@/components/Product/ProductInfo";
+import ProductExtraInfo from "@/components/Product/ProductExtraInfo";
 import Tabs from "@/components/Tabs";
 import CustomSlider from "@/components/UI/CustomSlider";
 import { formatMoney } from "@/ultils/helpers";
-import { productInformation } from "@/ultils/constants";
 import { tabsData } from "@/ultils/tabsData";
+import { ProductExtraInformation } from "@/ultils/constants";
 
 const DetailProduct = () => {
   const { pid, title, category } = useParams();
@@ -27,8 +25,6 @@ const DetailProduct = () => {
 
   useEffect(() => {
     if (pid) {
-      console.log(pid);
-
       fetchProductById(pid);
       fetchProductsByCategory(category);
     }
@@ -43,26 +39,32 @@ const DetailProduct = () => {
         </div>
       </div>
 
-      {/* 🟢 Loading Skeleton */}
+      {/* 🟢 Loading với animate-pulse */}
       {isLoading ? (
         <div className="w-main m-auto mt-6 flex gap-10 animate-pulse">
           <div className="w-2/5 flex flex-col gap-4">
-            <Skeleton height={458} />
-            <Skeleton height={120} />
+            <div className="w-full h-[458px] bg-gray-300 rounded-lg" />
+            <div className="w-full h-[120px] bg-gray-300 rounded-lg" />
           </div>
-          <div className="w-2/5 flex flex-col gap-6">
-            <Skeleton height={30} width={200} />
-            <Skeleton count={6} />
-            <Skeleton height={50} width={"100%"} />
+
+          <div className="w-2/5 flex flex-col gap-4">
+            <div className="w-[200px] h-[30px] bg-gray-300 rounded" />
+            <div className="w-full h-[150px] bg-gray-300 rounded" />
+            <div className="w-full h-[50px] bg-gray-300 rounded" />
+            <div className="w-full h-[40px] bg-gray-300 rounded" />
           </div>
+
           <div className="w-1/5 flex flex-col gap-4">
-            <Skeleton count={5} />
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="w-full h-[30px] bg-gray-300 rounded" />
+            ))}
           </div>
         </div>
       ) : (
         <>
-          {/* 🟢 Hiển thị thật khi đã load */}
+          {/* 🟢 Nội dung thật sau khi load */}
           <div className="w-main m-auto mt-4 flex gap-10">
+            {/* Hình ảnh */}
             <div className="w-2/5 flex flex-col gap-4">
               <div className="w-[458px] h-[458px]">
                 <ImageZoom
@@ -81,6 +83,7 @@ const DetailProduct = () => {
               </div>
             </div>
 
+            {/* Thông tin sản phẩm */}
             <div className="w-2/5">
               <div className="h-[458px] flex flex-col justify-between">
                 <div>
@@ -115,14 +118,16 @@ const DetailProduct = () => {
               </div>
             </div>
 
+            {/* Cột thông tin */}
             <div className="w-1/5">
-              {productInformation.map((product) => (
-                <ProductInfo key={product.id} productInfo={product} />
+              {ProductExtraInformation.map((product) => (
+                <ProductExtraInfo key={product.id} productExtraInfo={product} />
               ))}
             </div>
           </div>
 
-          <div className="w-full m-auto mt-8">
+          {/* Tabs & Slider */}
+          <div className="w-main m-auto mt-8">
             <Tabs data={tabsData} />
           </div>
 
@@ -132,10 +137,12 @@ const DetailProduct = () => {
             </h3>
 
             {!isLoading && productsByCategory[category]?.length > 0 ? (
-              <CustomSlider products={productsByCategory[category]} normal />
+              <div className="mt-8">
+                <CustomSlider products={productsByCategory[category]} normal />
+              </div>
             ) : (
-              <div className="mt-6">
-                <Skeleton height={250} count={1} />
+              <div className="mt-6 animate-pulse">
+                <div className="w-full h-[250px] bg-gray-300 rounded-lg" />
               </div>
             )}
           </div>
