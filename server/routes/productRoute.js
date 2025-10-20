@@ -24,7 +24,7 @@ productRouter.get("/:pid", getProduct);
 productRouter.put("/:pid", updateProduct);
 
 // PUT /api/products/rating/:id
-productRouter.put("/rating/:pid", verifyAccessToken, ratingProduct);
+productRouter.put("/ratings/:pid", verifyAccessToken, ratingProduct);
 
 // DELETE /api/products/:id
 productRouter.delete("/:pid", verifyAccessToken, isAdmin, deleteProduct);

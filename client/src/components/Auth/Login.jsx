@@ -1,7 +1,7 @@
 import React from "react";
 import { LuLogIn } from "react-icons/lu";
 import InputField from "../InputField";
-import Button from "../UI/Button";
+import Button from "../Common/Button";
 
 const Login = ({
   invalidField,

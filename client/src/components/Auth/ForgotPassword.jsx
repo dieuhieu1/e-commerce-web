@@ -2,7 +2,7 @@ import React from "react";
 import { BiLeftArrowAlt } from "react-icons/bi";
 import { IoSendSharp } from "react-icons/io5";
 import InputField from "../InputField";
-import Button from "../UI/Button";
+import Button from "../Common/Button";
 
 const ForgotPassword = ({
   invalidField,

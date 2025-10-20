@@ -7,7 +7,7 @@ import { useAuthStore } from "@/lib/zustand/useAuthStore";
 import { apiForgotPassword } from "@/apis/authApi";
 import { validate } from "@/ultils/helpers";
 
-import Header from "@/components/UI/Header";
+import Header from "@/components/Common/Header";
 import Register from "@/components/Auth/Register";
 import Login from "@/components/Auth/Login";
 import ForgotPassword from "@/components/Auth/ForgotPassword";

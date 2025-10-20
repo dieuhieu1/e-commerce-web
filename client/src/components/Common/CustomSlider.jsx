@@ -1,6 +1,6 @@
 import Slider from "react-slick";
 import Product from "../Product/Product";
-import Arrow from "./Arrow";
+import Arrow from "../Arrow";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 var settings = {
   dots: true,

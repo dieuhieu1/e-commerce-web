@@ -1,4 +1,4 @@
-import Sidebar from "../../components/UI/Sidebar";
+import Sidebar from "../../components/Common/Sidebar";
 import Banner from "../../components/Home/Banner";
 import { IoIosArrowForward } from "react-icons/io";
 import { useProductStore } from "@/lib/zustand/useProductStore";
@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import DealDaily from "@/components/Home/DealDaily";
 import BestSeller from "@/components/Home/BestSeller";
 import FeatureProducts from "@/components/FeatureProducts";
-import CustomSlider from "@/components/UI/CustomSlider";
+import CustomSlider from "@/components/Common/CustomSlider";
 
 const Home = () => {
   const { newArrivals, productCategories, fetchProductsCategory } =

@@ -66,8 +66,10 @@ const EmblaCarousel = ({
   );
 
   // --- Hover để tạm dừng autoplay ---
-  const handleMouseEnter = () => autoplayEnabled && autoplay.stop();
-  const handleMouseLeave = () => autoplayEnabled && autoplay.play();
+  const handleMouseEnter = () => {
+    if (!autoplayEnabled || !autoplay?.stop) return;
+    autoplay.stop();
+  };
 
   if (!images || images.length === 0) {
     return (
@@ -81,7 +83,6 @@ const EmblaCarousel = ({
     <section
       className="embla relative w-full group"
       onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
     >
       {/* Viewport */}
       <div
@@ -94,7 +95,7 @@ const EmblaCarousel = ({
               key={idx}
               className="embla__slide flex-shrink-0 pl-3 min-w-0"
               style={{ flexBasis: `calc(33.333% - 12px)` }}
-              onClick={() => onImageClick && onImageClick(idx)}
+              onClick={(e) => onImageClick && onImageClick(e, src)}
             >
               <div
                 className={`relative overflow-hidden rounded-lg transition-all duration-300 ${

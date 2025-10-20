@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useProductStore } from "@/lib/zustand/useProductStore";
-import CustomSlider from "../UI/CustomSlider";
+import CustomSlider from "../Common/CustomSlider";
 
 const tabs = [
   { id: 1, name: "best sellers" },

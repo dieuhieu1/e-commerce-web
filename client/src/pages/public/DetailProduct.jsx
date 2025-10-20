@@ -1,34 +1,64 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useProductStore } from "@/lib/zustand/useProductStore";
 import { useParams } from "react-router-dom";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import ImageZoom from "@/components/UI/ImageZoom";
+import ImageZoom from "@/components/ImageZoom";
 import Carousel from "@/components/Carousel";
-import Button from "@/components/UI/Button";
-import QuantitySelection from "@/components/UI/QuantitySelection";
+import Button from "@/components/Common/Button";
+import QuantitySelection from "@/components/QuantitySelection";
 import ProductExtraInfo from "@/components/Product/ProductExtraInfo";
-import Tabs from "@/components/Tabs";
-import CustomSlider from "@/components/UI/CustomSlider";
+import CustomSlider from "@/components/Common/CustomSlider";
 import { formatMoney } from "@/ultils/helpers";
 import { tabsData } from "@/ultils/tabsData";
 import { ProductExtraInformation } from "@/ultils/constants";
+import { apiGetProducts } from "@/apis/product";
+import StarRating from "@/components/StarRating";
+import Tabs from "@/components/Product/Tabs";
 
 const DetailProduct = () => {
+  const [currentImage, setCurrentImage] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState(null);
+  // Get Params From URL
   const { pid, title, category } = useParams();
-  const {
-    fetchProductById,
-    fetchProductsByCategory,
-    productsByCategory,
-    selectedProduct,
-    isLoading,
-  } = useProductStore();
-
+  const { fetchProductById, selectedProduct, isLoading } = useProductStore();
+  // Call API
+  const fetchProductsByCategory = async (category) => {
+    try {
+      const response = await apiGetProducts({ category });
+      if (response.success) {
+        setRelatedProducts(response.products);
+      }
+    } catch (error) {
+      console.error("Fetch related products failed:", error);
+    }
+  };
+  // Fetch API
   useEffect(() => {
-    if (pid) {
+    if (pid && category) {
       fetchProductById(pid);
       fetchProductsByCategory(category);
     }
-  }, [pid]);
+  }, [category, fetchProductById, pid]);
+
+  // Reload the data when user finished review
+  const reloadProduct = useCallback(async () => {
+    if (pid) {
+      await fetchProductById(pid);
+    }
+  }, [pid, fetchProductById]);
+
+  // Assign current Image to Product Thumb
+  useEffect(() => {
+    if (selectedProduct?.thumb) {
+      setCurrentImage(selectedProduct.thumb);
+    }
+    console.log(selectedProduct);
+  }, [selectedProduct]);
+
+  const handleChangeImage = (e, src) => {
+    e.stopPropagation();
+    setCurrentImage(src);
+  };
 
   return (
     <div className="w-full">
@@ -39,7 +69,6 @@ const DetailProduct = () => {
         </div>
       </div>
 
-      {/* 🟢 Loading với animate-pulse */}
       {isLoading ? (
         <div className="w-main m-auto mt-6 flex gap-10 animate-pulse">
           <div className="w-2/5 flex flex-col gap-4">
@@ -62,13 +91,11 @@ const DetailProduct = () => {
         </div>
       ) : (
         <>
-          {/* 🟢 Nội dung thật sau khi load */}
-          <div className="w-main m-auto mt-4 flex gap-10">
-            {/* Hình ảnh */}
+          <div className="w-main m-auto mt-6 flex gap-20">
             <div className="w-2/5 flex flex-col gap-4">
               <div className="w-[458px] h-[458px]">
                 <ImageZoom
-                  src={selectedProduct?.thumb}
+                  src={currentImage}
                   alt={selectedProduct?.title}
                   zoomLevel={3}
                   className="border border-gray-200 rounded"
@@ -76,9 +103,10 @@ const DetailProduct = () => {
               </div>
               <div className="w-[470px] mt-6 mb-[200px]">
                 <Carousel
+                  onImageClick={handleChangeImage}
                   images={selectedProduct?.images}
-                  showDots
-                  autoplayEnabled
+                  showDots={true}
+                  autoplayEnabled={true}
                 />
               </div>
             </div>
@@ -98,10 +126,17 @@ const DetailProduct = () => {
                       Sold: {selectedProduct?.sold}
                     </span>
                   </div>
+                  <div className="flex items-center gap-1 mt-8">
+                    <StarRating
+                      rating={selectedProduct?.totalRatings}
+                      size={25}
+                    />
+                    <span className="text-md text-main italic">{`(${selectedProduct?.ratings?.length} reviews)`}</span>
+                  </div>
                 </div>
                 <ul className="list-[square] text-sm text-gray-500 pl-4 mt-5">
                   {selectedProduct?.description?.map((el) => (
-                    <li key={el} className="leading-4 mt-2">
+                    <li key={el} className="leading-4 mt-6">
                       {el}
                     </li>
                   ))}
@@ -128,7 +163,13 @@ const DetailProduct = () => {
 
           {/* Tabs & Slider */}
           <div className="w-main m-auto mt-8">
-            <Tabs data={tabsData} />
+            <Tabs
+              data={tabsData}
+              averageRatings={selectedProduct?.totalRatings}
+              reviews={selectedProduct?.ratings}
+              productId={pid}
+              onReload={reloadProduct}
+            />
           </div>
 
           <div className="w-main m-auto mt-8">
@@ -136,9 +177,9 @@ const DetailProduct = () => {
               Other customers also liked
             </h3>
 
-            {!isLoading && productsByCategory[category]?.length > 0 ? (
+            {!isLoading ? (
               <div className="mt-8">
-                <CustomSlider products={productsByCategory[category]} normal />
+                <CustomSlider products={relatedProducts} normal />
               </div>
             ) : (
               <div className="mt-6 animate-pulse">

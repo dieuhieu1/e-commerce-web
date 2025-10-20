@@ -157,11 +157,10 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
 const ratingProduct = asyncHandler(async (req, res) => {
   const { star, comment } = req.body;
-  const { id: pid } = req.params;
-
+  const { pid } = req.params;
   // Get userId from middlware verify access token
   const { _id: userId } = req.user;
-  console.log(req.user);
+  console.log(req.params);
 
   if (!star || !pid || !comment) {
     throw new Error("Missing Inputs!");
@@ -194,7 +193,7 @@ const ratingProduct = asyncHandler(async (req, res) => {
     product.ratings.reduce((acc, r) => acc + r.star * 1, 0) /
     product.ratings.length;
   // Round the result
-  product.totalRating = avg.toFixed(1);
+  product.totalRatings = avg.toFixed(1);
 
   // Save the change
   const result = await product.save();
