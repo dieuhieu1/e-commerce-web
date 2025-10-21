@@ -24,7 +24,13 @@ const getProduct = asyncHandler(async (req, res) => {
 
   if (!pid) throw new Error("Missing product id! Please check your request!");
 
-  const product = await Product.findById(pid);
+  const product = await Product.findById(pid).populate({
+    path: "ratings",
+    populate: {
+      path: "postedBy",
+      select: "firstname lastname avatar",
+    },
+  });
 
   return res.status(200).json({
     success: product ? true : false,
@@ -92,20 +98,17 @@ const getProducts = asyncHandler(async (req, res) => {
 
   // Execute the query
   try {
+    // Đếm tổng số bản ghi với cùng điều kiện filter
+    const totalCounts = await Product.countDocuments(queries);
     // Execute query
     const response = await query;
 
-    // Đếm tổng số bản ghi với cùng điều kiện filter
-    const totalCounts = await Product.find(query).countDocuments();
-
     return res.status(200).json({
       success: response ? true : false,
-      meta: {
-        totalCount: totalCounts,
-        page: page,
-        limit: limit,
-        totalPages: Math.ceil(totalCounts / limit),
-      },
+      totalCount: totalCounts,
+      page: page,
+      limit: limit,
+      totalPages: Math.ceil(totalCounts / limit),
       products: response ? response : [],
     });
   } catch (err) {
@@ -156,7 +159,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 });
 
 const ratingProduct = asyncHandler(async (req, res) => {
-  const { star, comment } = req.body;
+  const { star, comment, updatedAt } = req.body;
   const { pid } = req.params;
   // Get userId from middlware verify access token
   const { _id: userId } = req.user;
@@ -179,9 +182,10 @@ const ratingProduct = asyncHandler(async (req, res) => {
     // Update new star and new comment
     existingRating.star = star;
     existingRating.comment = comment;
+    existingRating.updatedAt = updatedAt;
   } else {
     // Push new element to Array
-    product.ratings.push({ star, comment, postedBy: userId });
+    product.ratings.push({ star, comment, postedBy: userId, updatedAt });
   }
 
   // Average: Calcu sum with reduce then divided with total ratings

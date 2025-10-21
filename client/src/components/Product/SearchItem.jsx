@@ -112,10 +112,18 @@ const SearchItem = ({
     } else {
       delete queries.color;
     }
-    navigate({
-      pathname: `/${category}`,
-      search: createSearchParams(queries).toString(),
-    });
+    delete queries.page;
+    if (category) {
+      navigate({
+        pathname: `/${category}`,
+        search: createSearchParams(queries).toString(),
+      });
+    } else {
+      navigate({
+        pathname: "/products",
+        search: createSearchParams(queries).toString(),
+      });
+    }
   }, [selected]);
 
   // Fetch best price on mount
@@ -124,7 +132,6 @@ const SearchItem = ({
       fetchBestPriceProduct();
     }
   }, [type]);
-
   // Update URL when price changes (with debounce)
   useEffect(() => {
     let param = [];
@@ -142,11 +149,18 @@ const SearchItem = ({
     } else {
       delete queries.to;
     }
-
-    navigate({
-      pathname: `/${category}`,
-      search: createSearchParams(queries).toString(),
-    });
+    if (category) {
+      navigate({
+        pathname: `/${category}`,
+        search: createSearchParams(queries).toString(),
+      });
+    } else {
+      navigate({
+        pathname: "/products",
+        search: createSearchParams(queries).toString(),
+      });
+      return;
+    }
   }, [debouncePriceTo, debouncePriceFrom]);
 
   return (
@@ -183,7 +197,7 @@ const SearchItem = ({
                       value={el}
                       checked={selected.includes(el)}
                       onChange={handleSelect}
-                      className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500"
+                      className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 checked:bg-blue-500"
                     />
                     <label htmlFor={el} className="capitalize text-gray-700">
                       {el}

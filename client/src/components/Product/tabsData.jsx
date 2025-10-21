@@ -201,26 +201,6 @@ const ElectronicPayment = () => (
   </motion.div>
 );
 
-// --- REVIEW ---
-const CustomerReviewContent = () => (
-  <motion.div
-    variants={fadeSlide}
-    initial="hidden"
-    animate="visible"
-    className="text-sm text-center text-gray-700 py-8 flex flex-col items-center justify-center ml-[20%]"
-  >
-    <FaComments className="text-gray-300 text-5xl mb-4" />
-    <h3 className="text-lg font-semibold mb-2">No Reviews Yet</h3>
-    <p className="max-w-md mb-6">
-      Be the first to share your experience with this product and help others
-      make the right choice.
-    </p>
-    <button className="bg-blue-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-600 transition">
-      Write a Review
-    </button>
-  </motion.div>
-);
-
 // --- EXPORT TAB DATA ---
 export const tabsData = [
   {
@@ -231,9 +211,4 @@ export const tabsData = [
   { id: "warranty", title: "Warranty", content: <ElectronicWarranty /> },
   { id: "delivery", title: "Delivery", content: <ElectronicDelivery /> },
   { id: "payment", title: "Payment", content: <ElectronicPayment /> },
-  {
-    id: "customer-review",
-    title: "Customer Reviews",
-    content: <CustomerReviewContent />,
-  },
 ];

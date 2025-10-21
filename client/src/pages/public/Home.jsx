@@ -5,8 +5,8 @@ import { useProductStore } from "@/lib/zustand/useProductStore";
 import { useEffect } from "react";
 import DealDaily from "@/components/Home/DealDaily";
 import BestSeller from "@/components/Home/BestSeller";
-import FeatureProducts from "@/components/FeatureProducts";
 import CustomSlider from "@/components/Common/CustomSlider";
+import FeatureProducts from "@/components/Home/FeatureProducts";
 
 const Home = () => {
   const { newArrivals, productCategories, fetchProductsCategory } =

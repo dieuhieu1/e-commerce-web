@@ -44,6 +44,7 @@ export const colors = [
 ];
 
 export const sorts = [
+  { id: 300, value: "", text: "Choose" },
   { id: 301, value: "-sold", text: "Best selling" },
   { id: 302, value: "title", text: "Alphabetically (A - Z)" },
   { id: 303, value: "-title", text: "Alphabetically (Z - A)" },

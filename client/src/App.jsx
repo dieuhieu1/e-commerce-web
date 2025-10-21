@@ -1,7 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import Public from "./pages/public/Public";
 import Home from "./pages/public/Home";
-import Products from "./pages/public/Products";
 import Services from "./pages/public/Services";
 import FAQ from "./pages/public/FAQ";
 import DetailProduct from "./pages/public/DetailProduct";
@@ -12,6 +11,7 @@ import LoginPage from "./pages/public/LoginPage";
 import path from "./ultils/path";
 import ErrorPage from "./pages/public/ErrorPage";
 import CategoryPage from "./pages/public/CategoryPage";
+import Products from "./pages/public/Products";
 
 export const router = createBrowserRouter([
   {

@@ -1,19 +1,22 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useProductStore } from "@/lib/zustand/useProductStore";
 import { useParams } from "react-router-dom";
+
 import Breadcrumbs from "@/components/Breadcrumbs";
-import ImageZoom from "@/components/ImageZoom";
+import ImageZoom from "@/components/Product/ImageZoom";
 import Carousel from "@/components/Carousel";
 import Button from "@/components/Common/Button";
 import QuantitySelection from "@/components/QuantitySelection";
 import ProductExtraInfo from "@/components/Product/ProductExtraInfo";
 import CustomSlider from "@/components/Common/CustomSlider";
+
 import { formatMoney } from "@/ultils/helpers";
-import { tabsData } from "@/ultils/tabsData";
 import { ProductExtraInformation } from "@/ultils/constants";
 import { apiGetProducts } from "@/apis/product";
+
 import StarRating from "@/components/StarRating";
 import Tabs from "@/components/Product/Tabs";
+import { tabsData } from "@/components/Product/tabsData";
 
 const DetailProduct = () => {
   const [currentImage, setCurrentImage] = useState(null);
@@ -68,7 +71,7 @@ const DetailProduct = () => {
           <Breadcrumbs title={title} category={category} />
         </div>
       </div>
-
+      {/* Loading Skeleton */}
       {isLoading ? (
         <div className="w-main m-auto mt-6 flex gap-10 animate-pulse">
           <div className="w-2/5 flex flex-col gap-4">

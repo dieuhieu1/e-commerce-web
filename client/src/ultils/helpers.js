@@ -109,3 +109,8 @@ export const validate = (payload, setInvalidFields) => {
   setInvalidFields(newInvalids);
   return invalids;
 };
+
+export const generateRange = (start, end) => {
+  const length = end - start + 1;
+  return Array.from({ length }, (_, index) => start + index);
+};

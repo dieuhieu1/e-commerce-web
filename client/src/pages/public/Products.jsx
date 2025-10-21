@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
   createSearchParams,
   useNavigate,
-  useParams,
   useSearchParams,
 } from "react-router-dom";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -12,6 +11,7 @@ import SearchItem from "@/components/Product/SearchItem";
 import { apiGetProducts } from "@/apis/product";
 import InputSelect from "@/components/InputSelect";
 import { sorts } from "@/ultils/constants";
+import Pagination from "@/components/Pagination/Pagination";
 
 const breakpointColumnsObj = {
   default: 4,
@@ -28,19 +28,10 @@ const Products = () => {
   const [isLoading, setIsLoading] = useState(null);
   const [sort, setSort] = useState("");
 
-  const { category } = useParams();
   const [params] = useSearchParams();
 
   useEffect(() => {
-    let param = [];
-    for (let i of params.entries()) {
-      param.push(i);
-    }
-
-    const queries = { category };
-    for (let i of param) {
-      queries[i[0]] = i[1];
-    }
+    const queries = Object.fromEntries(params.entries());
     let priceQuery = {};
     if (queries.to && queries.from) {
       priceQuery = {
@@ -60,16 +51,21 @@ const Products = () => {
     delete queries.from;
     delete queries.to;
 
+    const queryObject =
+      Object.keys(queries).length === 0 ? {} : { ...priceQuery, ...queries };
+
     const loadProducts = async () => {
       setIsLoading(true);
-      const response = await apiGetProducts({ ...priceQuery, ...queries });
+      const response = await apiGetProducts(queryObject);
+
       if (response.success) {
-        setProductsByCategory(response.products);
+        setProductsByCategory(response);
       }
       setIsLoading(false);
     };
     loadProducts();
-  }, [category, params]);
+    window.scrollTo(0, 0);
+  }, [params]);
 
   const changeActiveFilter = useCallback(
     (name) => {
@@ -82,13 +78,13 @@ const Products = () => {
     [activeClick]
   );
   useEffect(() => {
-    navigate({
-      pathname: `/${category}`,
-      search: createSearchParams({
-        sort,
-      }).toString(),
-    });
-  }, [sort]);
+    if (sort) {
+      navigate({
+        pathname: "/products",
+        search: createSearchParams({ sort }).toString(),
+      });
+    }
+  }, [navigate, sort]);
   const changeSorts = useCallback(
     (value) => {
       setSort(value);
@@ -97,13 +93,6 @@ const Products = () => {
   );
   return (
     <div className="w-full">
-      <div className="h-[81px] flex justify-center items-center bg-gray-100">
-        <div className="w-main">
-          <h1 className="font-semibold uppercase">{category}</h1>
-          <Breadcrumbs category={category} />
-        </div>
-      </div>
-
       <div className="w-main border p-4 flex justify-between mt-8 m-auto">
         <div className="w-4/5 flex-auto p-4 flex flex-col gap-3">
           <span className="font-semibold text-sm">Filter By</span>
@@ -160,7 +149,7 @@ const Products = () => {
             columnClassName="my-masonry-grid_column"
           >
             {productsByCategory &&
-              productsByCategory?.map((el) => (
+              productsByCategory?.products?.map((el) => (
                 <Product
                   key={el._id}
                   pid={el._id}
@@ -170,6 +159,9 @@ const Products = () => {
               ))}
           </Masonry>
         )}
+      </div>
+      <div className="w-main m-auto my-4 flex justify-end">
+        <Pagination totalCount={productsByCategory?.totalCount} />
       </div>
     </div>
   );

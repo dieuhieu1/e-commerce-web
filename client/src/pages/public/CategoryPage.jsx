@@ -1,7 +1,184 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  createSearchParams,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import Masonry from "react-masonry-css";
+import Product from "@/components/Product/Product";
+import SearchItem from "@/components/Product/SearchItem";
+import { apiGetProducts } from "@/apis/product";
+import InputSelect from "@/components/InputSelect";
+import { sorts } from "@/ultils/constants";
+import Pagination from "@/components/Pagination/Pagination";
+
+const breakpointColumnsObj = {
+  default: 4,
+  1100: 3,
+  700: 2,
+  500: 1,
+};
 
 const CategoryPage = () => {
-  return <div>CategoryPage</div>;
+  const navigate = useNavigate();
+
+  const [activeClick, setActiveClick] = useState(null);
+  const [productsByCategory, setProductsByCategory] = useState(null);
+  const [isLoading, setIsLoading] = useState(null);
+  const [sort, setSort] = useState("");
+
+  const { category } = useParams();
+  const [params] = useSearchParams();
+
+  useEffect(() => {
+    let param = [];
+    for (let i of params.entries()) {
+      param.push(i);
+    }
+
+    const queries = { category };
+    for (let i of param) {
+      queries[i[0]] = i[1];
+    }
+    let priceQuery = {};
+    if (queries.to && queries.from) {
+      priceQuery = {
+        $and: [
+          { price: { gte: queries.from } },
+          { price: { lte: queries.to } },
+        ],
+      };
+      delete queries.price;
+    }
+    if (queries.from) {
+      queries.price = { gte: queries.from };
+    }
+    if (queries.to) {
+      queries.price = { lte: queries.to };
+    }
+    delete queries.from;
+    delete queries.to;
+
+    const loadProducts = async () => {
+      setIsLoading(true);
+      const response = await apiGetProducts({ ...priceQuery, ...queries });
+      if (response.success) {
+        setProductsByCategory(response.products);
+      }
+      setIsLoading(false);
+    };
+    loadProducts();
+  }, [category, params]);
+
+  const changeActiveFilter = useCallback(
+    (name) => {
+      if (activeClick === name) {
+        setActiveClick(null);
+      } else {
+        setActiveClick(name);
+      }
+    },
+    [activeClick]
+  );
+  useEffect(() => {
+    if (sort) {
+      navigate({
+        pathname: `/${category}`,
+        search: createSearchParams({
+          sort,
+        }).toString(),
+      });
+    }
+  }, [sort]);
+  const changeSorts = useCallback(
+    (value) => {
+      setSort(value);
+    },
+    [sort]
+  );
+  return (
+    <div className="w-full">
+      <div className="h-[81px] flex justify-center items-center bg-gray-100">
+        <div className="w-main">
+          <h1 className="font-semibold uppercase">{category}</h1>
+          <Breadcrumbs category={category} />
+        </div>
+      </div>
+
+      <div className="w-main border p-4 flex justify-between mt-8 m-auto">
+        <div className="w-4/5 flex-auto p-4 flex flex-col gap-3">
+          <span className="font-semibold text-sm">Filter By</span>
+          <div className="flex items-center gap-4">
+            <SearchItem
+              name="Price"
+              type="input"
+              activeClick={activeClick}
+              changeActiveFilter={changeActiveFilter}
+            />
+            <SearchItem
+              name="Color"
+              activeClick={activeClick}
+              changeActiveFilter={changeActiveFilter}
+            />
+          </div>
+        </div>
+        <div className="w-1/5 flex flex-col gap-3">
+          <span className="font-semibold text-sm">Sort By</span>
+          <div className="w-full">
+            <InputSelect
+              value={sort}
+              options={sorts}
+              changeValue={changeSorts}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-8 w-main m-auto">
+        {isLoading ? (
+          // 🟢 Hiệu ứng loading
+          <div className="grid grid-cols-4 gap-6 animate-pulse">
+            {Array(8)
+              .fill(0)
+              .map((_, index) => (
+                <div
+                  key={index}
+                  className="bg-gray-200 rounded-lg h-[400px] w-full"
+                >
+                  <div className="h-[300px] bg-gray-300 rounded-t-lg"></div>
+                  <div className="p-3 space-y-3">
+                    <div className="w-3/4 h-4 bg-gray-300 rounded"></div>
+                    <div className="w-1/2 h-4 bg-gray-300 rounded"></div>
+                    <div className="w-full h-6 bg-gray-300 rounded"></div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        ) : (
+          <Masonry
+            breakpointCols={breakpointColumnsObj}
+            className="my-masonry-grid"
+            columnClassName="my-masonry-grid_column"
+          >
+            {productsByCategory &&
+              productsByCategory?.map((el) => (
+                <Product
+                  key={el._id}
+                  pid={el._id}
+                  productData={el}
+                  normal={true}
+                />
+              ))}
+          </Masonry>
+        )}
+      </div>
+      <div className="w-main m-auto my-4 flex justify-end">
+        <Pagination totalCount={productsByCategory?.totalCount} />
+      </div>
+    </div>
+  );
 };
 
 export default CategoryPage;
