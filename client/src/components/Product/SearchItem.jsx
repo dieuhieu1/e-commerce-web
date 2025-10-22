@@ -1,7 +1,7 @@
 import { apiGetProducts } from "@/apis/product";
 import { useDebounce } from "@/hooks/useDebounce";
 import { colors } from "@/ultils/constants";
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import { AiOutlineDown } from "react-icons/ai";
 import {
   createSearchParams,
@@ -25,7 +25,15 @@ const SearchItem = ({
   const [price, setPrice] = useState({ from: 0, to: 0 });
   const debouncePriceFrom = useDebounce(price.from, 600);
   const debouncePriceTo = useDebounce(price.to, 600);
+  const formatCurrency = (num) => {
+    if (!num) return "";
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
 
+  const parseCurrency = (str) => {
+    if (!str) return 0;
+    return Number(str.replace(/\./g, ""));
+  };
   // Handle checkbox selection
   const handleSelect = (e) => {
     const value = e.target.value;
@@ -57,48 +65,45 @@ const SearchItem = ({
   };
 
   // Handle input change with validation (using SweetAlert)
-  const handlePriceChange = (e, field) => {
-    const value = Number(e.target.value);
-    if (value < 0) return;
+  const handlePriceChange = useCallback((e, field) => {
+    const raw = e.target.value;
+    const numericValue = parseCurrency(raw);
 
-    if (field === "from") {
-      if (price.to > 0 && value > price.to) {
+    if (numericValue < 0) return;
+
+    setPrice((prev) => ({ ...prev, [field]: numericValue }));
+  }, []);
+
+  useEffect(() => {
+    if (type !== "input") return;
+
+    // Validation logic here
+    if (debouncePriceFrom && debouncePriceTo) {
+      if (debouncePriceFrom > debouncePriceTo) {
         Swal.fire({
           icon: "error",
           title: "Error!",
           text: "'From' value cannot be greater than 'To' value!",
         }).then(() => {
-          setPrice((prev) => ({ ...prev, from: 0 }));
+          setPrice({ from: 0, to: 0 });
         });
         return;
       }
-      setPrice((prev) => ({ ...prev, from: value }));
     }
 
-    if (field === "to") {
-      if (value > bestPrice) {
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: `'To' value cannot exceed ${Number(
-            bestPrice
-          ).toLocaleString()} VND!`,
-        }).then(() => {
-          setPrice((prev) => ({ ...prev, to: 0 }));
-        });
-        return;
-      }
-      if (value < price.from) {
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: "'To' value cannot be less than 'From' value!",
-        });
-        return;
-      }
-      setPrice((prev) => ({ ...prev, to: value }));
+    if (debouncePriceTo > bestPrice) {
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: `'To' value cannot exceed ${Number(
+          bestPrice
+        ).toLocaleString()} VND!`,
+      }).then(() => {
+        setPrice((prev) => ({ ...prev, to: 0 }));
+      });
+      return;
     }
-  };
+  }, [debouncePriceTo, debouncePriceFrom]);
 
   // Sync color filter to URL params
   useEffect(() => {
@@ -225,20 +230,20 @@ const SearchItem = ({
                 <div className="flex items-center gap-2">
                   <label htmlFor="from">From</label>
                   <input
-                    type="number"
+                    type="text"
                     id="from"
                     className="form-input"
-                    value={price.from || ""}
+                    value={formatCurrency(price.from) || ""}
                     onChange={(e) => handlePriceChange(e, "from")}
                   />
                 </div>
                 <div className="flex items-center gap-2">
                   <label htmlFor="to">To</label>
                   <input
-                    type="number"
+                    type="text"
                     id="to"
                     className="form-input"
-                    value={price.to || ""}
+                    value={formatCurrency(price.to) || ""}
                     onChange={(e) => handlePriceChange(e, "to")}
                   />
                 </div>

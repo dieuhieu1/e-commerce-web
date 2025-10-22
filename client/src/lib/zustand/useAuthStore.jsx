@@ -15,7 +15,7 @@ export const useAuthStore = create(
       accessToken: null,
       isAuthenticated: false,
       isLoading: false,
-
+      message: "",
       register: async (userData) => {
         set({ isLoading: true });
         try {
@@ -78,11 +78,18 @@ export const useAuthStore = create(
           return false;
         }
         try {
-          const user = await apiGetCurrentUser(accessToken);
+          const response = await apiGetCurrentUser(accessToken);
+          const user = response.result;
           set({ user, isAuthenticated: true });
           return true;
         } catch {
-          set({ isAuthenticated: false, user: null, accessToken: null });
+          set({
+            isAuthenticated: false,
+            user: null,
+            accessToken: null,
+            message:
+              "Your session has ended. Please log in again to continue shopping.",
+          });
           return false;
         }
       },

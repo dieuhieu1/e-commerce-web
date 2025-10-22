@@ -20,7 +20,7 @@ export const apiLogout = (token) =>
 
 export const apiGetCurrentUser = (token) =>
   axios({
-    url: "/auth/me",
+    url: "/user/current",
     method: "get",
     headers: {
       Authorization: `Bearer ${token}`,

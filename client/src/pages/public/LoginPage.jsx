@@ -11,8 +11,9 @@ import Header from "@/components/Common/Header";
 import Register from "@/components/Auth/Register";
 import Login from "@/components/Auth/Login";
 import ForgotPassword from "@/components/Auth/ForgotPassword";
+import LoadingOverlay from "@/components/Loading";
 const LoginPage = () => {
-  const { login, register } = useAuthStore();
+  const { login, register, isLoading } = useAuthStore();
   const [email, setEmail] = useState("");
   const [invalidField, setInvalidField] = useState([]);
   const timeoutRef = useRef(null);
@@ -121,8 +122,10 @@ const LoginPage = () => {
       setUiState((prev) => ({ ...prev, isForgotPassword: false }));
     }, 400);
   };
+
   return (
     <div className="w-screen h-screen flex flex-col relative ">
+      {isLoading && <LoadingOverlay />}
       <Header />
       {uiState.isForgotPassword && (
         <ForgotPassword

@@ -1,12 +1,30 @@
 import { useAuthStore } from "@/lib/zustand/useAuthStore";
 import path from "@/ultils/path";
-import React, { memo } from "react";
+import React, { memo, useEffect } from "react";
 import { AiOutlineLogout } from "react-icons/ai";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const TopHeader = () => {
-  const { user, isAuthenticated, logout, isLoading } = useAuthStore();
+  const { user, isAuthenticated, logout, isLoading, checkAuth, message } =
+    useAuthStore();
+  const nagivate = useNavigate();
 
+  useEffect(() => {
+    checkAuth();
+  }, []);
+  useEffect(() => {
+    if (message) {
+      Swal.fire({
+        title: "Session expired",
+        text: message,
+        icon: "info",
+        confirmButtonText: "Go to Login",
+      }).then(() => {
+        nagivate(`/${path.LOGIN}`);
+      });
+    }
+  }, [message, nagivate]);
   return (
     <div className="w-full h-[60px] bg-gradient-to-r from-[#e63946] via-[#f77f00] to-[#fcbf49] text-white shadow-md flex justify-center items-center">
       <div className="w-main flex items-center justify-between text-sm md:text-base font-medium">
@@ -19,7 +37,6 @@ const TopHeader = () => {
 
         {/* RIGHT: User Section */}
         {isLoading ? (
-          // 🔵 Loading State
           <div className="flex items-center gap-2 border-l border-white/30 pl-4">
             <span className="flex items-center gap-2 animate-pulse">
               <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
@@ -27,7 +44,6 @@ const TopHeader = () => {
             </span>
           </div>
         ) : isAuthenticated ? (
-          // 🟢 Logged In
           <div className="flex items-center gap-4 border-l border-white/30 pl-4">
             <span className="hidden sm:block">
               Welcome,&nbsp;
@@ -46,7 +62,6 @@ const TopHeader = () => {
             </button>
           </div>
         ) : (
-          // 🔴 Guest
           <Link
             to={`/${path.LOGIN}`}
             className="flex items-center gap-1 border-l border-white/30 pl-4 hover:text-gray-100 hover:underline transition-all duration-200"

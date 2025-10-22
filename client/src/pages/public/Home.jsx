@@ -7,6 +7,7 @@ import DealDaily from "@/components/Home/DealDaily";
 import BestSeller from "@/components/Home/BestSeller";
 import CustomSlider from "@/components/Common/CustomSlider";
 import FeatureProducts from "@/components/Home/FeatureProducts";
+import { useAuthStore } from "@/lib/zustand/useAuthStore";
 
 const Home = () => {
   const { newArrivals, productCategories, fetchProductsCategory } =

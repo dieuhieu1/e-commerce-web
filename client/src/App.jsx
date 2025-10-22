@@ -12,6 +12,13 @@ import path from "./ultils/path";
 import ErrorPage from "./pages/public/ErrorPage";
 import CategoryPage from "./pages/public/CategoryPage";
 import Products from "./pages/public/Products";
+import AdminLayout from "./pages/admin/AdminLayout";
+import Dashboard from "./pages/admin/Dashboard";
+import ManageUser from "./pages/admin/ManageUser";
+import ManageProduct from "./pages/admin/ManageProduct";
+import CreateProduct from "./pages/admin/CreateProduct";
+import MemberLayout from "./pages/member/MemberLayout";
+import Personal from "./pages/member/Personal";
 
 export const router = createBrowserRouter([
   {
@@ -57,6 +64,35 @@ export const router = createBrowserRouter([
         element: <ResetPassword />,
       },
     ],
+  },
+  {
+    path: path.ADMIN,
+    element: <AdminLayout />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: path.DASHBOARD,
+        element: <Dashboard />,
+      },
+      {
+        path: path.MANAGE_USER,
+        element: <ManageUser />,
+      },
+      {
+        path: path.MANAGE_PRODUCTS,
+        element: <ManageProduct />,
+      },
+      {
+        path: path.CREATE_PRODUCT,
+        element: <CreateProduct />,
+      },
+    ],
+  },
+  {
+    path: path.MEMBER,
+    element: <MemberLayout />,
+    errorElement: <ErrorPage />,
+    children: [{ path: path.PERSONAL, element: <Personal /> }],
   },
   {
     path: path.VERIFY_EMAIL,
