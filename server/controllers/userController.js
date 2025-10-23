@@ -371,11 +371,11 @@ const getAllUsers = asyncHandler(async (req, res) => {
 });
 
 const deleteUser = asyncHandler(async (req, res) => {
-  const { _id } = req.params;
+  const { uid } = req.params;
 
-  if (!_id) throw new Error("missing input");
+  if (!uid) throw new Error("missing input");
 
-  const response = await User.findByIdAndDelete({ _id });
+  const response = await User.findByIdAndDelete({ _id: uid });
 
   return res.status(200).json({
     success: response ? true : false,
@@ -386,13 +386,13 @@ const deleteUser = asyncHandler(async (req, res) => {
 });
 
 const updateUser = asyncHandler(async (req, res) => {
-  const { _id } = req.user;
+  const { uid } = req.params;
 
-  if (!_id || Object.keys(req.body).length === 0) {
+  if (!uid || Object.keys(req.body).length === 0) {
     throw new Error("Missing input");
   }
 
-  const response = await User.findByIdAndUpdate({ _id }, req.body).select(
+  const response = await User.findByIdAndUpdate({ _id: uid }, req.body).select(
     "-role -password -refreshToken"
   );
 
@@ -405,13 +405,13 @@ const updateUser = asyncHandler(async (req, res) => {
 });
 
 const updateUserByAdmin = asyncHandler(async (req, res) => {
-  const { _id } = req.params;
+  const { uid } = req.params;
 
-  if (!_id || Object.keys(req.body).length === 0) {
+  if (!uid || Object.keys(req.body).length === 0) {
     throw new Error("Missing input");
   }
 
-  const response = await User.findByIdAndUpdate({ _id }, req.body).select(
+  const response = await User.findByIdAndUpdate({ _id: uid }, req.body).select(
     "-role -password -refreshToken"
   );
 

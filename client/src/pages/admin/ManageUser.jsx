@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { apiGetUsers } from "@/apis/user";
+import { apiDeleteUsers, apiGetUsers, apiUpdateUsers } from "@/apis/user";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2 } from "lucide-react";
@@ -8,12 +8,18 @@ import InputField from "@/components/Input/InputField";
 import { useDebounce } from "@/hooks/useDebounce";
 import Pagination from "@/components/Pagination/Pagination";
 import { useSearchParams } from "react-router-dom";
+import EditUserDialog from "@/components/Dialog/EditUserDialog";
+import toast from "react-hot-toast";
+import ConfirmDialog from "@/components/Dialog/ConfirmDialog";
 
 const ManageUser = () => {
   const [data, setData] = useState([]);
   const [queries, setQueries] = useState({ q: "" });
   const [loading, setLoading] = useState(false);
   const [params] = useSearchParams();
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const queriesDebounce = useDebounce(queries.q, 800);
 
@@ -39,7 +45,63 @@ const ManageUser = () => {
     (value) => setQueries((prev) => ({ ...prev, q: value })),
     []
   );
+  const handleSave = async (updatedData) => {
+    const { _id: userId, ...data } = updatedData;
+    const updatedUser = await apiUpdateUsers(userId, data);
+    if (updatedUser.success) {
+      toast.success(updatedUser.message, {
+        duration: 3500,
+        icon: "💾",
+        style: {
+          background: "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
+          color: "#166534",
+          border: "1px solid #86efac",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+          padding: "12px 18px",
+          borderRadius: "10px",
+          fontWeight: "500",
+          fontSize: "15px",
+        },
+      });
+    }
+    fetchUsers(Object.fromEntries([...params]));
+  };
+  const handleEdit = (user) => {
+    setSelectedUser(user);
+    setOpenDialog(true);
+  };
+  const handleDeleteClick = (userId) => {
+    setSelectedUser(userId);
+    setConfirmOpen(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    setConfirmOpen(false);
+    if (!selectedUser) return;
+
+    try {
+      const deletedUser = await apiDeleteUsers(selectedUser);
+      if (deletedUser.success) {
+        toast.success(deletedUser.message, {
+          style: {
+            background: "#f0fdf4",
+            color: "#166534",
+            border: "1px solid #bbf7d0",
+            fontWeight: "500",
+          },
+          duration: 3000,
+          icon: "🗑️",
+        });
+        fetchUsers(Object.fromEntries([...params]));
+      } else {
+        toast.error(deletedUser.message || "Failed to delete user", {
+          style: { background: "#fef2f2", color: "#991b1b" },
+        });
+      }
+    } catch (error) {
+      toast.error("An error occurred while deleting user" + error);
+    }
+  };
   return (
     <div className="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen p-8">
       {/* Header */}
@@ -148,13 +210,15 @@ const ManageUser = () => {
                       size="sm"
                       variant="outline"
                       className="border-blue-400 text-blue-600 hover:bg-blue-50"
+                      onClick={() => handleEdit(user)}
                     >
                       Edit
                     </Button>
                     <Button
                       size="sm"
-                      variant="destructive"
+                      variant="danger"
                       className="hover:bg-red-600 transition-all"
+                      onClick={() => handleDeleteClick(user._id)}
                     >
                       Delete
                     </Button>
@@ -175,9 +239,23 @@ const ManageUser = () => {
         </table>
 
         {/* Pagination */}
-        <div className="w-full flex justify-center py-6 bg-gray-50 rounded-b-2xl border-t border-gray-100">
+        <div className="w-full flex justify-center py-6 px-5 bg-gray-50 rounded-b-2xl border-t border-gray-100">
           <Pagination totalCount={data.totalCount} pageSize={5} />
         </div>
+
+        <ConfirmDialog
+          open={confirmOpen}
+          onOpenChange={setConfirmOpen}
+          title="Delete user?"
+          description="This action cannot be undone. The user will be permanently removed."
+          onConfirm={handleConfirmDelete}
+        />
+        <EditUserDialog
+          user={selectedUser}
+          open={openDialog}
+          onClose={() => setOpenDialog(false)}
+          onSave={handleSave}
+        />
       </div>
     </div>
   );

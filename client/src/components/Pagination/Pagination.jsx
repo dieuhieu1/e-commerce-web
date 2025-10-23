@@ -33,18 +33,21 @@ const ManagePagination = ({ totalCount, pageSize }) => {
         Showing <span className="font-semibold text-gray-700">{range()}</span>{" "}
         of <span className="font-semibold text-gray-700">{totalCount}</span>
       </span>
+
       <div>
         <Pagination>
           <PaginationContent className="flex gap-1">
+            {/* Previous */}
             <PaginationItem>
               <PaginationPrevious
                 onClick={() => handlePageChange(currentPage - 1)}
-                className={
+                className={`cursor-pointer ${
                   currentPage === 1 ? "pointer-events-none opacity-50" : ""
-                }
+                }`}
               />
             </PaginationItem>
 
+            {/* Pages */}
             {paginationRange?.map((page, idx) => {
               if (page === DOTS)
                 return (
@@ -58,6 +61,7 @@ const ManagePagination = ({ totalCount, pageSize }) => {
                   <PaginationLink
                     isActive={page === currentPage}
                     onClick={() => handlePageChange(page)}
+                    className="cursor-pointer hover:bg-gray-100 transition-colors rounded-md "
                   >
                     {page}
                   </PaginationLink>
@@ -65,14 +69,15 @@ const ManagePagination = ({ totalCount, pageSize }) => {
               );
             })}
 
+            {/* Next */}
             <PaginationItem>
               <PaginationNext
                 onClick={() => handlePageChange(currentPage + 1)}
-                className={
+                className={`cursor-pointer ${
                   currentPage === totalPages
                     ? "pointer-events-none opacity-50"
                     : ""
-                }
+                }`}
               />
             </PaginationItem>
           </PaginationContent>

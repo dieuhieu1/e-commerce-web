@@ -40,7 +40,7 @@ const Button = ({
   // --- Định nghĩa Style bằng Tailwind ---
 
   const baseStyles =
-    "inline-flex items-center justify-center font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300";
+    "inline-flex items-center justify-center cursor-pointer font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300";
 
   const variantStyles = {
     primary: "bg-main text-white hover:bg-red-700 focus:ring-blue-500",

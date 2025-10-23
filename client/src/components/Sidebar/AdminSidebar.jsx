@@ -96,14 +96,14 @@ const AdminSidebar = () => {
                         key={`${item.id}-${subIndex}`}
                         onClick={(e) => e.stopPropagation()}
                         className={({ isActive }) =>
-                          `px-4 py-2 text-sm rounded-lg mt-1 ml-2 cursor-pointer flex items-center gap-2 ${
+                          `px-4 py-2 text-sm rounded-lg mt-1 ml-5 cursor-pointer flex items-center gap-2 ${
                             isActive
                               ? "text-[#ee3131] bg-red-50 font-medium"
                               : "text-gray-600 hover:text-[#ee3131] hover:bg-gray-50"
                           }`
                         }
                       >
-                        • {item.text}
+                        {item.text}
                       </NavLink>
                     ))}
                   </div>
