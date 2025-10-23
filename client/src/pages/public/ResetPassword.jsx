@@ -4,7 +4,7 @@ import { BiLeftArrowAlt } from "react-icons/bi";
 import { IoSendSharp } from "react-icons/io5";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import InputField from "@/components/InputField";
+import InputField from "@/components/Input/InputField";
 import Button from "@/components/Common/Button";
 
 const ResetPassword = () => {

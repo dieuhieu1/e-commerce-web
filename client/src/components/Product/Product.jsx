@@ -1,7 +1,7 @@
 import { formatMoney } from "@/ultils/helpers";
 import React, { useState } from "react";
 import StarRating from "../StarRating";
-import SelectOption from "../SelectOption";
+import SelectOption from "../Search/SelectOption";
 import { AiFillEye } from "react-icons/ai";
 import { IoMenu } from "react-icons/io5";
 import { BsFillSuitHeartFill } from "react-icons/bs";

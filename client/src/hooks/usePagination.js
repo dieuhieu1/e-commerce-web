@@ -6,9 +6,13 @@ import { useMemo } from "react";
 // Export một hằng số để component có thể import và kiểm tra
 export const DOTS = "...";
 
-export const usePagination = (totalCount, currentPage, siblingCount = 1) => {
+export const usePagination = (
+  totalCount,
+  currentPage,
+  pageSize,
+  siblingCount = 1
+) => {
   const paginationRange = useMemo(() => {
-    const pageSize = 10;
     const totalPageCount = Math.ceil(totalCount / pageSize);
     const totalPageNumbers = siblingCount + 5;
 

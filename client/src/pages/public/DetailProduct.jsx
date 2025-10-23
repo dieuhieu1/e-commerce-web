@@ -4,9 +4,9 @@ import { useParams } from "react-router-dom";
 
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ImageZoom from "@/components/Product/ImageZoom";
-import Carousel from "@/components/Carousel";
+import Carousel from "@/components/Common/Carousel";
 import Button from "@/components/Common/Button";
-import QuantitySelection from "@/components/QuantitySelection";
+import QuantitySelection from "@/components/Product/QuantitySelection";
 import ProductExtraInfo from "@/components/Product/ProductExtraInfo";
 import CustomSlider from "@/components/Common/CustomSlider";
 

@@ -16,9 +16,12 @@ const {
   updateUserAddress,
   updateUserCart,
   verifyEmail,
+  createUsers,
 } = userController;
 
 userRouter.post("/register", register);
+userRouter.post("/insert", createUsers);
+
 userRouter.get("/verify-email/:token", verifyEmail);
 userRouter.post("/login", login);
 userRouter.post("/refreshtoken", refreshAccessToken);

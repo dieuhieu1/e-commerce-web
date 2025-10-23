@@ -20,7 +20,6 @@ export const useAuthStore = create(
         set({ isLoading: true });
         try {
           const data = await apiRegister(userData);
-          toast.success("Đăng ký thành công!");
           return data;
         } catch (error) {
           toast.error(error?.response?.data?.message || "Đăng ký thất bại!");
@@ -42,7 +41,6 @@ export const useAuthStore = create(
             isLoading: false,
           });
 
-          toast.success("Đăng nhập thành công!");
           return data;
         } catch (error) {
           set({ isLoading: false });
@@ -57,7 +55,12 @@ export const useAuthStore = create(
       logout: async () => {
         const accessToken = get().accessToken;
         try {
-          if (accessToken) await apiLogout(accessToken);
+          if (accessToken) {
+            const response = await apiLogout(accessToken);
+            if (response.success) {
+              toast.success("Logged out successfully!");
+            }
+          }
         } catch (error) {
           console.warn("Logout request failed, clearing local data only.");
         } finally {
@@ -66,7 +69,7 @@ export const useAuthStore = create(
             accessToken: null,
             isAuthenticated: false,
           });
-          toast.success("Đăng xuất thành công!");
+          toast.success("Logout successful!");
         }
       },
 

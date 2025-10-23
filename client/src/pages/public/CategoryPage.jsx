@@ -8,9 +8,9 @@ import {
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Masonry from "react-masonry-css";
 import Product from "@/components/Product/Product";
-import SearchItem from "@/components/Product/SearchItem";
+import SearchItem from "@/components/Search/SearchItem";
 import { apiGetProducts } from "@/apis/product";
-import InputSelect from "@/components/InputSelect";
+import InputSelect from "@/components/Input/InputSelect";
 import { sorts } from "@/ultils/constants";
 import Pagination from "@/components/Pagination/Pagination";
 

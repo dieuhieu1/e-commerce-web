@@ -1,4 +1,4 @@
-import Sidebar from "../../components/Common/Sidebar";
+import Sidebar from "../../components/Sidebar/Sidebar";
 import Banner from "../../components/Home/Banner";
 import { IoIosArrowForward } from "react-icons/io";
 import { useProductStore } from "@/lib/zustand/useProductStore";

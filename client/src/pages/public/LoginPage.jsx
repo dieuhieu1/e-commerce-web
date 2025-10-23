@@ -7,11 +7,11 @@ import { useAuthStore } from "@/lib/zustand/useAuthStore";
 import { apiForgotPassword } from "@/apis/authApi";
 import { validate } from "@/ultils/helpers";
 
-import Header from "@/components/Common/Header";
+import Header from "@/components/Header/Header";
 import Register from "@/components/Auth/Register";
 import Login from "@/components/Auth/Login";
 import ForgotPassword from "@/components/Auth/ForgotPassword";
-import LoadingOverlay from "@/components/Loading";
+import LoadingOverlay from "@/components/Common/Loading";
 const LoginPage = () => {
   const { login, register, isLoading } = useAuthStore();
   const [email, setEmail] = useState("");

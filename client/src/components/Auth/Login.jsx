@@ -1,6 +1,6 @@
 import React from "react";
 import { LuLogIn } from "react-icons/lu";
-import InputField from "../InputField";
+import InputField from "../Input/InputField";
 import Button from "../Common/Button";
 
 const Login = ({

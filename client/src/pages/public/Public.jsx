@@ -1,8 +1,8 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import Navigation from "../../components/Navigation";
-import TopHeader from "@/components/Common/TopHeader";
-import Header from "@/components/Common/Header";
+import TopHeader from "@/components/Header/TopHeader";
+import Header from "@/components/Header/Header";
 import Footer from "@/components/Common/Footer";
 
 const Public = () => {

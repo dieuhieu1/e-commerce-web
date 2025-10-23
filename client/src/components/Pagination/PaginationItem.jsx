@@ -1,38 +1,23 @@
 import React from "react";
 import {
   createSearchParams,
+  useLocation,
   useNavigate,
-  useParams,
   useSearchParams,
 } from "react-router-dom";
 
 const PaginationItem = ({ children }) => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const { category } = useParams;
+  const { pathname } = useLocation();
   const handlePagination = () => {
-    let param = [];
-
-    for (let i of params.entries()) {
-      param.push(i);
-    }
-
-    const queries = {};
-    for (let i of param) {
-      queries[i[0]] = i[1];
-    }
+    const queries = Object.fromEntries([...params]);
     if (Number(children)) queries.page = children;
-    if (category) {
-      navigate({
-        pathname: `/${category}`,
-        search: createSearchParams(queries).toString(),
-      });
-    } else {
-      navigate({
-        pathname: "/products",
-        search: createSearchParams(queries).toString(),
-      });
-    }
+
+    navigate({
+      pathname: pathname,
+      search: createSearchParams(queries).toString(),
+    });
   };
   return (
     <button

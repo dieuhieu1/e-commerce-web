@@ -7,7 +7,11 @@ const {
   generateRefreshToken,
 } = require("../middlewares/jwt");
 const { sendMail } = require("../ultils/sendMail");
-const { verifyEmailHTML, forgotPasswordHTML } = require("../ultils/constants");
+const {
+  verifyEmailHTML,
+  forgotPasswordHTML,
+  users,
+} = require("../ultils/constants");
 
 // API Register
 const register = asyncHandler(async (req, res) => {
@@ -150,7 +154,7 @@ const login = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
   const { _id } = req.user;
 
-  const user = await User.findById(_id).select("-refreshToken -role -password");
+  const user = await User.findById(_id).select("-refreshToken -password");
 
   return res.status(200).json({
     success: user ? true : false,
@@ -295,11 +299,75 @@ const resetPassword = asyncHandler(async (req, res) => {
 });
 
 const getAllUsers = asyncHandler(async (req, res) => {
-  const response = await User.find().select("-refreshToken -password -role");
-  return res.status(200).json({
-    success: response ? true : false,
-    users: response,
+  const queryObj = { ...req.query };
+  const excludeFields = ["page", "sort", "filter", "limit"];
+
+  // Delete uneccessary field of query object (sort, page, limit)
+  excludeFields.forEach((el) => {
+    delete queryObj[el];
   });
+
+  // 1. Filtering
+  let queryString = JSON.stringify(queryObj);
+  // Replace "gte" to "$gte" for the query
+  queryString = queryString.replace(
+    /\b(gte|gt|lte|lt)\b/g,
+    (match) => `$${match}`
+  );
+  const formattedQueries = JSON.parse(queryString);
+
+  if (queryObj?.name)
+    formattedQueries.name = { $regex: queryObj.name, $options: "i" };
+  if (req.query.q) {
+    delete formattedQueries.q;
+    formattedQueries["$or"] = [
+      { firstname: { $regex: req.query.q, $options: "i" } },
+      { lastname: { $regex: req.query.q, $options: "i" } },
+      { email: { $regex: req.query.q, $options: "i" } },
+    ];
+  }
+
+  let query = User.find(formattedQueries);
+
+  // 2. Sorting
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    query = query.sort(sortBy);
+  } else {
+    query = query.sort("-createdAt");
+  }
+  // 3. Field Limiting
+  if (req.query.fields) {
+    const fields = req.query.fields.split(",").join(" ");
+    query = query.select(fields);
+  } else {
+    query = query.select("-__v");
+  }
+  // 4. Pagination
+  const page = req.query.page * 1 || 1;
+  const limit = req.query.limit * 1 || process.env.LIMIT_PRODUCTS;
+  // Skip page, so we need to skip element in 1 page (limit) * value of page
+  const skip = (page - 1) * limit;
+  query.skip(skip).limit(limit);
+
+  // Execute the query
+  try {
+    // Đếm tổng số bản ghi với cùng điều kiện filter
+    const totalCounts = await User.countDocuments(formattedQueries);
+    // Execute query
+    const response = await query;
+
+    return res.status(200).json({
+      success: response ? true : false,
+      totalCount: totalCounts,
+      page: page,
+      limit: limit,
+      totalPages: Math.ceil(totalCounts / limit),
+      users: response ? response : [],
+    });
+  } catch (err) {
+    throw new Error(err);
+  }
 });
 
 const deleteUser = asyncHandler(async (req, res) => {
@@ -414,6 +482,14 @@ const updateUserCart = asyncHandler(async (req, res) => {
       : "Something went wrong! Cannot updated user cart.",
   });
 });
+
+const createUsers = asyncHandler(async (req, res) => {
+  const response = await User.create(users);
+  return res.status(200).json({
+    success: response ? true : false,
+    users: response ? response : "Some thing went wrong",
+  });
+});
 module.exports = {
   register,
   login,
@@ -430,4 +506,5 @@ module.exports = {
   updateUserAddress,
   updateUserCart,
   verifyEmail,
+  createUsers,
 };

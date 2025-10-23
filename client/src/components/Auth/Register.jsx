@@ -1,6 +1,6 @@
 import React from "react";
 import { FaPenToSquare } from "react-icons/fa6";
-import InputField from "../InputField";
+import InputField from "../Input/InputField";
 import Button from "../Common/Button";
 
 const Register = ({

@@ -1,8 +1,11 @@
 import { BsReplyFill, BsShieldShaded } from "react-icons/bs";
 import path from "./path";
-import { FaTty } from "react-icons/fa6";
+import { FaTruckFast, FaTty } from "react-icons/fa6";
 import { AiFillGift } from "react-icons/ai";
 import { RiTruckFill } from "react-icons/ri";
+import { MdGroups } from "react-icons/md";
+import { PiPackageBold } from "react-icons/pi";
+import { BiSolidDashboard } from "react-icons/bi";
 
 export const navigation = [
   { id: 101, value: "HOME", path: `/${path.HOME}` },
@@ -60,4 +63,46 @@ export const voteOptions = [
   { id: 3, text: "Neutral" },
   { id: 4, text: "Good" },
   { id: 5, text: "Perfect" },
+];
+
+export const adminSidebar = [
+  {
+    id: 1,
+    type: "single",
+    text: "dasboard",
+    path: `/${path.ADMIN}/${path.DASHBOARD}`,
+    icon: BiSolidDashboard,
+  },
+  {
+    id: 2,
+    type: "single",
+    text: "Manage users",
+    path: `/${path.ADMIN}/${path.MANAGE_USER}`,
+    icon: MdGroups,
+  },
+  {
+    id: 3,
+    type: "parent",
+    text: "Manage Products",
+    icon: PiPackageBold,
+    submenu: [
+      {
+        id: "create-product",
+        text: "Create Product",
+        path: `/${path.ADMIN}/${path.CREATE_PRODUCT}`,
+      },
+      {
+        id: "manage-product",
+        text: "Manage Product",
+        path: `/${path.ADMIN}/${path.MANAGE_PRODUCTS}`,
+      },
+    ],
+  },
+  {
+    id: 4,
+    type: "single",
+    text: "Manage orders",
+    path: `/${path.ADMIN}/${path.MANAGE_ORDER}`,
+    icon: FaTruckFast,
+  },
 ];

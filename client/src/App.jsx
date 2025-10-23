@@ -19,6 +19,7 @@ import ManageProduct from "./pages/admin/ManageProduct";
 import CreateProduct from "./pages/admin/CreateProduct";
 import MemberLayout from "./pages/member/MemberLayout";
 import Personal from "./pages/member/Personal";
+import ManageOrder from "./pages/admin/ManageOrder";
 
 export const router = createBrowserRouter([
   {
@@ -81,6 +82,10 @@ export const router = createBrowserRouter([
       {
         path: path.MANAGE_PRODUCTS,
         element: <ManageProduct />,
+      },
+      {
+        path: path.MANAGE_ORDER,
+        element: <ManageOrder />,
       },
       {
         path: path.CREATE_PRODUCT,
