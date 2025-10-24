@@ -114,3 +114,11 @@ export const generateRange = (start, end) => {
   const length = end - start + 1;
   return Array.from({ length }, (_, index) => start + index);
 };
+export const formatCurrency = (value) => {
+  if (!value) return "";
+  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
+export const parseCurrency = (value) => {
+  return value.replace(/\./g, "");
+};

@@ -18,6 +18,7 @@ import StarRating from "@/components/StarRating";
 import Tabs from "@/components/Product/Tabs";
 import { tabsData } from "@/components/Product/tabsData";
 
+import DOMPurify from "dompurify";
 const DetailProduct = () => {
   const [currentImage, setCurrentImage] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState(null);
@@ -96,7 +97,7 @@ const DetailProduct = () => {
         <>
           <div className="w-main m-auto mt-6 flex gap-20">
             <div className="w-2/5 flex flex-col gap-4">
-              <div className="w-[458px] h-[458px]">
+              <div className="w-[458px] h-[458px] mb-10">
                 <ImageZoom
                   src={currentImage}
                   alt={selectedProduct?.title}
@@ -138,11 +139,22 @@ const DetailProduct = () => {
                   </div>
                 </div>
                 <ul className="list-[square] text-sm text-gray-500 pl-4 mt-5">
-                  {selectedProduct?.description?.map((el) => (
-                    <li key={el} className="leading-4 mt-6">
-                      {el}
-                    </li>
-                  ))}
+                  {selectedProduct?.description?.length > 1 &&
+                    selectedProduct?.description?.map((el) => (
+                      <li key={el} className="leading-4 mt-6">
+                        {el}
+                      </li>
+                    ))}
+                  {selectedProduct?.description?.length === 1 && (
+                    <div
+                      className="text-sm line-clamp-[20]"
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(
+                          selectedProduct?.description[0]
+                        ),
+                      }}
+                    ></div>
+                  )}
                 </ul>
                 <div className="flex flex-col gap-8 mt-10">
                   <div className="flex items-center justify-between gap-4">

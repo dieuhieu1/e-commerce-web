@@ -4,7 +4,6 @@ const { cloudinary } = require("../../config/cloudinary.config");
 
 const uploadImages = asyncHandler(async (req, res) => {
   const { _id: userId } = req.user;
-  console.log(req.files);
 
   if (!req.files || req.files.length === 0)
     throw new Error("Missing inputs! No images uploaded");
@@ -48,18 +47,19 @@ const uploadImage = asyncHandler(async (req, res) => {
   }
 
   res.status(201).json({
-    status: true,
+    success: true,
     message: "Image uploaded successfully!",
     result: newImage,
   });
 });
 const deleteImage = asyncHandler(async (req, res) => {
-  const { id: imageId } = req.params;
+  const { _id } = req.body;
   const { _id: userId } = req.user;
-  if (!imageId) {
+
+  if (!_id) {
     throw new Error("Missing public id! Please check your request params");
   }
-  const image = await Image.findById({ _id: imageId });
+  const image = await Image.findById(_id);
 
   if (!image) {
     return res.status(404).json({
@@ -82,9 +82,9 @@ const deleteImage = asyncHandler(async (req, res) => {
   await cloudinary.uploader.destroy(publicId);
 
   // Delete image in MongoDB
-  const deletedImage = await Image.findByIdAndDelete({ _id: imageId });
+  const deletedImage = await Image.findByIdAndDelete(_id);
   return res.status(200).json({
-    status: deletedImage ? true : false,
+    success: deletedImage ? true : false,
     message: deletedImage
       ? "Image Deleted Successfully!"
       : "Something went wrong cannot deleted image in the DB. Please check the error log",

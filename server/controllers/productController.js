@@ -15,7 +15,9 @@ const createNewProduct = asyncHandler(async (req, res) => {
 
   return res.status(200).json({
     success: newProduct ? true : false,
-    newProduct: newProduct ? newProduct : "Cannot create new product!",
+    message: newProduct
+      ? "Created product successfully!"
+      : "Cannot create new product!",
   });
 });
 
@@ -69,7 +71,20 @@ const getProducts = asyncHandler(async (req, res) => {
     }));
     colorQueryObject = { $or: colorQuery };
   }
-  const queries = { ...colorQueryObject, ...formattedQueries };
+  let queryObject = {};
+  if (queryObj?.q) {
+    delete formattedQueries.q;
+    queryObject = {
+      $or: [
+        { color: { $regex: queryObj.q, $options: "i" } },
+        { title: { $regex: queryObj.q, $options: "i" } },
+        { category: { $regex: queryObj.q, $options: "i" } },
+        { brand: { $regex: queryObj.q, $options: "i" } },
+        { description: { $regex: queryObj.q, $options: "i" } },
+      ],
+    };
+  }
+  const queries = { ...colorQueryObject, ...formattedQueries, ...queryObject };
   // Create query but not execute --> Adding more condition of sorting and pagination
   let query = Product.find(queries);
 

@@ -41,10 +41,6 @@ const ManageUser = () => {
     fetchUsers(queries);
   }, [params, queriesDebounce]);
 
-  const setValue = useCallback(
-    (value) => setQueries((prev) => ({ ...prev, q: value })),
-    []
-  );
   const handleSave = async (updatedData) => {
     const { _id: userId, ...data } = updatedData;
     const updatedUser = await apiUpdateUsers(userId, data);
@@ -123,7 +119,7 @@ const ManageUser = () => {
         <InputField
           name="q"
           value={queries.q}
-          setValue={setValue}
+          setValue={setQueries}
           label="Search by name"
           width="w-[350px]"
           className="shadow-sm"

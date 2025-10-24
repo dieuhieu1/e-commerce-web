@@ -20,6 +20,6 @@ imageRouter.post(
   uploadCloud.single("fileImage"),
   uploadImage
 );
-imageRouter.delete("/:id", verifyAccessToken, isAdmin, deleteImage);
+imageRouter.delete("/delete-image", verifyAccessToken, isAdmin, deleteImage);
 
 module.exports = imageRouter;

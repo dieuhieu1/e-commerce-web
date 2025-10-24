@@ -24,7 +24,7 @@ const InputField = ({
           id={name}
           name={name}
           value={value}
-          onFocus={() => setInvalidField([])}
+          onFocus={() => setInvalidField && setInvalidField([])}
           onChange={
             onChange ||
             ((e) => setValue((prev) => ({ ...prev, [name]: e.target.value })))
