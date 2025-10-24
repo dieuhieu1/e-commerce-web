@@ -4,10 +4,10 @@ import { Editor } from "@tinymce/tinymce-react";
 const MarkdownEditor = ({ label, value, setValue, name, error }) => {
   const editorRef = useRef(null);
 
-  // ✅ Khi form reset (value rỗng), làm sạch nội dung editor
+  // 🔁 Khi value bên ngoài thay đổi, cập nhật lại nội dung editor
   useEffect(() => {
-    if (editorRef.current && value === "") {
-      editorRef.current.setContent("");
+    if (editorRef.current && value !== editorRef.current.getContent()) {
+      editorRef.current.setContent(value || "");
     }
   }, [value]);
 
@@ -17,7 +17,7 @@ const MarkdownEditor = ({ label, value, setValue, name, error }) => {
       <Editor
         apiKey={import.meta.env.VITE_TINYMCE_KEY}
         onInit={(_, editor) => (editorRef.current = editor)}
-        value={value}
+        initialValue={value || ""}
         onEditorChange={(content) => setValue(name, content)}
         init={{
           height: 400,

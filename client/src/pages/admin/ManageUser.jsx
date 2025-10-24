@@ -43,6 +43,8 @@ const ManageUser = () => {
 
   const handleSave = async (updatedData) => {
     const { _id: userId, ...data } = updatedData;
+    console.log(updatedData);
+
     const updatedUser = await apiUpdateUsers(userId, data);
     if (updatedUser.success) {
       toast.success(updatedUser.message, {

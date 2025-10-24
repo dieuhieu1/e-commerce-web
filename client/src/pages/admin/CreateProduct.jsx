@@ -68,16 +68,6 @@ const CreateProduct = () => {
       });
     }
 
-    // 🧩 Nếu upload gallery mới mà có sẵn ảnh → hỏi người dùng
-    if (field === "images" && imagePreviews.length > 0) {
-      return openConfirm("Replace existing gallery images?", async () => {
-        for (const img of imagePreviews) await apiDeleteImage(img);
-        setImagePreviews([]);
-        setValue("images", []);
-        await uploadNewImages(files, field);
-      });
-    }
-
     // ✅ Nếu chưa có ảnh thì upload luôn
     uploadNewImages(files, field);
   };
