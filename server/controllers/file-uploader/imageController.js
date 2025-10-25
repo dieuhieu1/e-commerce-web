@@ -74,7 +74,7 @@ const deleteImage = asyncHandler(async (req, res) => {
 
   if (!isUploaded) {
     return res.status(403).json({
-      status: "fail",
+      success: "fail",
       message: "You don't have permission to delete this image!",
     });
   }

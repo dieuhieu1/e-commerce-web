@@ -229,7 +229,7 @@ const CreateProduct = () => {
                 label="Description"
                 name={field.name}
                 value={field.value || ""}
-                setValue={setValue}
+                onChange={field.onChange} // ✅ dùng field.onChange
                 error={errors.description?.message}
               />
             )}

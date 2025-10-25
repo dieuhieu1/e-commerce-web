@@ -1,8 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
-const { cloudinary } = require("../config/cloudinary.config");
 const Product = require("../models/Product");
-
+const makeSKU = require("uniqid");
 const createNewProduct = asyncHandler(async (req, res) => {
   if (Object.keys(req.body).length === 0) {
     throw new Error("Missing Inputs!");
@@ -167,8 +166,8 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
   return res.status(200).json({
     success: deletedProduct ? true : false,
-    result: deletedProduct
-      ? deletedProduct
+    message: deletedProduct
+      ? `Product with id: ${pid} deleted successfully`
       : `Something went wrong! Cannot delete the product with id ${pid}`,
   });
 });
@@ -224,6 +223,47 @@ const ratingProduct = asyncHandler(async (req, res) => {
   });
 });
 
+const addVariant = asyncHandler(async (req, res) => {
+  const { pid } = req.params;
+
+  const { title, price, color, thumb, images } = req.body;
+  if (!title) {
+    return res.status(400).json({ error: "You must enter title." });
+  }
+  if (!price) {
+    return res.status(400).json({ error: "You must enter a price." });
+  }
+  if (!color) {
+    return res.status(400).json({ error: "You must enter a color." });
+  }
+  const variant = {
+    title,
+    color,
+    price: Number(price),
+    thumb,
+    images,
+    sku: makeSKU().toUpperCase(),
+  };
+  console.log(variant);
+
+  const updateVariant = await Product.findByIdAndUpdate(
+    pid,
+    {
+      $push: {
+        variants: variant,
+      },
+    },
+    { new: true }
+  );
+
+  return res.status(200).json({
+    success: updateVariant ? true : false,
+    message: updateVariant
+      ? "Add variant product successfully!"
+      : "Cannot add variant product!",
+  });
+});
+
 module.exports = {
   createNewProduct,
   getProduct,
@@ -231,4 +271,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   ratingProduct,
+  addVariant,
 };

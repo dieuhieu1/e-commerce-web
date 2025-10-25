@@ -9,25 +9,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useForm, Controller } from "react-hook-form";
 import { UploadCloud, X, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { useForm } from "react-hook-form";
 import { apiUploadImages, apiDeleteImage } from "@/apis/image";
-import { apiUpdateProduct } from "@/apis/product";
-import MarkdownEditor from "@/components/Input/MarkdownEditor";
 import ConfirmDialog from "@/components/Dialog/ConfirmDialog";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/components/ui/select";
-import { useProductStore } from "@/lib/zustand/useProductStore";
 import { formatCurrency, parseCurrency } from "@/ultils/helpers";
+import { apiAddVariant } from "@/apis/product";
 
-const EditProductDialog = ({ product, open, onClose, onSave }) => {
-  const { productCategories } = useProductStore();
+const AddVariantDialog = ({ originalVariant, open, onClose, onSave }) => {
   const [loading, setLoading] = useState(false);
   const [thumbPreview, setThumbPreview] = useState(null);
   const [imagePreviews, setImagePreviews] = useState([]);
@@ -37,40 +27,28 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
     onConfirm: null,
   });
   const [displayPrice, setDisplayPrice] = useState("");
-  const [tempUploadedImages, setTempUploadedImages] = useState([]); // 🆕 ảnh tạm
+  const [tempUploadedImages, setTempUploadedImages] = useState([]);
 
   const {
     register,
     handleSubmit,
-    control,
     setValue,
     reset,
-    watch,
     formState: { isDirty, isSubmitting, errors },
   } = useForm();
-
-  // --- Load dữ liệu sản phẩm khi mở ---
+  // Assign data from parent component
   useEffect(() => {
-    if (product) {
+    if (originalVariant && open) {
       reset({
-        title: product.title || "",
-        brand: product.brand || "",
-        category: product.category || "",
-        price: product.price || 0,
-        quantity: product.quantity || 0,
-        color: product.color || "",
-        description: Array.isArray(product.description)
-          ? product.description.join("")
-          : product.description || "",
+        title: originalVariant.title || "",
+        price: originalVariant.price || 0,
+        color: originalVariant.color || "",
       });
-      setDisplayPrice(formatCurrency(product.price || 0));
-      setThumbPreview(product.thumb ? { url: product.thumb } : null);
-      setImagePreviews(product.images?.map((url) => ({ url })) || []);
-      setLoading(false);
+      setDisplayPrice(formatCurrency(originalVariant.price || 0));
     }
-  }, [product, reset, open]);
+  }, [originalVariant, open]);
 
-  // --- Mở Confirm Dialog ---
+  // Open Confirm Dialog
   const openConfirm = (message, onConfirm) => {
     setConfirmData({ message, onConfirm });
     setConfirmOpen(true);
@@ -80,22 +58,9 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
     setConfirmData({ message: "", onConfirm: null });
   };
 
-  // --- Upload ảnh ---
+  // Handle Upload Images
   const handleUploadImages = async (files, field) => {
-    if (!files || files.length === 0) return;
-
-    if (field === "thumb" && thumbPreview) {
-      return openConfirm("Replace existing thumbnail?", async () => {
-        await apiDeleteImage(thumbPreview);
-        setThumbPreview(null);
-        await uploadNewImages(files, field);
-      });
-    }
-
-    await uploadNewImages(files, field);
-  };
-
-  const uploadNewImages = async (files, field) => {
+    if (!files?.length) return;
     const formData = new FormData();
     for (let file of files) formData.append("fileImages", file);
 
@@ -109,60 +74,58 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
           public_id: img.publicId,
         }));
 
-        // Save Template Images Not Save
-        setTempUploadedImages((prev) => [...prev, ...images.map((i) => i._id)]);
+        setTempUploadedImages((prev) => [
+          ...prev,
+          ...images.map((i) => i.public_id),
+        ]);
 
         if (field === "thumb") {
-          setThumbPreview(images[0]);
-          setValue("thumb", images[0]);
+          setThumbPreview(images);
+          setValue("thumb", images);
         } else {
           setImagePreviews((prev) => [...prev, ...images]);
-          setValue("images", [...(watch("images") || []), ...images]);
+          setValue("images", [...(imagePreviews || []), ...images]);
         }
 
-        toast.success("✅ Images uploaded successfully!");
+        toast.success("✅ Upload successful!");
       } else toast.error("❌ Upload failed!");
-    } catch (error) {
-      toast.error("❌ Upload failed!");
+    } catch (err) {
+      toast.error("❌ Upload failed!" + err);
     } finally {
       setLoading(false);
-      closeConfirm();
     }
   };
 
-  // --- Xóa ảnh ---
+  // Delete image
   const handleAskDelete = (image, field) => {
     openConfirm("Delete this image?", async () => {
       await handleDeleteImage(image, field);
     });
   };
 
+  // Handle Delete Image
   const handleDeleteImage = async (image, field) => {
     if (!image) return;
     try {
       setLoading(true);
-      console.log(image);
-
       const res = await apiDeleteImage(image);
       if (res.success) {
-        // Nếu ảnh bị xóa là ảnh tạm thì loại khỏi danh sách
         setTempUploadedImages((prev) =>
           prev.filter((id) => id !== image.public_id)
         );
 
-        if (res.success) {
-          if (field === "thumb") {
-            setThumbPreview(null);
-            setValue("thumb", null);
-          } else {
-            const updated = imagePreviews.filter(
-              (img) => img.public_id !== image.public_id
-            );
-            setImagePreviews(updated);
-            setValue("images", updated);
-          }
-          toast.success("🗑️ Image deleted successfully!");
+        if (field === "thumb") {
+          setThumbPreview(null);
+          setValue("thumb", null);
+        } else {
+          const updated = imagePreviews.filter(
+            (i) => i.public_id !== image.public_id
+          );
+          setImagePreviews(updated);
+          setValue("images", updated);
         }
+
+        toast.success("🗑️ Image deleted successfully!");
       }
     } catch {
       toast.error("❌ Failed to delete image!");
@@ -172,24 +135,55 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
     }
   };
 
+  // Submit variant
   const onSubmit = async (data) => {
-    const payload = {
-      ...data,
-      _id: product._id,
-      price: Number(data.price),
-      thumb: thumbPreview?.url || product.thumb,
-      images: imagePreviews.map((img) => img.url),
+    if (!thumbPreview) {
+      toast.error("Thumbnail is required!");
+      return;
+    }
+
+    const productId = originalVariant._id;
+    const variantData = {
+      title: data.title.trim(),
+      color: data.color.trim(),
+      price: parseCurrency(displayPrice),
+      thumb: thumbPreview,
+      images: imagePreviews,
     };
 
-    setLoading(true);
-    onSave && onSave(payload);
-    setTempUploadedImages([]);
-    onClose();
+    try {
+      setLoading(true);
+      const res = await apiAddVariant(productId, variantData);
 
-    setLoading(false);
+      if (res.success) {
+        toast.success(res.message || "Variant added successfully!", {
+          duration: 3500,
+          icon: "💾",
+          style: {
+            background: "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
+            color: "#166534",
+            border: "1px solid #86efac",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+            padding: "12px 18px",
+            borderRadius: "10px",
+            fontWeight: "500",
+            fontSize: "15px",
+          },
+        });
+        onSave(res.success);
+        await cleanupAndClose(); // 🧹 dọn ảnh tạm và reset form
+        onClose?.(); // ✅ đóng dialog nếu callback tồn tại
+      } else {
+        toast.error(res.message || "Failed to add variant!");
+      }
+    } catch (error) {
+      console.error("⚠️ Error adding variant:", error);
+      toast.error("An unexpected error occurred while saving!");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // --- Cancel / Đóng dialog ---
   const handleClose = async () => {
     if (isDirty) {
       openConfirm("Discard unsaved changes?", async () => {
@@ -199,6 +193,7 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
     }
     await cleanupAndClose();
   };
+
   const cleanupAndClose = async () => {
     if (tempUploadedImages.length > 0) {
       try {
@@ -226,10 +221,10 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0">
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0">
         <DialogHeader className="p-6 pb-4 flex-shrink-0">
-          <DialogTitle className="text-xl font-semibold">
-            Edit Product
+          <DialogTitle className="text-lg font-semibold">
+            Add Product Variant
           </DialogTitle>
         </DialogHeader>
 
@@ -239,100 +234,45 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
             <p className="text-gray-600 font-medium">Processing...</p>
           </div>
         )}
+
         <div className="overflow-y-auto p-6">
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="grid grid-cols-2 gap-6 py-2"
+            className="flex flex-col gap-4"
           >
             {/* Title */}
-            <div className="flex flex-col space-y-2">
+            <div className="flex flex-col gap-1">
               <Label>Title</Label>
               <Input
                 {...register("title", { required: "Title is required" })}
               />
-              {errors.title && (
-                <p className="text-red-500 text-sm">{errors.title.message}</p>
-              )}
-            </div>
-
-            {/* Brand */}
-            <div className="flex flex-col space-y-2">
-              <Label>Brand</Label>
-              <Input
-                {...register("brand", { required: "Brand is required" })}
-              />
-            </div>
-
-            {/* Category */}
-            <div className="flex flex-col space-y-2">
-              <Label>Category</Label>
-              <Controller
-                name="category"
-                control={control}
-                rules={{ required: "Category is required" }}
-                render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {productCategories?.map((cat) => (
-                        <SelectItem key={cat._id} value={cat.title}>
-                          {cat.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
             </div>
 
             {/* Color */}
-            <div className="flex flex-col space-y-2">
+            <div className="flex flex-col gap-1">
               <Label>Color</Label>
-              <Input {...register("color")} placeholder="Enter color" />
+              <Input
+                {...register("color", { required: "Color is required" })}
+              />
             </div>
 
             {/* Price */}
-            <div className="flex flex-col space-y-2">
+            <div className="flex flex-col gap-1">
               <Label>Price</Label>
               <Input
                 type="text"
                 value={displayPrice}
                 onChange={(e) => {
-                  const raw = e?.target?.value.replace(/[^\d]/g, "");
+                  const raw = e.target.value.replace(/[^\d]/g, "");
                   setDisplayPrice(formatCurrency(raw));
                   setValue("price", parseCurrency(raw));
                 }}
-              />
-            </div>
-
-            {/* Quantity */}
-            <div className="flex flex-col space-y-2">
-              <Label>Quantity</Label>
-              <Input type="number" {...register("quantity", { min: 0 })} />
-            </div>
-
-            {/* Description */}
-            <div className="col-span-2">
-              <Controller
-                name="description"
-                control={control}
-                rules={{ required: "Description is required" }}
-                render={({ field }) => (
-                  <MarkdownEditor
-                    label="Description"
-                    name={field.name}
-                    value={field.value || ""}
-                    onChange={field.onChange} // ✅ dùng field.onChange
-                    error={errors.description?.message}
-                  />
-                )}
+                placeholder="Enter price"
               />
             </div>
 
             {/* Thumbnail */}
-            <div className="col-span-2 flex flex-col space-y-2">
+            <div className="flex flex-col gap-1">
               <Label>Thumbnail</Label>
               <label
                 htmlFor="thumbUpload"
@@ -349,7 +289,7 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
                 onChange={(e) => handleUploadImages(e.target.files, "thumb")}
               />
               {thumbPreview && (
-                <div className="relative w-48 h-48 mx-auto mt-3">
+                <div className="relative w-40 h-40 mt-3">
                   <img
                     src={thumbPreview.url}
                     alt="thumb"
@@ -367,7 +307,7 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
             </div>
 
             {/* Gallery */}
-            <div className="col-span-2 flex flex-col space-y-2">
+            <div className="flex flex-col gap-1">
               <Label>Gallery Images</Label>
               <label
                 htmlFor="galleryUpload"
@@ -384,10 +324,9 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
                 className="hidden"
                 onChange={(e) => handleUploadImages(e.target.files, "images")}
               />
-
               <div className="flex flex-wrap gap-3 mt-3">
                 {imagePreviews.map((img, idx) => (
-                  <div key={idx} className="relative w-40 h-40">
+                  <div key={idx} className="relative w-32 h-32">
                     <img
                       src={img.url}
                       alt={`preview-${idx}`}
@@ -405,7 +344,8 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
               </div>
             </div>
 
-            <DialogFooter className="col-span-2 flex justify-end mt-6">
+            {/* Footer */}
+            <DialogFooter className="flex justify-end mt-6">
               <Button type="button" variant="secondary" onClick={handleClose}>
                 Cancel
               </Button>
@@ -413,7 +353,7 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
                 type="submit"
                 className="ml-2 bg-blue-600 text-white hover:bg-blue-700"
               >
-                {isSubmitting ? "Saving..." : "Save Changes"}
+                {isSubmitting ? "Saving..." : "Add Variant"}
               </Button>
             </DialogFooter>
           </form>
@@ -432,4 +372,4 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
   );
 };
 
-export default EditProductDialog;
+export default AddVariantDialog;

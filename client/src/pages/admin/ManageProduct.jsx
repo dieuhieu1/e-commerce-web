@@ -5,20 +5,33 @@ import {
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
+
 import {
   apiGetProducts,
   apiDeleteProduct,
   apiUpdateProduct,
+  apiAddVariant,
 } from "@/apis/product";
+
+import {
+  Loader2,
+  Star,
+  RefreshCw,
+  Pencil,
+  Trash2,
+  PlusCircle,
+} from "lucide-react";
+
+import toast from "react-hot-toast";
 import { useDebounce } from "@/hooks/useDebounce";
+
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Star } from "lucide-react";
 import Button from "@/components/Common/Button";
 import InputField from "@/components/Input/InputField";
 import Pagination from "@/components/Pagination/Pagination";
-import toast from "react-hot-toast";
 import ConfirmDialog from "@/components/Dialog/ConfirmDialog";
 import EditProductDialog from "@/components/Dialog/EditProductDialog";
+import AddVariantDialog from "@/components/Dialog/AddVariantDialog";
 
 const ManageProduct = () => {
   // Hook
@@ -30,6 +43,8 @@ const ManageProduct = () => {
   const [queries, setQueries] = useState({ q: "" });
   const [loading, setLoading] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+  const [variantDialog, setVariantDialog] = useState(false);
+
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   // Debounce
@@ -83,6 +98,12 @@ const ManageProduct = () => {
     }
   };
 
+  const handleAddVariant = async (isAdded) => {
+    if (isAdded) {
+      fetchProducts(Object.fromEntries([...params]));
+    }
+  };
+
   const handleEdit = (product) => {
     setSelectedProduct(product);
     setOpenDialog(true);
@@ -125,14 +146,20 @@ const ManageProduct = () => {
     <div className="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen p-8">
       {/* Header */}
       <header className="sticky top-0 z-20 bg-white shadow-md flex justify-between items-center text-2xl font-semibold px-6 py-4 rounded-xl border border-gray-200">
-        <span className="text-gray-800">🛒 Manage Products</span>
+        <span className="text-gray-800 flex items-center gap-2">
+          🛒 Manage Products
+        </span>
         <Button
           onClick={() => fetchProducts()}
           variant="outline"
           className="flex items-center gap-2 font-medium hover:bg-gray-100 transition-all duration-200"
           width="w-[150px]"
         >
-          {loading && <Loader2 size={18} className="animate-spin" />}
+          {loading ? (
+            <Loader2 size={18} className="animate-spin" />
+          ) : (
+            <RefreshCw size={18} />
+          )}
           Refresh
         </Button>
       </header>
@@ -163,6 +190,7 @@ const ManageProduct = () => {
               <th className="px-6 py-4 text-center">Rating</th>
               <th className="px-6 py-4 text-center">Stock</th>
               <th className="px-6 py-4 text-center">Status</th>
+              <th className="px-6 py-4 text-center">Variants</th>
               <th className="px-6 py-4 text-center">Actions</th>
             </tr>
           </thead>
@@ -179,13 +207,13 @@ const ManageProduct = () => {
                   <td className="px-6 py-4 font-medium text-gray-600">
                     {index + 1}
                   </td>
-                  <td className="px-6 py-4 flex items-center gap-3">
+                  <td className="px-6 py-4 flex items-center justify-start gap-3">
                     <img
                       src={product.thumb}
                       alt={product.title}
-                      className="w-12 h-12 rounded-md object-cover border"
+                      className="w-30 h-30 rounded-md object-cover border shadow-sm"
                     />
-                    <p className="font-semibold text-gray-800 line-clamp-1">
+                    <p className="font-semibold text-gray-800 line-clamp-1 text-base">
                       {product.title}
                     </p>
                   </td>
@@ -244,23 +272,53 @@ const ManageProduct = () => {
                       </Badge>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-center flex justify-center gap-3">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-blue-400 text-blue-600 hover:bg-blue-50"
-                      onClick={() => handleEdit(product)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="danger"
-                      className="hover:bg-red-600 transition-all"
-                      onClick={() => handleDeleteClick(product._id)}
-                    >
-                      Delete
-                    </Button>
+                  <td className="px-6 py-4 text-center">
+                    {product?.variants?.length > 0 ? (
+                      <Badge className="bg-red-100  text-green-700 rounded-full px-3 py-1">
+                        {product?.variants.length}
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-green-100 text-red-600 rounded-full px-3 py-1">
+                        0
+                      </Badge>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <div className="flex flex-col justify-center items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex gap-2 items-center bg-blue-600  "
+                        fullWidth
+                        onClick={() => handleEdit(product)}
+                      >
+                        <Pencil size={15} />
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        fullWidth
+                        className="flex items-center justify-center gap-1 hover:bg-red-600 text-white transition-all w-[120px]"
+                        onClick={() => handleDeleteClick(product._id)}
+                      >
+                        <Trash2 size={15} />
+                        Delete
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="flex items-center justify-center gap-1 bg-green-600 hover:bg-green-800 text-white transition-all w-[120px]"
+                        fullWidth
+                        onClick={() => {
+                          setSelectedProduct(product);
+                          setVariantDialog(true);
+                        }}
+                      >
+                        <PlusCircle size={15} />
+                        Variant
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -297,6 +355,13 @@ const ManageProduct = () => {
           open={openDialog}
           onClose={() => setOpenDialog(false)}
           onSave={handleSave}
+        />
+        {/* Customize Variants */}
+        <AddVariantDialog
+          originalVariant={selectedProduct}
+          open={variantDialog}
+          onClose={() => setVariantDialog(false)}
+          onSave={handleAddVariant}
         />
       </div>
     </div>

@@ -37,8 +37,6 @@ const Button = ({
   fullWidth = false,
   className = "", // Cho phép truyền thêm class từ bên ngoài
 }) => {
-  // --- Định nghĩa Style bằng Tailwind ---
-
   const baseStyles =
     "inline-flex items-center justify-center cursor-pointer font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300";
 

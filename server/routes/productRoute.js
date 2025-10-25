@@ -7,7 +7,7 @@ const {
   updateProduct,
   deleteProduct,
   ratingProduct,
-  uploadProductImages,
+  addVariant,
 } = require("../controllers/productController");
 
 const { uploadCloud: uploader } = require("../config/cloudinary.config");
@@ -19,6 +19,9 @@ productRouter.get("/", getProducts);
 
 // GET /api/products/:id
 productRouter.get("/:pid", getProduct);
+
+// PUT /api/products/variants/:id
+productRouter.put("/variant/:pid", addVariant);
 
 // PUT /api/products/:id
 productRouter.put("/:pid", updateProduct);
