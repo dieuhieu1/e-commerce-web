@@ -22,8 +22,9 @@ var productSchema = new mongoose.Schema(
       required: true,
     },
     thumb: {
-      type: String,
-      require: true,
+      _id: { type: String },
+      public_id: { type: String },
+      image_url: { type: String, require: true },
     },
     price: {
       type: Number,
@@ -67,7 +68,11 @@ var productSchema = new mongoose.Schema(
         title: { type: String },
         color: { type: String },
         price: { type: Number },
-        thumb: { type: String },
+        thumb: {
+          _id: { type: String },
+          public_id: { type: String },
+          image_url: { type: String, require: true },
+        },
         images: { type: Array },
         sku: { type: String },
       },

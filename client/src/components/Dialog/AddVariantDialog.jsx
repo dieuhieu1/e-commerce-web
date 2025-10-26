@@ -34,6 +34,7 @@ const AddVariantDialog = ({ originalVariant, open, onClose, onSave }) => {
     handleSubmit,
     setValue,
     reset,
+    watch,
     formState: { isDirty, isSubmitting, errors },
   } = useForm();
   // Assign data from parent component
@@ -60,7 +61,21 @@ const AddVariantDialog = ({ originalVariant, open, onClose, onSave }) => {
 
   // Handle Upload Images
   const handleUploadImages = async (files, field) => {
-    if (!files?.length) return;
+    if (!files || files.length === 0) return;
+    // If existed a thumb, replace the one old
+    if (field === "thumb" && thumbPreview) {
+      return openConfirm("Replace existing thumbnail?", async () => {
+        await apiDeleteImage({ _id: thumbPreview._id });
+        setThumbPreview(null);
+        // Upload new image
+        await uploadNewImages(files, field);
+      });
+    }
+    // If field = galery --> Just upload
+    await uploadNewImages(files, field);
+  };
+
+  const uploadNewImages = async (files, field) => {
     const formData = new FormData();
     for (let file of files) formData.append("fileImages", file);
 
@@ -70,32 +85,30 @@ const AddVariantDialog = ({ originalVariant, open, onClose, onSave }) => {
       if (res.success) {
         const images = res.data.map((img) => ({
           _id: img._id,
-          url: img.imageUrl,
+          image_url: img.image_url,
           public_id: img.publicId,
         }));
 
-        setTempUploadedImages((prev) => [
-          ...prev,
-          ...images.map((i) => i.public_id),
-        ]);
+        // Save Template Images Not Save
+        setTempUploadedImages((prev) => [...prev, ...images.map((i) => i._id)]);
 
         if (field === "thumb") {
-          setThumbPreview(images);
-          setValue("thumb", images);
+          setThumbPreview(images[0]);
+          setValue("thumb", images[0]);
         } else {
           setImagePreviews((prev) => [...prev, ...images]);
-          setValue("images", [...(imagePreviews || []), ...images]);
+          setValue("images", [...watch("images"), ...images]);
         }
 
-        toast.success("✅ Upload successful!");
-      } else toast.error("❌ Upload failed!");
-    } catch (err) {
-      toast.error("❌ Upload failed!" + err);
+        toast.success("✅ Images uploaded successfully!");
+      }
+    } catch (error) {
+      toast.error("❌ Upload failed!");
     } finally {
       setLoading(false);
+      closeConfirm();
     }
   };
-
   // Delete image
   const handleAskDelete = (image, field) => {
     openConfirm("Delete this image?", async () => {
@@ -170,9 +183,8 @@ const AddVariantDialog = ({ originalVariant, open, onClose, onSave }) => {
             fontSize: "15px",
           },
         });
+        await cleanupAndClose(true);
         onSave(res.success);
-        await cleanupAndClose(); // 🧹 dọn ảnh tạm và reset form
-        onClose?.(); // ✅ đóng dialog nếu callback tồn tại
       } else {
         toast.error(res.message || "Failed to add variant!");
       }
@@ -187,18 +199,19 @@ const AddVariantDialog = ({ originalVariant, open, onClose, onSave }) => {
   const handleClose = async () => {
     if (isDirty) {
       openConfirm("Discard unsaved changes?", async () => {
-        await cleanupAndClose();
+        await cleanupAndClose(false);
       });
       return;
     }
-    await cleanupAndClose();
+    await cleanupAndClose(false);
   };
 
-  const cleanupAndClose = async () => {
-    if (tempUploadedImages.length > 0) {
+  // Clean up state and image function
+  const cleanupAndClose = async (keepTemps = false) => {
+    if (!keepTemps && tempUploadedImages.length > 0) {
       try {
-        console.log(tempUploadedImages);
         setLoading(true);
+        // apiDeleteImage expects { _id } or public_id based on your api
         await Promise.all(
           tempUploadedImages.map((_id) => apiDeleteImage({ _id }))
         );
@@ -209,14 +222,23 @@ const AddVariantDialog = ({ originalVariant, open, onClose, onSave }) => {
         setLoading(false);
         setTempUploadedImages([]);
       }
+    } else {
+      // if keepTemps === true we clear temp array so cleanup won't attempt deleting later
+      setTempUploadedImages([]);
     }
 
-    reset();
+    // Reset local form/UI state before closing
+    try {
+      reset();
+    } catch (e) {
+      // safe-guard: reset might fail if form unmounted
+      console.warn("reset() failed:", e);
+    }
     setThumbPreview(null);
     setImagePreviews([]);
     setDisplayPrice("");
     setConfirmOpen(false);
-    onClose();
+    onClose && onClose();
   };
 
   return (
@@ -291,7 +313,7 @@ const AddVariantDialog = ({ originalVariant, open, onClose, onSave }) => {
               {thumbPreview && (
                 <div className="relative w-40 h-40 mt-3">
                   <img
-                    src={thumbPreview.url}
+                    src={thumbPreview.image_url}
                     alt="thumb"
                     className="w-full h-full object-cover rounded-md border"
                   />
@@ -328,7 +350,7 @@ const AddVariantDialog = ({ originalVariant, open, onClose, onSave }) => {
                 {imagePreviews.map((img, idx) => (
                   <div key={idx} className="relative w-32 h-32">
                     <img
-                      src={img.url}
+                      src={img.image_url}
                       alt={`preview-${idx}`}
                       className="w-full h-full object-cover rounded-md border shadow-sm"
                     />

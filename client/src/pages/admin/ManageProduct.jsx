@@ -6,12 +6,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 
-import {
-  apiGetProducts,
-  apiDeleteProduct,
-  apiUpdateProduct,
-  apiAddVariant,
-} from "@/apis/product";
+import { apiGetProducts, apiDeleteProduct } from "@/apis/product";
 
 import {
   Loader2,
@@ -76,29 +71,8 @@ const ManageProduct = () => {
     const searchParams = Object.fromEntries([...params]);
     fetchProducts(searchParams);
   }, [params]);
-  const handleSave = async (updatedData) => {
-    const { _id: productId, ...data } = updatedData;
-    const res = await apiUpdateProduct(productId, data);
-    if (res.success) {
-      toast.success(res.message || "Product updated successfully!", {
-        duration: 3500,
-        icon: "💾",
-        style: {
-          background: "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
-          color: "#166534",
-          border: "1px solid #86efac",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-          padding: "12px 18px",
-          borderRadius: "10px",
-          fontWeight: "500",
-          fontSize: "15px",
-        },
-      });
-      fetchProducts(Object.fromEntries([...params]));
-    }
-  };
 
-  const handleAddVariant = async (isAdded) => {
+  const onSave = async (isAdded) => {
     if (isAdded) {
       fetchProducts(Object.fromEntries([...params]));
     }
@@ -209,7 +183,7 @@ const ManageProduct = () => {
                   </td>
                   <td className="px-6 py-4 flex items-center justify-start gap-3">
                     <img
-                      src={product.thumb}
+                      src={product.thumb.image_url}
                       alt={product.title}
                       className="w-30 h-30 rounded-md object-cover border shadow-sm"
                     />
@@ -354,14 +328,14 @@ const ManageProduct = () => {
           product={selectedProduct}
           open={openDialog}
           onClose={() => setOpenDialog(false)}
-          onSave={handleSave}
+          onSave={onSave}
         />
         {/* Customize Variants */}
         <AddVariantDialog
           originalVariant={selectedProduct}
           open={variantDialog}
           onClose={() => setVariantDialog(false)}
-          onSave={handleAddVariant}
+          onSave={onSave}
         />
       </div>
     </div>

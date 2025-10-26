@@ -108,7 +108,7 @@ const EmblaCarousel = ({
                 style={{ width: "100%", height: h }}
               >
                 <img
-                  src={src}
+                  src={src.image_url || src}
                   alt={`slide_${idx}`}
                   className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                   loading="lazy"

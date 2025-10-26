@@ -84,11 +84,12 @@ const CreateProduct = () => {
       if (res.success) {
         const images = res.data.map((img) => ({
           _id: img._id,
-          url: img.imageUrl,
+          image_url: img.image_url,
           public_id: img.publicId,
         }));
-
+        console.log(images);
         if (field === "thumb") {
+          // Need to take the first element because Images in an Array
           setThumbPreview(images[0]);
           setValue("thumb", images[0]);
         } else {
@@ -147,6 +148,7 @@ const CreateProduct = () => {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
+      console.log(data);
 
       const payload = {
         title: data.title?.trim(),
@@ -156,8 +158,8 @@ const CreateProduct = () => {
         price: Number(data.price),
         quantity: Number(data.quantity),
         color: data.color?.trim() || null,
-        thumb: data.thumb ? data.thumb.url : null,
-        images: data.images?.map((img) => img.url) || [],
+        thumb: data.thumb ? data.thumb : null,
+        images: data.images?.map((img) => img) || [],
       };
 
       const res = await apiCreateProduct(payload);
@@ -318,8 +320,8 @@ const CreateProduct = () => {
           {thumbPreview && (
             <div className="relative w-48 h-48 mx-auto mt-3">
               <img
-                src={thumbPreview.url}
-                alt="thumb"
+                src={thumbPreview.image_url}
+                alt={`thumb-${thumbPreview._id}`}
                 className="w-full h-full object-cover rounded-md border shadow"
               />
               <button
@@ -358,8 +360,8 @@ const CreateProduct = () => {
             {imagePreviews.map((img, idx) => (
               <div key={idx} className="relative w-48 h-48">
                 <img
-                  src={img.url}
-                  alt={`preview-${idx}`}
+                  src={img.image_url}
+                  alt={`preview-${img._id}`}
                   className="w-full h-full object-cover rounded-md border shadow-sm"
                 />
                 <button

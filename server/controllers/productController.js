@@ -2,6 +2,8 @@ const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 const Product = require("../models/Product");
 const makeSKU = require("uniqid");
+const { deleteImageFromCloudinary } = require("../ultils/cloudinary");
+const Image = require("../models/Image");
 const createNewProduct = asyncHandler(async (req, res) => {
   if (Object.keys(req.body).length === 0) {
     throw new Error("Missing Inputs!");
@@ -161,7 +163,35 @@ const deleteProduct = asyncHandler(async (req, res) => {
   const { pid } = req.params;
 
   if (!pid) throw new Error("Missing product id! Please check your request!");
+  const productToDelete = await Product.findById({ _id: pid });
+  if (!productToDelete) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Product not found" });
+  }
+  const deletePromises = [];
 
+  // Add promise delete thumb
+  if (productToDelete.thumb) {
+    deletePromises.push(
+      deleteImageFromCloudinary(productToDelete.thumb.public_id)
+    );
+    deletePromises.push(Image.findByIdAndDelete(productToDelete.thumb._id));
+  }
+
+  // Add promise delete images
+  if (productToDelete.images?.length > 0) {
+    productToDelete.images.forEach((image) => {
+      // Push 2 promise delete in cloudinary and delete in DB to Array
+      deletePromises.push(deleteImageFromCloudinary(image.public_id));
+      deletePromises.push(Image.findByIdAndDelete(image._id));
+    });
+  }
+
+  // Call one with all promsie already pushed
+  if (deletePromises.length > 0) {
+    await Promise.all(deletePromises);
+  }
   const deletedProduct = await Product.findByIdAndDelete({ _id: pid });
 
   return res.status(200).json({

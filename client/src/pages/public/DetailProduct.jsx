@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useProductStore } from "@/lib/zustand/useProductStore";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ImageZoom from "@/components/Product/ImageZoom";
@@ -22,8 +22,18 @@ import DOMPurify from "dompurify";
 const DetailProduct = () => {
   const [currentImage, setCurrentImage] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState(null);
+  const [variant, setVariant] = useState(null);
+  const [currentProduct, setCurrentProduct] = useState({
+    title: "",
+    thumb: {},
+    images: [],
+    price: "",
+    color: "",
+  });
+  const navigate = useNavigate();
+
   // Get Params From URL
-  const { pid, title, category } = useParams();
+  const { pid, category } = useParams();
   const { fetchProductById, selectedProduct, isLoading } = useProductStore();
   // Call API
   const fetchProductsByCategory = async (category) => {
@@ -36,6 +46,32 @@ const DetailProduct = () => {
       console.error("Fetch related products failed:", error);
     }
   };
+  useEffect(() => {
+    if (variant && selectedProduct?.variants) {
+      const selectedVariant = selectedProduct.variants.find(
+        (el) => el.sku === variant
+      );
+      console.log(selectedVariant);
+
+      if (selectedVariant) {
+        setCurrentProduct({
+          title: selectedVariant.title,
+          thumb: selectedVariant.thumb,
+          images: selectedVariant.images,
+          price: selectedVariant.price,
+          color: selectedVariant.color,
+        });
+      }
+    } else {
+      setCurrentProduct({
+        title: "",
+        thumb: {},
+        images: [],
+        price: "",
+        color: "",
+      });
+    }
+  }, [variant, selectedProduct]);
   // Fetch API
   useEffect(() => {
     if (pid && category) {
@@ -53,11 +89,11 @@ const DetailProduct = () => {
 
   // Assign current Image to Product Thumb
   useEffect(() => {
-    if (selectedProduct?.thumb) {
-      setCurrentImage(selectedProduct.thumb);
-    }
-    console.log(selectedProduct);
-  }, [selectedProduct]);
+    const image = currentProduct?.thumb?.image_url
+      ? currentProduct.thumb
+      : selectedProduct?.thumb;
+    if (image) setCurrentImage(image);
+  }, [currentProduct, selectedProduct]);
 
   const handleChangeImage = (e, src) => {
     e.stopPropagation();
@@ -68,8 +104,8 @@ const DetailProduct = () => {
     <div className="w-full">
       <div className="h-[81px] w-full flex justify-center items-center bg-gray-100">
         <div className="w-main">
-          <h3>{title}</h3>
-          <Breadcrumbs title={title} category={category} />
+          <h3>{currentProduct.title || selectedProduct?.title}</h3>
+          <Breadcrumbs />
         </div>
       </div>
       {/* Loading Skeleton */}
@@ -98,17 +134,23 @@ const DetailProduct = () => {
           <div className="w-main m-auto mt-6 flex gap-20">
             <div className="w-2/5 flex flex-col gap-4">
               <div className="w-[458px] h-[458px] mb-10">
+                {/* Ảnh chính */}
                 <ImageZoom
-                  src={currentImage}
-                  alt={selectedProduct?.title}
+                  src={currentImage?.image_url}
+                  alt={currentProduct.title || selectedProduct?.title}
                   zoomLevel={3}
                   className="border border-gray-200 rounded"
                 />
               </div>
               <div className="w-[470px] mt-6 mb-[200px]">
+                {/* Carousel hình ảnh */}
                 <Carousel
                   onImageClick={handleChangeImage}
-                  images={selectedProduct?.images}
+                  images={
+                    currentProduct?.images?.length
+                      ? currentProduct.images
+                      : selectedProduct?.images
+                  }
                   showDots={true}
                   autoplayEnabled={true}
                 />
@@ -120,12 +162,16 @@ const DetailProduct = () => {
               <div className="h-[458px] flex flex-col justify-between">
                 <div>
                   <h2 className="text-3xl font-semibold italic text-gray-900">
-                    {formatMoney(Number(selectedProduct?.price))} VND
+                    {formatMoney(
+                      Number(currentProduct.price || selectedProduct?.price)
+                    )}{" "}
+                    VND
                   </h2>
                   <div className="flex items-center justify-between mt-3">
                     <span className="text-main font-semibold text-xl">
                       In Stock: {selectedProduct?.quantity}
                     </span>
+
                     <span className="text-gray-600 font-medium text-2xl">
                       Sold: {selectedProduct?.sold}
                     </span>
@@ -156,9 +202,70 @@ const DetailProduct = () => {
                     ></div>
                   )}
                 </ul>
+                {/* Variant selection */}
+                <div className="flex gap-3 flex-wrap mt-4">
+                  <span className="font-bold">Color:</span>
+                  <div className="flex flex-wrap gap-4 items-center w-full">
+                    <div
+                      onClick={() => {
+                        setVariant(null);
+                        navigate(
+                          `/${category}/${pid}/${selectedProduct.title.replace(
+                            /\s+/g,
+                            ""
+                          )}`
+                        );
+                      }}
+                      className={`flex items-center gap-2 p-2 border cursor-pointer ${
+                        !variant && "border-red-500"
+                      }`}
+                    >
+                      <img
+                        src={selectedProduct?.thumb.image_url}
+                        alt={`product_${selectedProduct?.thumb?.public_id}`}
+                        className="w-8 h-8 rounded-md object-cover"
+                      />
+                      <span className="flex flex-col">
+                        {" "}
+                        <span>{selectedProduct?.color}</span>
+                        <span className="text-sm">
+                          {selectedProduct?.price}
+                        </span>
+                      </span>
+                    </div>
+                    {selectedProduct?.variants?.map((el) => (
+                      <div
+                        onClick={() => {
+                          setVariant(el.sku);
+                          navigate(
+                            `/${category}/${pid}/${el.title.replace(
+                              /\s+/g,
+                              ""
+                            )}`
+                          );
+                        }}
+                        className={`flex items-center gap-2 p-2 border cursor-pointer ${
+                          variant === el.sku && "border-red-500"
+                        }`}
+                      >
+                        <img
+                          src={el?.thumb.image_url}
+                          alt={`product_${el?.thumb?.public_id}`}
+                          className="w-8 h-8 rounded-md object-cover"
+                        />
+                        <span className="flex flex-col">
+                          {" "}
+                          <span>{el.color}</span>
+                          <span className="text-sm">{el?.price}</span>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Quantity and Add to Cart Btn */}
                 <div className="flex flex-col gap-8 mt-10">
                   <div className="flex items-center justify-between gap-4">
-                    <span className="font-semibold">Quantity</span>
+                    <span className="font-semibold">Quantity:</span>
                     <QuantitySelection max={selectedProduct?.quantity} />
                   </div>
                   <Button className="cursor-pointer" fullWidth>

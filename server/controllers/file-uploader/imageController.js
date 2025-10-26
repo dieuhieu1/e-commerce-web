@@ -10,7 +10,7 @@ const uploadImages = asyncHandler(async (req, res) => {
   console.log(req.files);
 
   const imagesData = req.files.map((file) => ({
-    imageUrl: file.path,
+    image_url: file.path,
     publicId: file.filename,
     uploadedBy: userId,
   }));
@@ -33,15 +33,15 @@ const uploadImage = asyncHandler(async (req, res) => {
   if (!req.file) {
     throw new Error("Missing file upload! Please check your request params!");
   }
-  const { path: imageUrl, filename: publicId } = req.file;
+  const { path: image_url, filename: publicId } = req.file;
   const newImage = await Image.create({
-    imageUrl: imageUrl,
+    image_url: image_url,
     publicId: publicId,
     uploadedBy: userId,
   });
   if (!newImage) {
     return res.status(500).json({
-      status: false,
+      success: false,
       message: "Something wrong when uploaded image. Please try again",
     });
   }
@@ -57,13 +57,13 @@ const deleteImage = asyncHandler(async (req, res) => {
   const { _id: userId } = req.user;
 
   if (!_id) {
-    throw new Error("Missing public id! Please check your request params");
+    throw new Error("Missing image id! Please check your request params");
   }
   const image = await Image.findById(_id);
 
   if (!image) {
     return res.status(404).json({
-      status: "fail",
+      success: false,
       message: "Image not found! Please check your imageId",
     });
   }
@@ -74,7 +74,7 @@ const deleteImage = asyncHandler(async (req, res) => {
 
   if (!isUploaded) {
     return res.status(403).json({
-      success: "fail",
+      success: false,
       message: "You don't have permission to delete this image!",
     });
   }

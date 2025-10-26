@@ -8,6 +8,7 @@ const Breadcrumbs = () => {
     const isHexId = /^[0-9a-fA-F]{8,32}$/.test(segment.label);
     return !isHexId;
   });
+  console.log(crumbs);
 
   return (
     <nav className="text-md text-gray-600 ">

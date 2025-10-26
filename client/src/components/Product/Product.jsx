@@ -44,7 +44,7 @@ const Product = ({ productData, isNew, normal }) => {
           </div>
           <img
             src={
-              thumb ||
+              thumb.image_url ||
               "https://www.allaboardeducators.com/images/productimages/1.jpg"
             }
             alt={slug}

@@ -51,6 +51,8 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
 
   // --- Load dữ liệu sản phẩm khi mở ---
   useEffect(() => {
+    console.log(product);
+
     if (product) {
       reset({
         title: product.title || "",
@@ -64,8 +66,8 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
           : product.description || "",
       });
       setDisplayPrice(formatCurrency(product.price || 0));
-      setThumbPreview(product.thumb ? { url: product.thumb } : null);
-      setImagePreviews(product.images?.map((url) => ({ url })) || []);
+      setThumbPreview(product.thumb ? product.thumb : null);
+      setImagePreviews(product.images?.map((image) => image) || []);
       setLoading(false);
     }
   }, [product, reset, open]);
@@ -83,15 +85,16 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
   // --- Upload ảnh ---
   const handleUploadImages = async (files, field) => {
     if (!files || files.length === 0) return;
-
+    // If existed a thumb, replace the one old
     if (field === "thumb" && thumbPreview) {
       return openConfirm("Replace existing thumbnail?", async () => {
-        await apiDeleteImage(thumbPreview);
+        await apiDeleteImage({ _id: thumbPreview._id });
         setThumbPreview(null);
+        // Upload new image
         await uploadNewImages(files, field);
       });
     }
-
+    // If field = galery --> Just upload
     await uploadNewImages(files, field);
   };
 
@@ -105,7 +108,7 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
       if (res.success) {
         const images = res.data.map((img) => ({
           _id: img._id,
-          url: img.imageUrl,
+          image_url: img.image_url,
           public_id: img.publicId,
         }));
 
@@ -117,11 +120,11 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
           setValue("thumb", images[0]);
         } else {
           setImagePreviews((prev) => [...prev, ...images]);
-          setValue("images", [...(watch("images") || []), ...images]);
+          setValue("images", [...watch("images"), ...images]);
         }
 
         toast.success("✅ Images uploaded successfully!");
-      } else toast.error("❌ Upload failed!");
+      }
     } catch (error) {
       toast.error("❌ Upload failed!");
     } finally {
@@ -130,39 +133,40 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
     }
   };
 
-  // --- Xóa ảnh ---
+  // Confirm Delete Image
   const handleAskDelete = (image, field) => {
     openConfirm("Delete this image?", async () => {
       await handleDeleteImage(image, field);
     });
   };
 
+  // Handle Delete Image
   const handleDeleteImage = async (image, field) => {
     if (!image) return;
     try {
       setLoading(true);
-      console.log(image);
 
       const res = await apiDeleteImage(image);
       if (res.success) {
-        // Nếu ảnh bị xóa là ảnh tạm thì loại khỏi danh sách
+        if (field === "thumb") {
+          setThumbPreview(null);
+          setValue("thumb", null);
+        } else {
+          const updated = imagePreviews.filter(
+            (img) => img.public_id !== image.public_id
+          );
+          setImagePreviews(updated);
+          setValue("images", updated);
+        }
+
+        // Check if the Image is temp, delete it from state TempUploadedImage
         setTempUploadedImages((prev) =>
           prev.filter((id) => id !== image.public_id)
         );
 
-        if (res.success) {
-          if (field === "thumb") {
-            setThumbPreview(null);
-            setValue("thumb", null);
-          } else {
-            const updated = imagePreviews.filter(
-              (img) => img.public_id !== image.public_id
-            );
-            setImagePreviews(updated);
-            setValue("images", updated);
-          }
-          toast.success("🗑️ Image deleted successfully!");
-        }
+        toast.success("🗑️ Image deleted successfully!");
+      } else {
+        toast.error(res.message);
       }
     } catch {
       toast.error("❌ Failed to delete image!");
@@ -173,37 +177,77 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
   };
 
   const onSubmit = async (data) => {
-    const payload = {
-      ...data,
-      _id: product._id,
+    if (!thumbPreview || !imagePreviews) {
+      toast.error("Thumbnail and Image Gallery is required!");
+      return;
+    }
+
+    const productId = product._id;
+    const productData = {
       price: Number(data.price),
-      thumb: thumbPreview?.url || product.thumb,
-      images: imagePreviews.map((img) => img.url),
+      thumb: thumbPreview,
+      images: imagePreviews,
+      ...data,
     };
 
-    setLoading(true);
-    onSave && onSave(payload);
-    setTempUploadedImages([]);
-    onClose();
+    console.log(productData);
+    try {
+      setLoading(true);
+      // Call api update product
+      const res = await apiUpdateProduct(productId, productData);
 
-    setLoading(false);
+      if (res.success) {
+        toast.success(res.message || "Product updated successfully!", {
+          duration: 3500,
+          icon: "💾",
+          style: {
+            background: "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
+            color: "#166534",
+            border: "1px solid #86efac",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+            padding: "12px 18px",
+            borderRadius: "10px",
+            fontWeight: "500",
+            fontSize: "15px",
+          },
+        });
+        // Set the temp image to [] prevent no to delete in cleanup function
+        setTempUploadedImages([]);
+        await cleanupAndClose(true);
+        // Pass the result to reload data in Parent Component
+        onSave(res.success);
+
+        // Clean up function
+      } else {
+        toast.error(res.message || "Failed to add variant!");
+      }
+    } catch (error) {
+      console.error("⚠️ Error adding variant:", error);
+      toast.error("An unexpected error occurred while saving!");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // --- Cancel / Đóng dialog ---
+  // Handle Close (cancel)
   const handleClose = async () => {
     if (isDirty) {
+      // show confirm dialog and if confirmed -> cleanupAndClose()
       openConfirm("Discard unsaved changes?", async () => {
-        await cleanupAndClose();
+        await cleanupAndClose(false); // default - xoá temp images
       });
       return;
     }
-    await cleanupAndClose();
+    // not dirty -> safe to cleanup and close (delete temps)
+    await cleanupAndClose(false);
   };
-  const cleanupAndClose = async () => {
-    if (tempUploadedImages.length > 0) {
+
+  // Clean up state and image function
+  const cleanupAndClose = async (keepTemps = false) => {
+    if (!keepTemps && tempUploadedImages.length > 0) {
       try {
-        console.log(tempUploadedImages);
         setLoading(true);
+        // apiDeleteImage expects { _id } or public_id based on your api
         await Promise.all(
           tempUploadedImages.map((_id) => apiDeleteImage({ _id }))
         );
@@ -214,14 +258,23 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
         setLoading(false);
         setTempUploadedImages([]);
       }
+    } else {
+      // if keepTemps === true we clear temp array so cleanup won't attempt deleting later
+      setTempUploadedImages([]);
     }
 
-    reset();
+    // Reset local form/UI state before closing
+    try {
+      reset();
+    } catch (e) {
+      // safe-guard: reset might fail if form unmounted
+      console.warn("reset() failed:", e);
+    }
     setThumbPreview(null);
     setImagePreviews([]);
     setDisplayPrice("");
     setConfirmOpen(false);
-    onClose();
+    onClose && onClose();
   };
 
   return (
@@ -232,7 +285,7 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
             Edit Product
           </DialogTitle>
         </DialogHeader>
-
+        {/* Loading overlay */}
         {loading && (
           <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-50">
             <Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-2" />
@@ -351,7 +404,7 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
               {thumbPreview && (
                 <div className="relative w-48 h-48 mx-auto mt-3">
                   <img
-                    src={thumbPreview.url}
+                    src={thumbPreview.image_url}
                     alt="thumb"
                     className="w-full h-full object-cover rounded-md border"
                   />
@@ -389,8 +442,8 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
                 {imagePreviews.map((img, idx) => (
                   <div key={idx} className="relative w-40 h-40">
                     <img
-                      src={img.url}
-                      alt={`preview-${idx}`}
+                      src={img.image_url}
+                      alt={`preview-${img._id}`}
                       className="w-full h-full object-cover rounded-md border shadow-sm"
                     />
                     <button
@@ -404,7 +457,7 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
                 ))}
               </div>
             </div>
-
+            {/*  Footer */}
             <DialogFooter className="col-span-2 flex justify-end mt-6">
               <Button type="button" variant="secondary" onClick={handleClose}>
                 Cancel
