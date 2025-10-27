@@ -11,7 +11,6 @@ import path from "@/ultils/path";
 
 const Header = () => {
   const { isAuthenticated, user } = useAuthStore();
-  console.log(user);
 
   return (
     <header className="w-full bg-white shadow-sm z-100 mb-6">
@@ -36,22 +35,25 @@ const Header = () => {
             <span>Online Support 24/7</span>
           </div>
           {isAuthenticated && (
-            <Link to={path.MEMBER} className="flex">
+            <div className="flex">
               <div className="cursor-pointer flex px-6 border-r items-center justify-center gap-2">
                 <BsHandbagFill color="red" size={20} />
                 <span>0 item(s)</span>
               </div>
-              <div className="cursor-pointer flex px-6 items-center justify-center gap-4 border-r">
+              <Link
+                to={`/${path.MEMBER}/${path.PERSONAL}`}
+                className="cursor-pointer flex px-6 items-center justify-center gap-4 border-r"
+              >
                 <FaUserCircle size={22} /> Profile
-              </div>
-            </Link>
+              </Link>
+            </div>
           )}{" "}
           {user?.role === "admin" && (
             <Link to={path.ADMIN}>
               <div className="cursor-pointer flex items-center gap-3 px-4 py-2 rounded-full border border-white/30 bg-white/10 backdrop-blur-md hover:opacity-70 transition-all duration-300 shadow-sm hover:shadow-md ml-5">
                 <MdDashboard size={22} className="text-main" />
                 <span className="text-sm font-medium  text-main tracking-wide">
-                  Admin Dashboard
+                  Admin Workspace
                 </span>
               </div>
             </Link>

@@ -13,10 +13,10 @@ const {
   deleteUser,
   updateUser,
   updateUserByAdmin,
-  updateUserAddress,
   updateUserCart,
   verifyEmail,
   createUsers,
+  changePassword,
 } = userController;
 
 userRouter.post("/register", register);
@@ -28,12 +28,12 @@ userRouter.post("/refreshtoken", refreshAccessToken);
 userRouter.post("/logout", logout);
 userRouter.post("/forgot-password", forgotPassword);
 userRouter.post("/reset-password", resetPassword);
+userRouter.post("/change-password", verifyAccessToken, changePassword);
 
 userRouter.get("/current", verifyAccessToken, getCurrentUser);
 userRouter.get("/", verifyAccessToken, isAdmin, getAllUsers);
 
 userRouter.put("/current", verifyAccessToken, updateUser);
-userRouter.put("/address", verifyAccessToken, updateUserAddress);
 userRouter.put("/cart", verifyAccessToken, updateUserCart);
 
 userRouter.put("/:uid", verifyAccessToken, isAdmin, updateUserByAdmin);

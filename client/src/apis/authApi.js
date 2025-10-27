@@ -43,3 +43,9 @@ export const apiGetCurrent = () =>
     url: "/user/current",
     method: "get",
   });
+export const apiChangePassword = (data) =>
+  axios({
+    url: "/user/change-password",
+    method: "post",
+    data,
+  });

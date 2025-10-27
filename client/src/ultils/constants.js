@@ -1,11 +1,17 @@
-import { BsReplyFill, BsShieldShaded } from "react-icons/bs";
+import {
+  BsListColumnsReverse,
+  BsReplyFill,
+  BsShieldShaded,
+} from "react-icons/bs";
 import path from "./path";
 import { FaTruckFast, FaTty } from "react-icons/fa6";
-import { AiFillGift } from "react-icons/ai";
-import { RiTruckFill } from "react-icons/ri";
+import { AiFillGift, AiOutlineShoppingCart } from "react-icons/ai";
+import { RiLockPasswordLine, RiTruckFill } from "react-icons/ri";
 import { MdGroups } from "react-icons/md";
 import { PiPackageBold } from "react-icons/pi";
 import { BiSolidDashboard } from "react-icons/bi";
+import { FaRegUserCircle } from "react-icons/fa";
+import { TbHistoryToggle } from "react-icons/tb";
 
 export const navigation = [
   { id: 101, value: "HOME", path: `/${path.HOME}` },
@@ -104,5 +110,43 @@ export const adminSidebar = [
     text: "Manage orders",
     path: `/${path.ADMIN}/${path.MANAGE_ORDER}`,
     icon: FaTruckFast,
+  },
+];
+
+export const memberSidebar = [
+  {
+    id: 1,
+    type: "single",
+    text: "Personal",
+    path: `/${path.MEMBER}/${path.PERSONAL}`,
+    icon: FaRegUserCircle,
+  },
+  {
+    id: 2,
+    type: "single",
+    text: "Change Password",
+    path: `/${path.MEMBER}/${path.CHANGE_PASSWORD}`,
+    icon: RiLockPasswordLine,
+  },
+  {
+    id: 3,
+    type: "single",
+    text: "My cart",
+    path: `/${path.MEMBER}/${path.MY_CART}`,
+    icon: AiOutlineShoppingCart,
+  },
+  {
+    id: 4,
+    type: "single",
+    text: "Buy History",
+    path: `/${path.MEMBER}/${path.HISTORY}`,
+    icon: TbHistoryToggle,
+  },
+  {
+    id: 5,
+    type: "single",
+    text: "Wishlist",
+    path: `/${path.MEMBER}/${path.WISHLIST}`,
+    icon: BsListColumnsReverse,
   },
 ];

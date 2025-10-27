@@ -20,6 +20,10 @@ import CreateProduct from "./pages/admin/CreateProduct";
 import MemberLayout from "./pages/member/MemberLayout";
 import Personal from "./pages/member/Personal";
 import ManageOrder from "./pages/admin/ManageOrder";
+import MyCart from "./pages/member/MyCart";
+import WishList from "./pages/member/WishList";
+import History from "./pages/member/History";
+import ChangePassword from "./pages/member/ChangePassword";
 
 export const router = createBrowserRouter([
   {
@@ -97,7 +101,13 @@ export const router = createBrowserRouter([
     path: path.MEMBER,
     element: <MemberLayout />,
     errorElement: <ErrorPage />,
-    children: [{ path: path.PERSONAL, element: <Personal /> }],
+    children: [
+      { path: path.PERSONAL, element: <Personal /> },
+      { path: path.MY_CART, element: <MyCart /> },
+      { path: path.WISHLIST, element: <WishList /> },
+      { path: path.HISTORY, element: <History /> },
+      { path: path.CHANGE_PASSWORD, element: <ChangePassword /> },
+    ],
   },
   {
     path: path.VERIFY_EMAIL,

@@ -17,3 +17,8 @@ export const apiDeleteUsers = (uid) =>
     url: "/user/" + uid,
     method: "delete",
   });
+export const apiUpdateProfileUser = () =>
+  axios({
+    url: "/user/",
+    method: "delete",
+  });

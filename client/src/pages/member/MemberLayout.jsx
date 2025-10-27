@@ -1,3 +1,5 @@
+import Header from "@/components/Header/Header";
+import MemberSidebar from "@/components/Sidebar/MemberSidebar";
 import { useAuthStore } from "@/lib/zustand/useAuthStore";
 import path from "@/ultils/path";
 import React from "react";
@@ -9,8 +11,11 @@ const MemberLayout = () => {
     <Navigate to={`/${path.LOGIN}`} replace={true} />;
   }
   return (
-    <div>
-      MemberLayout <Outlet />
+    <div className="flex">
+      <MemberSidebar />
+      <div className="flex-auto bg-gray-100 min-h-screen">
+        <Outlet />
+      </div>
     </div>
   );
 };

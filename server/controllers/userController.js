@@ -298,6 +298,42 @@ const resetPassword = asyncHandler(async (req, res) => {
   });
 });
 
+const changePassword = asyncHandler(async (req, res) => {
+  const { _id: userId } = req.user;
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return res
+      .status(400)
+      .json({ message: "All password fields are required." });
+  }
+
+  // Find User in Databasez
+  const user = await User.findById(userId).select("+password");
+  if (!user) {
+    return res.status(404).json({ message: "User not found." });
+  }
+
+  // 3️⃣ So sánh mật khẩu hiện tại
+  const isMatch = await user.isCorrectPassword(currentPassword);
+  if (!isMatch) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Current password is incorrect." });
+  }
+  // HashedPassword will be gen before save
+  user.password = newPassword;
+  user.passwordChangedAt = Date.now();
+  await user.save();
+
+  // 6️⃣ Phản hồi thành công
+  return res.status(200).json({
+    success: true,
+    message:
+      "Password changed successfully! Please remember to login with your new password.",
+  });
+});
+
 const getAllUsers = asyncHandler(async (req, res) => {
   const queryObj = { ...req.query };
   const excludeFields = ["page", "sort", "filter", "limit"];
@@ -385,25 +421,6 @@ const deleteUser = asyncHandler(async (req, res) => {
   });
 });
 
-const updateUser = asyncHandler(async (req, res) => {
-  const { uid } = req.params;
-
-  if (!uid || Object.keys(req.body).length === 0) {
-    throw new Error("Missing input");
-  }
-
-  const response = await User.findByIdAndUpdate({ _id: uid }, req.body).select(
-    "-role -password -refreshToken"
-  );
-
-  return res.status(200).json({
-    success: response ? true : false,
-    message: response
-      ? `User with email: ${response.email} updated successfully!`
-      : "Something went wrong!",
-  });
-});
-
 const updateUserByAdmin = asyncHandler(async (req, res) => {
   const { uid } = req.params;
 
@@ -422,25 +439,49 @@ const updateUserByAdmin = asyncHandler(async (req, res) => {
       : "Something went wrong!",
   });
 });
-
-const updateUserAddress = asyncHandler(async (req, res) => {
+const updateUser = asyncHandler(async (req, res) => {
   const { _id: userId } = req.user;
 
-  if (!req.body.address) {
-    throw new Error("Missing inputs! Please check your request");
+  const targetId = userId;
+
+  if (!targetId || Object.keys(req.body).length === 0) {
+    throw new Error("Missing input");
   }
 
-  const response = await User.findByIdAndUpdate(
-    { _id: userId },
-    { $push: { address: req.body.address } },
-    { new: true }
-  ).select("-password -role -refreshToken");
+  let updateData = {};
+
+  if (req.body.address) {
+    // If request.address is an array replace all
+    if (Array.isArray(req.body.address)) {
+      updateData.$set = {
+        ...(updateData.$set || {}),
+        address: req.body.address,
+      };
+    } else {
+      // if have only one address, use push to
+      updateData.$push = { address: req.body.address };
+    }
+  }
+
+  // Các field còn lại (nếu có) sẽ được cập nhật bằng $set
+  const otherFields = Object.keys(req.body).filter((k) => k !== "address");
+  if (otherFields.length > 0) {
+    updateData.$set = {};
+    otherFields.forEach((key) => {
+      updateData.$set[key] = req.body[key];
+    });
+  }
+
+  const response = await User.findByIdAndUpdate({ _id: targetId }, updateData, {
+    new: true,
+  }).select("-password -refreshToken");
 
   return res.status(200).json({
-    success: response ? true : false,
-    updatedUser: response
-      ? response
-      : "Something went wrong! Cannot updated user info",
+    success: !!response,
+    message: response
+      ? `User ${response.email} updated successfully!`
+      : "Something went wrong!",
+    updatedUser: response || null,
   });
 });
 
@@ -491,20 +532,23 @@ const createUsers = asyncHandler(async (req, res) => {
   });
 });
 module.exports = {
+  // Authorization
   register,
   login,
   getCurrentUser,
   refreshAccessToken,
+  verifyEmail,
   logout,
+  // Change password
   forgotPassword,
   resetPassword,
+  changePassword,
+  // Get User
+  createUsers,
   getAllUsers,
   deleteUser,
   updateUser,
   updateUser,
   updateUserByAdmin,
-  updateUserAddress,
   updateUserCart,
-  verifyEmail,
-  createUsers,
 };
