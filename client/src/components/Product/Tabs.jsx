@@ -5,11 +5,12 @@ import CommentModal from "./CommentModal";
 import { MessageCircle } from "lucide-react";
 import { apiRatingProduct } from "@/apis/product";
 import { useAuthStore } from "@/lib/zustand/useAuthStore";
-import { CustomDialog } from "../Common/CustomDialog";
+import { CustomDialog } from "../Dialog/CustomDialog";
 import { useNavigate } from "react-router-dom";
 
 import path from "@/ultils/path";
 import Review from "./Review";
+import toast from "react-hot-toast";
 
 function Tabs({ data, averageRatings, reviews, productId, onReload }) {
   // Global state isAuthenticated
@@ -46,7 +47,11 @@ function Tabs({ data, averageRatings, reviews, productId, onReload }) {
         comment,
         updatedAt: Date.now(),
       });
-
+      if (response.success) {
+        toast.success(
+          "Thank for your review! We appreciate your exprience and improve our service in the future!"
+        );
+      }
       onReload();
     },
     [onReload, productId]

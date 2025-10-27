@@ -37,7 +37,7 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
     onConfirm: null,
   });
   const [displayPrice, setDisplayPrice] = useState("");
-  const [tempUploadedImages, setTempUploadedImages] = useState([]); // 🆕 ảnh tạm
+  const [tempUploadedImages, setTempUploadedImages] = useState([]); // Template Image
 
   const {
     register,

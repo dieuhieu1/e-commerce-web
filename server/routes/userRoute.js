@@ -17,6 +17,7 @@ const {
   verifyEmail,
   createUsers,
   changePassword,
+  removeProductUserCart,
 } = userController;
 
 userRouter.post("/register", register);
@@ -35,6 +36,7 @@ userRouter.get("/", verifyAccessToken, isAdmin, getAllUsers);
 
 userRouter.put("/current", verifyAccessToken, updateUser);
 userRouter.put("/cart", verifyAccessToken, updateUserCart);
+userRouter.put("/cart/remove/:pid", verifyAccessToken, removeProductUserCart);
 
 userRouter.put("/:uid", verifyAccessToken, isAdmin, updateUserByAdmin);
 

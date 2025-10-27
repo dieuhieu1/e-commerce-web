@@ -2,6 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Camera, Plus, Trash2 } from "lucide-react";
 import { useAuthStore } from "@/lib/zustand/useAuthStore";
+import default_avatar from "../../assets/default_3.png";
+import { apiDeleteImage, apiUploadImages } from "@/apis/image";
+import ConfirmDialog from "@/components/Dialog/ConfirmDialog";
+import toast from "react-hot-toast";
+import { apiUpdateProfileUser } from "@/apis/user";
+import LoadingOverlay from "@/components/Loading/LoadingOverlay";
 
 const Personal = () => {
   const { user } = useAuthStore();
@@ -11,12 +17,18 @@ const Personal = () => {
   const [addresses, setAddresses] = useState([]);
   const [userData, setUserData] = useState({});
 
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmData, setConfirmData] = useState({
+    message: "",
+    onConfirm: null,
+  });
+  const [loading, setLoading] = useState(false);
+
   const {
     register,
-    formState: { errors },
+    formState: { errors, isDirty },
     handleSubmit,
     reset,
-    watch,
   } = useForm();
 
   // Assign user data in first useEffect
@@ -32,9 +44,12 @@ const Personal = () => {
         avatar: user.avatar || null,
         role: user.role || "",
         isBlocked: user.isBlocked || false,
+        address: user.address || [],
       });
+      setAddresses(user.address);
     }
   }, [user]);
+
   // Assign user data to the form
   useEffect(() => {
     if (userData && Object.keys(userData).length > 0) {
@@ -42,41 +57,109 @@ const Personal = () => {
     }
   }, [userData, reset]);
 
-  const newPassword = watch("newPassword");
+  // Upload image
+  const handleUploadAndChangeAvatar = async (file) => {
+    if (!file) return;
 
-  const onSubmit = (data) => {
+    if (avatarPreview) {
+      return openConfirm("Replace existing thumbnail?", async () => {
+        await apiDeleteImage({ _id: avatarPreview._id });
+        setAvatarPreview(null);
+        // Upload new image
+        await uploadNewImages(file);
+      });
+    }
+    await uploadNewImages(file);
+  };
+  const uploadNewImages = async (file) => {
+    const formData = new FormData();
+    formData.append("fileImages", file);
+
+    try {
+      setLoading(true);
+      const res = await apiUploadImages(formData);
+      if (res.success) {
+        const image = res.data;
+        console.log(image);
+
+        // Save Avatar Preview
+        setAvatarPreview(image[0]);
+        toast.success("✅ Avatar uploaded successfully!");
+      }
+    } catch (error) {
+      toast.error("❌ Upload failed!" + error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Open / Close Confirm Dialog
+  const openConfirm = (message, onConfirm) => {
+    setConfirmData({ message, onConfirm });
+    setConfirmOpen(true);
+  };
+  const closeConfirm = () => {
+    setConfirmOpen(false);
+    setConfirmData({ message: "", onConfirm: null });
+  };
+
+  // Submit form
+  const onSubmit = async (data) => {
     const updatedData = {
       ...userData,
       firstname: data.firstname,
       lastname: data.lastname,
       mobile: data.mobile,
       avatar: avatarPreview || userData.avatar,
+      address: addresses,
     };
-
-    if (data.newPassword && data.newPassword === data.confirmPassword) {
-      updatedData.password = data.newPassword;
+    try {
+      setLoading(true);
+      const updateUserInfo = await apiUpdateProfileUser(updatedData);
+      if (updateUserInfo.success) {
+        toast.success(
+          updateUserInfo.message || "User Profile updated successfully!"
+        );
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred while updating!" + error);
+    } finally {
+      setAvatarPreview(null);
+      setUserData(updatedData);
+      setIsEditing(false);
+      setLoading(false);
     }
-
-    setUserData(updatedData);
-    setIsEditing(false);
-    console.log("Updated data:", { ...updatedData, addresses });
   };
 
+  // Cancel update user info
   const handleCancel = () => {
-    reset(userData);
+    if (isDirty) {
+      return openConfirm("Discard unsaved changes?", async () => {
+        await cleanupAndClose(false); // Cleanup
+      });
+    }
+  };
+
+  // Clean up function
+  const cleanupAndClose = async () => {
+    if (avatarPreview) {
+      try {
+        setLoading(true);
+        // Api Delete Image
+        const response = await apiDeleteImage({ _id: avatarPreview._id });
+        if (response.success) {
+          toast.success("🧹 Cleaned temp images! Discard change successfully");
+        }
+      } catch (error) {
+        toast.error("⚠️ Failed to clean temp images!" + error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    reset();
     setAvatarPreview(null);
     setIsEditing(false);
-  };
-
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
+    closeConfirm();
   };
 
   const addAddress = () => {
@@ -115,17 +198,20 @@ const Personal = () => {
           <div className="flex justify-center mb-8">
             <div className="relative">
               <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-                {avatarPreview || userData.avatar ? (
+                {avatarPreview || userData?.avatar ? (
                   <img
-                    src={avatarPreview || userData.avatar}
+                    src={
+                      avatarPreview?.image_url || userData?.avatar?.image_url
+                    }
                     alt="Avatar"
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span className="text-4xl text-gray-400">
-                    {userData.firstname}
-                    {userData.lastname}
-                  </span>
+                  <img
+                    src={default_avatar}
+                    alt="Avatar"
+                    className="w-full h-full object-cover"
+                  />
                 )}
               </div>
               {isEditing && (
@@ -134,8 +220,10 @@ const Personal = () => {
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={handleAvatarChange}
                     className="hidden"
+                    onChange={(e) =>
+                      handleUploadAndChangeAvatar(e.target.files[0])
+                    }
                   />
                 </label>
               )}
@@ -260,7 +348,7 @@ const Personal = () => {
                 <button
                   type="button"
                   onClick={addAddress}
-                  className="flex items-center gap-2 px-3 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                  className="cursor-pointer flex items-center gap-2 px-3 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
                 >
                   <Plus size={16} />
                   Add Address
@@ -290,7 +378,7 @@ const Personal = () => {
                       <button
                         type="button"
                         onClick={() => removeAddress(addr.id)}
-                        className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                        className="cursor-pointer px-3 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
                       >
                         <Trash2 size={20} />
                       </button>
@@ -307,14 +395,14 @@ const Personal = () => {
               <button
                 type="button"
                 onClick={handleCancel}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                className="cursor-pointer px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleSubmit(onSubmit)}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                className="cursor-pointer px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
               >
                 Save Changes
               </button>
@@ -322,6 +410,14 @@ const Personal = () => {
           )}
         </div>
       </div>
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Confirm Action"
+        description={confirmData.message}
+        onConfirm={confirmData.onConfirm}
+      />
+      <LoadingOverlay loading={loading} />
     </div>
   );
 };

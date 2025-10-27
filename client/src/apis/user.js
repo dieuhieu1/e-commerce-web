@@ -17,8 +17,15 @@ export const apiDeleteUsers = (uid) =>
     url: "/user/" + uid,
     method: "delete",
   });
-export const apiUpdateProfileUser = () =>
+export const apiUpdateProfileUser = (data) =>
   axios({
-    url: "/user/",
-    method: "delete",
+    url: "/user/current",
+    method: "put",
+    data,
+  });
+export const apiUpdateUserCart = (data) =>
+  axios({
+    url: "/user/cart",
+    method: "put",
+    data,
   });

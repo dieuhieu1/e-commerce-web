@@ -2,11 +2,14 @@ import Header from "@/components/Header/Header";
 import MemberSidebar from "@/components/Sidebar/MemberSidebar";
 import { useAuthStore } from "@/lib/zustand/useAuthStore";
 import path from "@/ultils/path";
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
 const MemberLayout = () => {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, checkAuth } = useAuthStore();
+  useEffect(() => {
+    checkAuth();
+  }, []);
   if (!isAuthenticated || !user) {
     <Navigate to={`/${path.LOGIN}`} replace={true} />;
   }

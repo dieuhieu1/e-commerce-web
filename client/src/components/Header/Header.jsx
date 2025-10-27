@@ -13,7 +13,7 @@ const Header = () => {
   const { isAuthenticated, user } = useAuthStore();
 
   return (
-    <header className="w-full bg-white shadow-sm z-100 mb-6">
+    <header className="w-full bg-white shadow-sm mb-6">
       <div className="max-w-[1250px] mx-auto flex justify-between items-center h-[110px] py-[35px] px-4">
         <Link to={"/"}>
           <img src={logo} alt="Logo" className="w-[180px] object-contain" />
@@ -38,7 +38,7 @@ const Header = () => {
             <div className="flex">
               <div className="cursor-pointer flex px-6 border-r items-center justify-center gap-2">
                 <BsHandbagFill color="red" size={20} />
-                <span>0 item(s)</span>
+                <span>{`${user.cart.length || 0} item(s)`}</span>
               </div>
               <Link
                 to={`/${path.MEMBER}/${path.PERSONAL}`}

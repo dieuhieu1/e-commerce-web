@@ -18,7 +18,9 @@ var userSchema = new mongoose.Schema(
       unique: true,
     },
     avatar: {
-      type: String,
+      _id: { type: String },
+      public_id: { type: String },
+      image_url: { type: String, require: true },
     },
     mobile: {
       type: String,

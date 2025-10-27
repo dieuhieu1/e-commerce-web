@@ -10,7 +10,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import logo from "@/assets/logo.png";
-import Button from "./Button";
+import Button from "../Common/Button";
 
 export function CustomDialog({
   open, // optional: dùng khi controlled

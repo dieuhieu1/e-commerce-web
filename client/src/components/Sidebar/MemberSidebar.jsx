@@ -29,14 +29,14 @@ const MemberSidebar = () => {
       <div className="flex flex-col items-center justify-center py-6 border-b border-gray-200">
         <div>
           <img
-            src={user?.avatar || default_avatar}
+            src={user?.avatar?.image_url || default_avatar}
             alt="logo"
-            className="w-[140px] object-contain drop-shadow-sm rounded-full"
+            className="w-[200px] h-[200px] object-cover drop-shadow-sm rounded-full"
           />
         </div>
-        <h12 className="text-gray-500 mt-1 tracking-wide">
+        <h1 className="text-gray-500 mt-1 tracking-wide">
           {user?.firstname + " " + user?.lastname}
-        </h12>
+        </h1>
       </div>
 
       {/* Menu */}

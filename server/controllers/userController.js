@@ -69,7 +69,6 @@ const register = asyncHandler(async (req, res) => {
 
 const verifyEmail = asyncHandler(async (req, res) => {
   const { token: verificationToken } = req.params;
-  console.log(req.params);
   const hashedToken = crypto
     .createHash("sha256")
     .update(verificationToken)
@@ -442,37 +441,35 @@ const updateUserByAdmin = asyncHandler(async (req, res) => {
 const updateUser = asyncHandler(async (req, res) => {
   const { _id: userId } = req.user;
 
-  const targetId = userId;
+  // 1. Tách 'address' ra khỏi 'req.body', 'otherFields' sẽ chứa phần còn lại
+  const { address, ...otherFields } = req.body;
 
-  if (!targetId || Object.keys(req.body).length === 0) {
+  if (!userId || Object.keys(req.body).length === 0) {
     throw new Error("Missing input");
   }
 
-  let updateData = {};
+  const updateData = {};
 
-  if (req.body.address) {
-    // If request.address is an array replace all
-    if (Array.isArray(req.body.address)) {
-      updateData.$set = {
-        ...(updateData.$set || {}),
-        address: req.body.address,
-      };
+  // 2. Khởi tạo $set với các trường 'otherFields'
+  // Chỉ khởi tạo $set nếu 'otherFields' thực sự có dữ liệu
+  if (Object.keys(otherFields).length > 0) {
+    updateData.$set = otherFields;
+  }
+
+  // 3. Xử lý logic cho 'address'
+  if (address) {
+    if (Array.isArray(address)) {
+      // Nếu 'address' là một mảng, GHI ĐÈ nó vào $set
+      // Cần đảm bảo '$set' đã được khởi tạo
+      if (!updateData.$set) updateData.$set = {};
+      updateData.$set.address = address;
     } else {
-      // if have only one address, use push to
-      updateData.$push = { address: req.body.address };
+      // Nếu 'address' là một object, PUSH nó
+      updateData.$push = { address: address };
     }
   }
 
-  // Các field còn lại (nếu có) sẽ được cập nhật bằng $set
-  const otherFields = Object.keys(req.body).filter((k) => k !== "address");
-  if (otherFields.length > 0) {
-    updateData.$set = {};
-    otherFields.forEach((key) => {
-      updateData.$set[key] = req.body[key];
-    });
-  }
-
-  const response = await User.findByIdAndUpdate({ _id: targetId }, updateData, {
+  const response = await User.findByIdAndUpdate({ _id: userId }, updateData, {
     new: true,
   }).select("-password -refreshToken");
 
@@ -487,25 +484,32 @@ const updateUser = asyncHandler(async (req, res) => {
 
 const updateUserCart = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const { productId, quantity, color } = req.body;
+  const { productId, quantity = 1, color } = req.body;
   console.log(req.body);
-
-  if (!productId || !quantity || !color) {
-    throw new Error("Missing Input! Check your request params");
+  // Validate req.body
+  if (!productId) {
+    throw new Error("Missing Product Id! Check your request params");
+  }
+  if (!color) {
+    throw new Error("Missing Color! Check your request params");
   }
 
+  // Find user in DB
   const user = await User.findById(_id);
   const userCart = user.cart;
   console.log(userCart);
 
+  // Check is product in cart?
   const productAlreadyInCart = userCart.find(
     (item) =>
       item.productId.toString() === productId.toString() && item.color === color
   );
 
+  // If yes plus the quantity
   if (productAlreadyInCart) {
     productAlreadyInCart.quantity += +quantity;
   } else {
+    // Else push new product to cart array
     const newProduct = {
       productId: productId,
       quantity: quantity,
@@ -513,17 +517,50 @@ const updateUserCart = asyncHandler(async (req, res) => {
     };
     user.cart.push(newProduct);
   }
-
-  const updatedUser = await user.save();
+  // Saving the update
+  const updatedUserCart = await user.save();
   return res.status(200).json({
-    success: updatedUser ? true : false,
-    message: "Updated User Cart Successfully!",
-    result: updatedUser
-      ? updatedUser
+    success: updatedUserCart ? true : false,
+    message: updatedUserCart
+      ? "Updated User Cart Successfully!"
       : "Something went wrong! Cannot updated user cart.",
+    result: updatedUserCart ? updatedUserCart : [],
   });
 });
+const removeProductUserCart = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  const { productId } = req.params;
 
+  // Validate req.body
+  if (!productId) {
+    throw new Error("Missing Product Id! Check your request params");
+  }
+  if (!color) {
+    throw new Error("Missing Color! Check your request params");
+  }
+
+  const user = await User.findById(_id);
+  const userCart = user.cart;
+
+  const alreadyInCart = user?.cart?.findIndex(
+    (item) => item.productId.toString() === productId
+  );
+
+  if (itemIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: "Product not found in cart!",
+    });
+  }
+  user.cart.splice(itemIndex, 1);
+  await user.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Removed product from cart successfully!",
+    cart: user.cart,
+  });
+});
 const createUsers = asyncHandler(async (req, res) => {
   const response = await User.create(users);
   return res.status(200).json({
@@ -548,7 +585,7 @@ module.exports = {
   getAllUsers,
   deleteUser,
   updateUser,
-  updateUser,
   updateUserByAdmin,
   updateUserCart,
+  removeProductUserCart,
 };
