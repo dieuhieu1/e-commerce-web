@@ -132,3 +132,18 @@ export const getRandomAvatar = () => {
   const randomIndex = Math.floor(Math.random() * defaultAvatars.length);
   return defaultAvatars[randomIndex];
 };
+export const formatUSD = (amount) => (amount / 24000).toFixed(2);
+export const formatCurrencyVND = (amount) =>
+  new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(amount);
+export const formatDate = (dateString) => {
+  return new Date(dateString).toLocaleDateString("vi-VN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};

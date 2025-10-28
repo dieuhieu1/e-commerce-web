@@ -20,11 +20,10 @@ import CreateProduct from "./pages/admin/CreateProduct";
 import MemberLayout from "./pages/member/MemberLayout";
 import Personal from "./pages/member/Personal";
 import ManageOrder from "./pages/admin/ManageOrder";
-import MyCart from "./pages/member/MyCart";
 import WishList from "./pages/member/WishList";
 import History from "./pages/member/History";
 import ChangePassword from "./pages/member/ChangePassword";
-import DetailCart from "./components/Cart/DetailCart";
+import DetailCart from "./pages/member/DetailCart";
 import Checkout from "./pages/member/Checkout";
 
 export const router = createBrowserRouter([
@@ -109,7 +108,6 @@ export const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       { path: path.PERSONAL, element: <Personal /> },
-      { path: path.MY_CART, element: <MyCart /> },
       { path: path.WISHLIST, element: <WishList /> },
       { path: path.HISTORY, element: <History /> },
       { path: path.CHANGE_PASSWORD, element: <ChangePassword /> },

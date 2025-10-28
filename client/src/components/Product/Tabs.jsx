@@ -6,13 +6,15 @@ import { MessageCircle } from "lucide-react";
 import { apiRatingProduct } from "@/apis/product";
 import { useAuthStore } from "@/lib/zustand/useAuthStore";
 import { CustomDialog } from "../Dialog/CustomDialog";
-import { useNavigate } from "react-router-dom";
+import { createSearchParams, useLocation, useNavigate } from "react-router-dom";
 
 import path from "@/ultils/path";
 import Review from "./Review";
 import toast from "react-hot-toast";
 
 function Tabs({ data, averageRatings, reviews, productId, onReload }) {
+  const location = useLocation();
+
   // Global state isAuthenticated
   const { isAuthenticated } = useAuthStore();
 
@@ -69,7 +71,10 @@ function Tabs({ data, averageRatings, reviews, productId, onReload }) {
 
   // Handle confirm Login Modal
   const handleConfirmLoginModal = () => {
-    navigate(`/${path.LOGIN}`);
+    navigate({
+      pathname: `/${path.LOGIN}`,
+      search: createSearchParams({ redirect: location.pathname }).toString(),
+    });
     setIsLoginModalOpen(false);
   };
 

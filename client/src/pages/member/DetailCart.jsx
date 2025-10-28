@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useAuthStore } from "@/lib/zustand/useAuthStore";
 import { formatCurrency } from "@/ultils/helpers";
 import { useNavigate } from "react-router-dom";
@@ -12,12 +12,22 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
-import { DetailCartItem } from "./DetailCartItem"; // Import component hàng
+import { DetailCartItem } from "../../components/Cart/DetailCartItem"; // Import component hàng
 import path from "@/ultils/path";
 
 const DetailCart = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const channel = new BroadcastChannel("cart_sync");
+    channel.onmessage = (event) => {
+      if (event.data.type === "CART_CLEARED") {
+        window.location.reload();
+      }
+    };
+    return () => channel.close();
+  }, []);
 
   // Tính toán tổng tiền
   const subtotal =

@@ -96,6 +96,10 @@ export const useAuthStore = create(
           return false;
         }
       },
+      updateUser: (updatedData) =>
+        set((state) => ({
+          user: { ...state.user, ...updatedData },
+        })),
     }),
     {
       name: "auth-storage",

@@ -7,12 +7,18 @@ import { useAuthStore } from "@/lib/zustand/useAuthStore";
 import toast from "react-hot-toast";
 import { apiUpdateUserCart } from "@/apis/user";
 import path from "@/ultils/path";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  createSearchParams,
+  Link,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { CustomDialog } from "../Dialog/CustomDialog";
 import QuickViewDialog from "../Dialog/QuickViewDialog";
 import { BsFillCartCheckFill } from "react-icons/bs";
 
 const ProductCard = ({ productData }) => {
+  const location = useLocation();
   const navigate = useNavigate();
   // Get user state and auth-checking function from Zustand store
   const { user, checkAuth } = useAuthStore();
@@ -94,7 +100,10 @@ const ProductCard = ({ productData }) => {
     }
   };
   const handleConfirmLoginModal = () => {
-    navigate(`/${path.LOGIN}`);
+    navigate({
+      pathname: `/${path.LOGIN}`,
+      search: createSearchParams({ redirect: location.pathname }).toString(),
+    });
     setIsLoginModalOpen(false);
   };
   return (

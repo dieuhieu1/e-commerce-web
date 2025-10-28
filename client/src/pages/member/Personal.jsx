@@ -10,7 +10,7 @@ import { apiUpdateProfileUser } from "@/apis/user";
 import LoadingOverlay from "@/components/Loading/LoadingOverlay";
 
 const Personal = () => {
-  const { user } = useAuthStore();
+  const { user, updateUser } = useAuthStore();
 
   const [isEditing, setIsEditing] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(null);
@@ -57,19 +57,31 @@ const Personal = () => {
     }
   }, [userData, reset]);
 
-  // Upload image
   const handleUploadAndChangeAvatar = async (file) => {
     if (!file) return;
 
-    if (avatarPreview) {
+    // Lấy _id ảnh hiện tại (nếu có)
+    const currentAvatarId = avatarPreview?._id || userData?.avatar?._id;
+
+    // Nếu đã có avatar cũ => xác nhận thay thế
+    if (currentAvatarId) {
       return openConfirm("Replace existing thumbnail?", async () => {
-        await apiDeleteImage({ _id: avatarPreview._id });
-        setAvatarPreview(null);
-        // Upload new image
-        await uploadNewImages(file);
+        try {
+          await apiDeleteImage({ _id: currentAvatarId });
+          setAvatarPreview(null);
+          await uploadNewImages(file);
+        } catch (error) {
+          console.error("Error replacing avatar:", error);
+        }
       });
     }
-    await uploadNewImages(file);
+
+    // Nếu chưa có avatar => upload luôn
+    try {
+      await uploadNewImages(file);
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+    }
   };
   const uploadNewImages = async (file) => {
     const formData = new FormData();
@@ -80,8 +92,6 @@ const Personal = () => {
       const res = await apiUploadImages(formData);
       if (res.success) {
         const image = res.data;
-        console.log(image);
-
         // Save Avatar Preview
         setAvatarPreview(image[0]);
         toast.success("✅ Avatar uploaded successfully!");
@@ -117,6 +127,8 @@ const Personal = () => {
       setLoading(true);
       const updateUserInfo = await apiUpdateProfileUser(updatedData);
       if (updateUserInfo.success) {
+        await updateUser({ avatar: avatarPreview || userData.avatar });
+
         toast.success(
           updateUserInfo.message || "User Profile updated successfully!"
         );

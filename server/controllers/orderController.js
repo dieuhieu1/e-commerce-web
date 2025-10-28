@@ -1,55 +1,58 @@
 const Order = require("../models/Order");
-const Coupon = require("../models/Coupon");
 const User = require("../models/User");
 
 const asyncHandler = require("express-async-handler");
 
 const createNewOrder = asyncHandler(async (req, res) => {
   const { _id: userId } = req.user;
-  const { couponId } = req.body;
-  const user = await User.findById({ _id: userId })
-    .select("cart")
-    .populate("cart.productId", "title slug price");
-  // Get user cart --> Populate to the Product Details
-  const userCart = user.cart;
-  const products = userCart?.map((item) => ({
-    product: item.productId,
-    count: item.quantity,
-    color: item.color,
-  }));
-  // Calculate total base on quantity and price
+  const { products, total, address, status } = req.body;
 
-  let total = userCart.reduce(
-    (sum, el) => el.quantity * el.productId.price + sum,
-    0
-  );
-
-  const orderData = {
-    products: products,
-    total: total,
-    orderedBy: userId,
-  };
-  if (couponId) {
-    const selectedCoupon = await Coupon.findById({ _id: couponId });
-    total =
-      Math.round((total * (1 - +selectedCoupon.discount / 100)) / 1000) *
-        1000 || total;
-    console.log(total);
-
-    orderData.total = total;
-    orderData.coupon = couponId;
+  // Kiểm tra dữ liệu đầu vào
+  if (!products || !Array.isArray(products) || products.length === 0) {
+    throw new Error("Missing or invalid products array!");
   }
+  if (!total) {
+    throw new Error("Missing total amount!");
+  }
+
+  const user = await User.findById(userId);
+  // Nếu có address gửi lên
+  if (address && address.value) {
+    if (!user) throw new Error("User not found!");
+
+    // Kiểm tra xem địa chỉ đã tồn tại trong user.address chưa
+    const isExist = user.address.some(
+      (item) =>
+        item.value.trim().toLowerCase() === address.value.trim().toLowerCase()
+    );
+
+    // Nếu chưa có thì push vào
+    if (!isExist) {
+      user.address.push(address);
+      await user.save();
+    }
+  }
+
+  // Tạo dữ liệu đơn hàng
+  const orderData = {
+    products,
+    total,
+    orderedBy: userId,
+    status: status || "Processing",
+  };
 
   const newOrder = await Order.create(orderData);
 
+  // Xóa giỏ hàng sau khi đặt hàng
+  user.cart = [];
+  await user.save();
   return res.status(200).json({
-    success: newOrder ? true : false,
-    message: "Your order has been placed successfully!",
-    order: newOrder
-      ? newOrder
-      : "Your request could not be processed. Please try again",
+    success: !!newOrder,
+    message: newOrder
+      ? "Your order has been placed successfully!"
+      : "Your request could not be processed. Please try again.",
+    order: newOrder,
   });
-  // Create products Array contains info about product: product, orderBy, count
 });
 
 const updateOrderStatus = asyncHandler(async (req, res) => {
@@ -77,62 +80,183 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 });
 
 const getOrders = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10 } = req.query;
-  const ordersDoc = await Order.find()
-    .sort("-createdAt")
-    .populate("products.product")
-    .limit(limit)
-    .skip((page - 1) * limit)
-    .exec();
-  const count = await Order.countDocuments();
+  const queryObj = { ...req.query };
+  const excludeFields = ["page", "sort", "filter", "limit"];
 
-  const orders = ordersDoc.map((order) => ({
-    _id: order._id,
-    total: order.total,
-    orderedBy: order.orderedBy,
-    products: order?.products,
-    coupon: order?.coupon,
-    status: order.status,
-  }));
+  // Delete uneccessary field of query object (sort, page, limit)
+  excludeFields.forEach((el) => {
+    delete queryObj[el];
+  });
+
+  // 1. Filtering
+  let queryString = JSON.stringify(queryObj);
+  // Replace "gte" to "$gte" for the query
+  queryString = queryString.replace(
+    /\b(gte|gt|lte|lt)\b/g,
+    (match) => `$${match}`
+  );
+  const formattedQueries = JSON.parse(queryString);
+  // let colorQueryObject = {};
+
+  // if (queryObj?.title)
+  //   formattedQueries.title = { $regex: queryObj.title, $options: "i" };
+  // if (queryObj?.category)
+  //   formattedQueries.category = { $regex: queryObj.category, $options: "i" };
+  // if (queryObj?.color) {
+  //   delete formattedQueries.color;
+  //   const colorArr = queryObj.color?.split(",");
+  //   const colorQuery = colorArr.map((el) => ({
+  //     color: { $regex: el, $options: "iu" },
+  //   }));
+  //   colorQueryObject = { $or: colorQuery };
+  // }
+  // let queryObject = {};
+  // if (queryObj?.q) {
+  //   delete formattedQueries.q;
+  //   queryObject = {
+  //     $or: [
+  //       { color: { $regex: queryObj.q, $options: "i" } },
+  //       { title: { $regex: queryObj.q, $options: "i" } },
+  //       { category: { $regex: queryObj.q, $options: "i" } },
+  //       { brand: { $regex: queryObj.q, $options: "i" } },
+  //       { description: { $regex: queryObj.q, $options: "i" } },
+  //     ],
+  //   };
+  // }
+  const queries = { formattedQueries };
+  // Create query but not execute --> Adding more condition of sorting and pagination
+  let query = Order.find(queries);
+
+  // 2. Sorting
+  if (req.query.sort) {
+    // '-price,quantity' --> [-price, quantity] --> -price quantity
+    const sortBy = req.query.sort.split(",").join(" ");
+    query = query.sort(sortBy);
+  } else {
+    // Default sortBy
+    query = query.sort("-createdAt");
+  }
+  // 3. Field Limiting
+  if (req.query.fields) {
+    const fields = req.query.fields.split(",").join(" ");
+    query = query.select(fields);
+  } else {
+    query = query.select("-__v");
+  }
+  // 4. Pagination
+  const page = req.query.page * 1 || 1;
+  const limit = req.query.limit * 1 || process.env.LIMIT_PRODUCTS;
+  // Skip page, so we need to skip element in 1 page (limit) * value of page
+  const skip = (page - 1) * limit;
+  query.skip(skip).limit(limit);
+
+  // Execute the query
+
+  // Đếm tổng số bản ghi với cùng điều kiện filter
+  const totalCounts = await Order.countDocuments(queries);
+  // Execute query
+  const response = await query;
 
   return res.status(200).json({
-    success: orders ? true : false,
-    totalPages: Math.ceil(count / limit),
-    currentPage: Number(page),
-    count,
-    orders: orders,
+    success: response ? true : false,
+    totalCount: totalCounts,
+    page: page,
+    limit: limit,
+    totalPages: Math.ceil(totalCounts / limit),
+    order: response ? response : [],
   });
 });
 
 const getMyOrder = asyncHandler(async (req, res) => {
   const { _id: userId } = req.user;
-  const { page = 1, limit = 10 } = req.query;
+  const queryObj = { ...req.query };
+  const excludeFields = ["page", "sort", "filter", "limit"];
 
-  const ordersDoc = await Order.find({ orderedBy: userId })
-    .sort("-createdAt")
-    .populate("products")
-    .limit(limit)
-    .skip((page - 1) * limit)
-    .exec();
+  // Delete uneccessary field of query object (sort, page, limit)
+  excludeFields.forEach((el) => {
+    delete queryObj[el];
+  });
 
-  const count = await Order.countDocuments();
+  // 1. Filtering
+  let queryString = JSON.stringify(queryObj);
+  // Replace "gte" to "$gte" for the query
+  queryString = queryString.replace(
+    /\b(gte|gt|lte|lt)\b/g,
+    (match) => `$${match}`
+  );
+  const formattedQueries = JSON.parse(queryString);
+  const queries = { ...formattedQueries, orderedBy: userId };
+  // Create query but not execute --> Adding more condition of sorting and pagination
+  let query = Order.find(queries);
 
-  const orders = ordersDoc.map((order) => ({
-    _id: order._id,
-    total: order.total,
-    orderedBy: order.orderedBy,
-    products: order?.products,
-    coupon: order?.coupon,
-    status: order.status,
-  }));
+  // 2. Sorting
+  if (req.query.sort) {
+    // '-price,quantity' --> [-price, quantity] --> -price quantity
+    const sortBy = req.query.sort.split(",").join(" ");
+    query = query.sort(sortBy);
+  } else {
+    // Default sortBy
+    query = query.sort("-createdAt");
+  }
+  // 3. Field Limiting
+  if (req.query.fields) {
+    const fields = req.query.fields.split(",").join(" ");
+    query = query.select(fields);
+  } else {
+    query = query.select("-__v");
+  }
+  // 4. Pagination
+  const page = req.query.page * 1 || 1;
+  const limit = req.query.limit * 1 || process.env.LIMIT_PRODUCTS;
+  // Skip page, so we need to skip element in 1 page (limit) * value of page
+  const skip = (page - 1) * limit;
+  query.skip(skip).limit(limit);
+
+  // Execute the query
+
+  // Đếm tổng số bản ghi với cùng điều kiện filter
+  const totalCounts = await Order.countDocuments(queries);
+  // Execute query
+  const response = await query;
 
   return res.status(200).json({
-    success: orders ? true : false,
-    totalPages: Math.ceil(count / limit),
-    currentPage: Number(page),
-    count,
-    orders: orders,
+    success: response ? true : false,
+    totalCount: totalCounts,
+    page: page,
+    limit: limit,
+    totalPages: Math.ceil(totalCounts / limit),
+    order: response ? response : [],
   });
 });
+// const getMyOrder = asyncHandler(async (req, res) => {
+//   const { _id: userId } = req.user;
+//   const { page = 1, limit = 10 } = req.query;
+
+//   const ordersDoc = await Order.find({ orderedBy: userId })
+//     .sort("-createdAt")
+//     .populate("products")
+//     .limit(limit)
+//     .skip((page - 1) * limit)
+//     .exec();
+
+//   const count = await Order.countDocuments();
+
+//   const orders = ordersDoc.map((order) => ({
+//     _id: order._id,
+//     total: order.total,
+//     orderedBy: order.orderedBy,
+//     products: order?.products,
+//     coupon: order?.coupon,
+//     status: order.status,
+//   }));
+
+//   return res.status(200).json({
+//     success: orders ? true : false,
+//     totalPages: Math.ceil(count / limit),
+//     currentPage: Number(page),
+//     count,
+//     orders: orders,
+//   });
+// });
 
 module.exports = { createNewOrder, updateOrderStatus, getOrders, getMyOrder };

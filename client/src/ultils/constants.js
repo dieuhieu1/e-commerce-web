@@ -128,22 +128,16 @@ export const memberSidebar = [
     path: `/${path.MEMBER}/${path.CHANGE_PASSWORD}`,
     icon: RiLockPasswordLine,
   },
+
   {
     id: 3,
-    type: "single",
-    text: "My cart",
-    path: `/${path.MEMBER}/${path.MY_CART}`,
-    icon: AiOutlineShoppingCart,
-  },
-  {
-    id: 4,
     type: "single",
     text: "Buy History",
     path: `/${path.MEMBER}/${path.HISTORY}`,
     icon: TbHistoryToggle,
   },
   {
-    id: 5,
+    id: 4,
     type: "single",
     text: "Wishlist",
     path: `/${path.MEMBER}/${path.WISHLIST}`,

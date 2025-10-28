@@ -14,11 +14,21 @@ const Home = () => {
   const { newArrivals, productCategories, fetchProductsCategory } =
     useProductStore();
   const { checkAuth } = useAuthStore();
+
   useEffect(() => {
     fetchProductsCategory();
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    const channel = new BroadcastChannel("cart_sync");
+    channel.onmessage = (event) => {
+      if (event.data.type === "CART_CLEARED") {
+        window.location.reload();
+      }
+    };
+    return () => channel.close();
+  }, []);
   return (
     <div className="w-main mt-6">
       <div className="flex">

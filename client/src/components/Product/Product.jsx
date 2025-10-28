@@ -8,7 +8,12 @@ import {
   BsFillCartCheckFill,
   BsFillSuitHeartFill,
 } from "react-icons/bs";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  createSearchParams,
+  Link,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import QuickViewDialog from "../Dialog/QuickViewDialog";
 import path from "@/ultils/path";
 import { CustomDialog } from "../Dialog/CustomDialog";
@@ -26,6 +31,8 @@ import toast from "react-hot-toast";
  * @param {boolean} [props.normal] - If true, hides the "NEW" or "TRENDING" badge.
  */
 const Product = ({ productData, isNew, normal }) => {
+  const location = useLocation();
+
   const navigate = useNavigate();
   // Get user state and auth-checking function from Zustand store
   const { user, checkAuth } = useAuthStore();
@@ -106,7 +113,10 @@ const Product = ({ productData, isNew, normal }) => {
    * Navigates the user to the login page.
    */
   const handleConfirmLoginModal = () => {
-    navigate(`/${path.LOGIN}`);
+    navigate({
+      pathname: `/${path.LOGIN}`,
+      search: createSearchParams({ redirect: location.pathname }).toString(),
+    });
     setIsLoginModalOpen(false);
   };
 

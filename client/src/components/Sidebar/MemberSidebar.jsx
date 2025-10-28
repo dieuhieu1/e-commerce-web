@@ -1,5 +1,5 @@
 import path from "@/ultils/path";
-import React, { memo, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import default_avatar from "../../assets/default_3.png";
 import { memberSidebar } from "@/ultils/constants";
 import { useAuthStore } from "@/lib/zustand/useAuthStore";

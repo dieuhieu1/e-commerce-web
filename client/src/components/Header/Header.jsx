@@ -53,7 +53,7 @@ const Header = () => {
                     Profile
                   </div>
                 ) : (
-                  <div>
+                  <div className="flex gap-2">
                     <FaUserCircle size={22} /> Profile
                   </div>
                 )}
