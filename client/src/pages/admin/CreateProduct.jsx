@@ -17,7 +17,8 @@ import { useProductStore } from "@/lib/zustand/useProductStore";
 import ConfirmDialog from "@/components/Dialog/ConfirmDialog";
 import MarkdownEditor from "@/components/Input/MarkdownEditor";
 import { apiCreateProduct } from "@/apis/product";
-import { formatCurrency, formatMoney, parseCurrency } from "@/ultils/helpers";
+import { formatCurrency, parseCurrency } from "@/ultils/helpers";
+import { colors } from "@/ultils/constants";
 
 const CreateProduct = () => {
   const {
@@ -294,7 +295,25 @@ const CreateProduct = () => {
         {/* Color */}
         <div className="flex flex-col space-y-2">
           <Label>Color</Label>
-          <Input placeholder="Enter color" {...register("color")} />
+          <Controller
+            name="color"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <Select onValueChange={field.onChange} value={field.value}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select color" />
+                </SelectTrigger>
+                <SelectContent>
+                  {colors.map((c, idx) => (
+                    <SelectItem key={idx} value={c.value}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
         </div>
 
         {/* Thumbnail Upload */}

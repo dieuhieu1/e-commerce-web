@@ -1,6 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useProductStore } from "@/lib/zustand/useProductStore";
-import { useNavigate, useParams } from "react-router-dom";
+import {
+  createSearchParams,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ImageZoom from "@/components/Product/ImageZoom";
@@ -10,7 +15,7 @@ import QuantitySelection from "@/components/Product/QuantitySelection";
 import ProductExtraInfo from "@/components/Product/ProductExtraInfo";
 import CustomSlider from "@/components/Common/CustomSlider";
 
-import { formatMoney } from "@/ultils/helpers";
+import { formatCurrency, formatMoney } from "@/ultils/helpers";
 import { ProductExtraInformation } from "@/ultils/constants";
 import { apiGetProducts } from "@/apis/product";
 
@@ -19,10 +24,21 @@ import Tabs from "@/components/Product/Tabs";
 import { tabsData } from "@/components/Product/tabsData";
 
 import DOMPurify from "dompurify";
+import { useAuthStore } from "@/lib/zustand/useAuthStore";
+import path from "@/ultils/path";
+import { CustomDialog } from "@/components/Dialog/CustomDialog";
+import { apiUpdateUserCart } from "@/apis/user";
+import toast from "react-hot-toast";
 const DetailProduct = () => {
+  const location = useLocation();
+
+  // --- COMPONENT STATE ---
   const [currentImage, setCurrentImage] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState(null);
   const [variant, setVariant] = useState(null);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // Toggles the "Please Login" modal
+  const [quantity, setQuantity] = useState(1);
+
   const [currentProduct, setCurrentProduct] = useState({
     title: "",
     thumb: {},
@@ -34,7 +50,11 @@ const DetailProduct = () => {
 
   // Get Params From URL
   const { pid, category } = useParams();
+
+  // Get user state and auth-checking function from Zustand store
+  const { user, checkAuth } = useAuthStore();
   const { fetchProductById, selectedProduct, isLoading } = useProductStore();
+
   // Call API
   const fetchProductsByCategory = async (category) => {
     try {
@@ -46,6 +66,21 @@ const DetailProduct = () => {
       console.error("Fetch related products failed:", error);
     }
   };
+
+  // Scroll To Top Smooth
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [pid]);
+
+  // Fetch API
+  useEffect(() => {
+    if (pid && category) {
+      fetchProductById(pid);
+      fetchProductsByCategory(category);
+    }
+  }, [category, fetchProductById, pid]);
+
+  // Get Varaint Data
   useEffect(() => {
     if (variant && selectedProduct?.variants) {
       const selectedVariant = selectedProduct.variants.find(
@@ -72,20 +107,6 @@ const DetailProduct = () => {
       });
     }
   }, [variant, selectedProduct]);
-  // Fetch API
-  useEffect(() => {
-    if (pid && category) {
-      fetchProductById(pid);
-      fetchProductsByCategory(category);
-    }
-  }, [category, fetchProductById, pid]);
-
-  // Reload the data when user finished review
-  const reloadProduct = useCallback(async () => {
-    if (pid) {
-      await fetchProductById(pid);
-    }
-  }, [pid, fetchProductById]);
 
   // Assign current Image to Product Thumb
   useEffect(() => {
@@ -95,9 +116,62 @@ const DetailProduct = () => {
     if (image) setCurrentImage(image);
   }, [currentProduct, selectedProduct]);
 
+  // Reload the data when user finished review
+  const reloadProduct = useCallback(async () => {
+    if (pid) {
+      await fetchProductById(pid);
+    }
+  }, [pid, fetchProductById]);
+
   const handleChangeImage = (e, src) => {
     e.stopPropagation();
     setCurrentImage(src);
+  };
+
+  const handleAddToCart = async () => {
+    if (!user) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+    console.log(user);
+
+    const color = currentProduct.color
+      ? currentProduct.color
+      : selectedProduct.color;
+    const price = currentProduct.price
+      ? currentProduct.price
+      : selectedProduct.price;
+    const thumb = currentProduct.thumb.image_url
+      ? currentProduct.thumb.image_url
+      : selectedProduct.thumb.image_url;
+    const title = currentProduct.title
+      ? currentProduct.title
+      : selectedProduct.title;
+    const data = {
+      color: color,
+      quantity: quantity,
+      price: price,
+      thumb: thumb,
+      title: title,
+    };
+    const productId = selectedProduct._id;
+    console.log(data);
+    const response = await apiUpdateUserCart(productId, data);
+
+    if (response.success) {
+      toast.success(response.message);
+      checkAuth(); // Re-fetch user data to update cart state globally
+    } else {
+      toast.error(response.message);
+    }
+  };
+
+  const handleConfirmLoginModal = () => {
+    navigate({
+      pathname: `/${path.LOGIN}`,
+      search: createSearchParams({ redirect: location.pathname }).toString(),
+    });
+    setIsLoginModalOpen(false);
   };
 
   return (
@@ -133,10 +207,10 @@ const DetailProduct = () => {
         <>
           <div className="w-main m-auto mt-6 flex gap-20">
             <div className="w-2/5 flex flex-col gap-4">
-              <div className="w-[458px] h-[458px] mb-10">
+              <div className="w-[458px] h-[458px] mb-10 flex justify-center items-center border border-gray-200 rounded bg-white overflow-hidden">
                 {/* Ảnh chính */}
                 <ImageZoom
-                  src={currentImage?.image_url}
+                  src={currentImage?.image_url || currentImage}
                   alt={currentProduct.title || selectedProduct?.title}
                   zoomLevel={3}
                   className="border border-gray-200 rounded"
@@ -227,9 +301,9 @@ const DetailProduct = () => {
                       />
                       <span className="flex flex-col">
                         {" "}
-                        <span>{selectedProduct?.color}</span>
+                        <span>{selectedProduct?.color || "Black"}</span>
                         <span className="text-sm">
-                          {selectedProduct?.price}
+                          {formatCurrency(selectedProduct?.price)} VND
                         </span>
                       </span>
                     </div>
@@ -247,6 +321,7 @@ const DetailProduct = () => {
                         className={`flex items-center gap-2 p-2 border cursor-pointer ${
                           variant === el.sku && "border-red-500"
                         }`}
+                        key={el.sku}
                       >
                         <img
                           src={el?.thumb.image_url}
@@ -255,8 +330,10 @@ const DetailProduct = () => {
                         />
                         <span className="flex flex-col">
                           {" "}
-                          <span>{el.color}</span>
-                          <span className="text-sm">{el?.price}</span>
+                          <span>{el?.color || "Black"}</span>
+                          <span className="text-sm">
+                            {formatCurrency(el?.price)} VND
+                          </span>
                         </span>
                       </div>
                     ))}
@@ -266,9 +343,17 @@ const DetailProduct = () => {
                 <div className="flex flex-col gap-8 mt-10">
                   <div className="flex items-center justify-between gap-4">
                     <span className="font-semibold">Quantity:</span>
-                    <QuantitySelection max={selectedProduct?.quantity} />
+                    <QuantitySelection
+                      max={selectedProduct?.quantity}
+                      quantity={quantity}
+                      setQuantity={setQuantity}
+                    />
                   </div>
-                  <Button className="cursor-pointer" fullWidth>
+                  <Button
+                    className="cursor-pointer"
+                    fullWidth
+                    onClick={handleAddToCart}
+                  >
                     Add to Cart
                   </Button>
                 </div>
@@ -311,6 +396,24 @@ const DetailProduct = () => {
           </div>
         </>
       )}
+
+      {/* Login Required Dialog */}
+      <CustomDialog
+        open={isLoginModalOpen}
+        onOpenChange={setIsLoginModalOpen}
+        title="Login Required!"
+        confirmText="Go to Login Page"
+        cancelText="Not now!"
+        onConfirm={handleConfirmLoginModal}
+        // The "Not now" (cancel) button should close *this* modal
+        onClose={() => setIsLoginModalOpen(false)}
+      >
+        <p className="text-gray-700 text-md">
+          Please login your account Digital World to add product to your own
+          cart.
+        </p>
+      </CustomDialog>
+
       <div className="h-[100px] w-full"></div>
     </div>
   );

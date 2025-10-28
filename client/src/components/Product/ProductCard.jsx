@@ -1,35 +1,119 @@
-import React from "react";
+import React, { useState } from "react";
 import { formatMoney } from "@/ultils/helpers";
 import StarRating from "../StarRating";
 // Import icons
 import { FiEye, FiHeart, FiShoppingCart } from "react-icons/fi";
+import { useAuthStore } from "@/lib/zustand/useAuthStore";
+import toast from "react-hot-toast";
+import { apiUpdateUserCart } from "@/apis/user";
+import path from "@/ultils/path";
+import { Link, useNavigate } from "react-router-dom";
+import { CustomDialog } from "../Dialog/CustomDialog";
+import QuickViewDialog from "../Dialog/QuickViewDialog";
+import { BsFillCartCheckFill } from "react-icons/bs";
 
 const ProductCard = ({ productData }) => {
-  // Giả sử productData có thể có 'originalPrice' để tính giảm giá
-  const { title, thumb, totalRatings, price, originalPrice } = productData;
+  const navigate = useNavigate();
+  // Get user state and auth-checking function from Zustand store
+  const { user, checkAuth } = useAuthStore();
+  // --- COMPONENT STATE ---
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [openQuickView, setOpenQuickView] = useState(false);
 
+  // Destructure product data for easier access
+  const {
+    _id,
+    title,
+    thumb,
+    totalRatings,
+    price,
+    category,
+    originalPrice,
+    color,
+  } = productData;
+  // --- DERIVED STATE & VARS ---
+
+  // Construct the navigation path for the product detail page
+  const productPath = `/${category?.toLowerCase()}/${_id}/${title}`;
   const hasDiscount = originalPrice && originalPrice > price;
+  // Check if this product is already in the user's cart
+  const isProductInCart = user?.cart?.some((el) => el?.product?._id === _id);
 
-  // Bạn có thể thêm một hàm xử lý click cho toàn bộ card ở đây
-  // Ví dụ: const handleCardClick = () => { /* navigate to product detail */ };
+  // --- EVENT HANDLERS ---
 
+  /**
+   * Handles clicks on the hover icons (Quick View, Cart, Wishlist).
+   * @param {React.MouseEvent} e - The click event.
+   * @param {'CART' | 'QUICK_VIEW' | 'WISH_LIST'} flag - Identifies which icon was clicked.
+   */
+  const handleClickOpions = async (e, flag) => {
+    e.stopPropagation(); // CRITICAL: Prevents the click from bubbling up to the parent <Link> and navigating.
+
+    // --- CART LOGIC ---
+    if (flag === "CART") {
+      // User must be logged in to add to cart
+      if (!user) {
+        setIsLoginModalOpen(true);
+        return;
+      }
+
+      const toastId = toast.loading("Adding to cart...");
+      // 'color' might be a default or first variant. Adjust as needed.
+      const data = {
+        color: color,
+        title: title,
+        price: price,
+        thumb: thumb.image_url,
+        quantity: 1,
+      };
+      const productId = _id;
+      const response = await apiUpdateUserCart(productId, data);
+
+      if (response.success) {
+        toast.success(response.message, { id: toastId });
+        checkAuth(); // Re-fetch user data to update cart state globally
+      } else {
+        toast.error(response.message, { id: toastId });
+      }
+    }
+
+    // --- QUICK VIEW LOGIC ---
+    if (flag === "QUICK_VIEW") {
+      setOpenQuickView(true);
+    }
+
+    // --- WISHLIST LOGIC ---
+    if (flag === "WISH_LIST") {
+      if (!user) {
+        setIsLoginModalOpen(true);
+        return;
+      }
+      // Placeholder for wishlist API call
+      toast.success("Added to wishlist (demo)");
+      // const response = await apiUpdateWishlist...
+    }
+  };
+  const handleConfirmLoginModal = () => {
+    navigate(`/${path.LOGIN}`);
+    setIsLoginModalOpen(false);
+  };
   return (
-    // Thêm hiệu ứng scale cho toàn bộ card khi hover
     <div className="group w-full sm:w-1/2 lg:w-1/3 p-2">
       <div
         className="bg-white rounded-lg shadow-sm hover:shadow-xl 
                    transition-all duration-300 flex flex-col h-full overflow-hidden 
                    border border-gray-100 
-                   transform hover:scale-105 cursor-pointer" // Thêm transform và hover:scale-105
-        // Nếu muốn cả card click được, thêm onClick={handleCardClick} ở đây
+                   transform hover:scale-105 cursor-pointer"
       >
         {/* === IMAGE CONTAINER === */}
         <div className="relative w-full aspect-square overflow-hidden bg-gray-50">
-          <img
-            src={thumb?.image_url || "/placeholder-image.png"} // Thêm ảnh dự phòng
-            alt={title}
-            className="object-contain w-full h-full p-4 transition-transform duration-500 ease-out"
-          />
+          <Link to={productPath}>
+            <img
+              src={thumb?.image_url || "/placeholder-image.png"}
+              alt={title}
+              className="object-contain w-full h-full p-4 transition-transform duration-500 ease-out"
+            />
+          </Link>
 
           {/* --- Sale Badge --- */}
           {hasDiscount && (
@@ -48,6 +132,7 @@ const ProductCard = ({ productData }) => {
                          hover:bg-blue-600 hover:text-white 
                          transition-all duration-200 hover:scale-150"
               title="Quick View"
+              onClick={(e) => handleClickOpions(e, "QUICK_VIEW")}
             >
               <FiEye size={20} />
             </button>
@@ -56,17 +141,31 @@ const ProductCard = ({ productData }) => {
                          hover:bg-blue-600 hover:text-white 
                          transition-all duration-200 hover:scale-150"
               title="Add to Wishlist"
+              onClick={(e) => handleClickOpions(e, "WISH_LIST")}
             >
               <FiHeart size={20} />
             </button>
-            <button
-              className="bg-white p-2 rounded-full text-gray-800 shadow-md 
-                         hover:bg-blue-600 hover:text-white 
-                         transition-all duration-200 hover:scale-150"
-              title="Add to Cart"
-            >
-              <FiShoppingCart size={20} />
-            </button>
+            {isProductInCart ? (
+              <button
+                className="bg-white p-2 rounded-full text-gray-800 shadow-md 
+              hover:bg-green-600 hover:text-white 
+              transition-all duration-200 hover:scale-150 cursor-not-allowed"
+                title="Add to Cart"
+                onClick={(e) => handleClickOpions(e, "CART")}
+              >
+                <BsFillCartCheckFill size={20} />
+              </button>
+            ) : (
+              <button
+                className="bg-white p-2 rounded-full text-gray-800 shadow-md 
+              hover:bg-blue-600 hover:text-white 
+              transition-all duration-200 hover:scale-150"
+                title="Add to Cart"
+                onClick={(e) => handleClickOpions(e, "CART")}
+              >
+                <FiShoppingCart size={20} />
+              </button>
+            )}
           </div>
         </div>
 
@@ -109,6 +208,30 @@ const ProductCard = ({ productData }) => {
           </div>
         </div>
       </div>
+
+      {/* Login Required Dialog */}
+      <CustomDialog
+        open={isLoginModalOpen}
+        onOpenChange={setIsLoginModalOpen}
+        title="Login Required!"
+        confirmText="Go to Login Page"
+        cancelText="Not now!"
+        onConfirm={handleConfirmLoginModal}
+        // The "Not now" (cancel) button should close *this* modal
+        onClose={() => setIsLoginModalOpen(false)}
+      >
+        <p className="text-gray-700 text-md">
+          Please login your account Digital World to add product to your own
+          cart.
+        </p>
+      </CustomDialog>
+
+      {/* Quick View Dialog */}
+      <QuickViewDialog
+        open={openQuickView}
+        onClose={() => setOpenQuickView(false)}
+        product={productData}
+      />
     </div>
   );
 };

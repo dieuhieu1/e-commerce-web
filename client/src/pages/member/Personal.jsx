@@ -179,6 +179,8 @@ const Personal = () => {
   return (
     <div className="w-full min-h-screen bg-gray-50 px-4 py-6">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md">
+        {loading && <LoadingOverlay />}
+
         <header className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
           <h1 className="text-3xl font-semibold text-gray-800">
             Personal Information
@@ -417,7 +419,6 @@ const Personal = () => {
         description={confirmData.message}
         onConfirm={confirmData.onConfirm}
       />
-      <LoadingOverlay loading={loading} />
     </div>
   );
 };

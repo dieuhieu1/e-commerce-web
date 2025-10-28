@@ -11,6 +11,7 @@ import { useSearchParams } from "react-router-dom";
 import EditUserDialog from "@/components/Dialog/EditUserDialog";
 import toast from "react-hot-toast";
 import ConfirmDialog from "@/components/Dialog/ConfirmDialog";
+import { getRandomAvatar } from "@/ultils/helpers";
 
 const ManageUser = () => {
   const [data, setData] = useState([]);
@@ -27,6 +28,8 @@ const ManageUser = () => {
     setLoading(true);
     try {
       const response = await apiGetUsers({ ...params, limit: 5 });
+      console.log(response);
+
       setData(response || []);
     } catch (error) {
       console.error(error);
@@ -160,10 +163,10 @@ const ManageUser = () => {
                   <td className="px-6 py-4 flex items-center gap-3">
                     <Avatar className="w-9 h-9 ring-2 ring-offset-1 ring-blue-100">
                       <AvatarImage src={user.avatar} alt={user.firstname} />
-                      <AvatarFallback>
-                        {user.firstname[0]}
-                        {user.lastname[0]}
-                      </AvatarFallback>
+                      <AvatarImage
+                        src={user?.avatar?.image_url || getRandomAvatar()}
+                        alt={user.firstname}
+                      />
                     </Avatar>
                     <div>
                       <p className="font-semibold text-gray-800">{`${user.firstname} ${user.lastname}`}</p>
@@ -172,7 +175,19 @@ const ManageUser = () => {
                   <td className="px-6 py-4 text-gray-600">{user.email}</td>
                   <td className="px-6 py-4 text-gray-600">{user.mobile}</td>
                   <td className="px-6 py-4 text-gray-500">
-                    {user.address?.[0] || (
+                    {user?.address?.length > 0 ? (
+                      <ul className="space-y-1">
+                        {user.address.map((addr, i) => (
+                          <li
+                            key={addr._id || i}
+                            className="flex items-center gap-1"
+                          >
+                            <span className="text-blue-500">📍</span>
+                            <span>{addr.value}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
                       <span className="text-gray-400">N/A</span>
                     )}
                   </td>

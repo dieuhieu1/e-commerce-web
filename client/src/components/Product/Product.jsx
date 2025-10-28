@@ -44,7 +44,7 @@ const Product = ({ productData, isNew, normal }) => {
   // Construct the navigation path for the product detail page
   const productPath = `/${category?.toLowerCase()}/${_id}/${title}`;
   // Check if this product is already in the user's cart
-  const isProductInCart = user?.cart?.some((el) => el.productId === _id);
+  const isProductInCart = user?.cart?.some((el) => el?.product?._id === _id);
 
   // --- EVENT HANDLERS ---
 
@@ -66,8 +66,15 @@ const Product = ({ productData, isNew, normal }) => {
 
       const toastId = toast.loading("Adding to cart...");
       // 'color' might be a default or first variant. Adjust as needed.
-      const data = { productId: _id, color: color };
-      const response = await apiUpdateUserCart(data);
+      const data = {
+        color: color,
+        title: title,
+        price: price,
+        thumb: thumb.image_url,
+        quantity: 1,
+      };
+      const productId = _id;
+      const response = await apiUpdateUserCart(productId, data);
 
       if (response.success) {
         toast.success(response.message, { id: toastId });
@@ -128,10 +135,6 @@ const Product = ({ productData, isNew, normal }) => {
         <div className="relative w-full overflow-hidden bg-gray-50">
           {/* The main link to the product detail page. Wraps the image. */}
           <Link to={productPath}>
-            {/* 'aspect-square' ensures all images are 1:1 ratio.
-              'object-contain' ensures the whole product is visible.
-              'group-hover:scale-105' makes the image zoom slightly when the PARENT 'group' div is hovered.
-            */}
             <img
               src={
                 thumb?.image_url ||

@@ -24,6 +24,8 @@ import MyCart from "./pages/member/MyCart";
 import WishList from "./pages/member/WishList";
 import History from "./pages/member/History";
 import ChangePassword from "./pages/member/ChangePassword";
+import DetailCart from "./components/Cart/DetailCart";
+import Checkout from "./pages/member/Checkout";
 
 export const router = createBrowserRouter([
   {
@@ -67,6 +69,10 @@ export const router = createBrowserRouter([
       {
         path: path.RESET_PASSWORD,
         element: <ResetPassword />,
+      },
+      {
+        path: path.DETAIL_CART,
+        element: <DetailCart />,
       },
     ],
   },
@@ -113,6 +119,10 @@ export const router = createBrowserRouter([
     path: path.VERIFY_EMAIL,
     element: <VerifyEmail />,
     errorElement: <ErrorPage />,
+  },
+  {
+    path: path.CHECK_OUT,
+    element: <Checkout />,
   },
   {
     path: "*",

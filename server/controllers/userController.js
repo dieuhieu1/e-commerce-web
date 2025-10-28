@@ -12,6 +12,7 @@ const {
   forgotPasswordHTML,
   users,
 } = require("../ultils/constants");
+const { log } = require("console");
 
 // API Register
 const register = asyncHandler(async (req, res) => {
@@ -153,7 +154,15 @@ const login = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
   const { _id } = req.user;
 
-  const user = await User.findById(_id).select("-refreshToken -password");
+  const user = await User.findById(_id)
+    .select("-refreshToken -password")
+    .populate({
+      path: "cart",
+      populate: {
+        path: "product",
+        select: "title thumb price _id",
+      },
+    });
 
   return res.status(200).json({
     success: user ? true : false,
@@ -484,26 +493,49 @@ const updateUser = asyncHandler(async (req, res) => {
 
 const updateUserCart = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const { productId, quantity = 1, color } = req.body;
-  console.log(req.body);
+
+  const { pid: product } = req.params;
+  const { quantity = 1, color, price, thumb, title } = req.body;
   // Validate req.body
-  if (!productId) {
+  if (!product) {
     throw new Error("Missing Product Id! Check your request params");
   }
   if (!color) {
     throw new Error("Missing Color! Check your request params");
   }
+  if (!price) {
+    throw new Error("Missing Price! Check your request params");
+  }
+  if (!thumb) {
+    throw new Error("Missing thumb! Check your request params");
+  }
+  if (!title) {
+    throw new Error("Missing title! Check your request params");
+  }
 
   // Find user in DB
   const user = await User.findById(_id);
   const userCart = user.cart;
-  console.log(userCart);
+  console.log("Cart", userCart);
 
   // Check is product in cart?
-  const productAlreadyInCart = userCart.find(
-    (item) =>
-      item.productId.toString() === productId.toString() && item.color === color
-  );
+  const productAlreadyInCart = userCart.find((item) => {
+    {
+      console.log(
+        "Compare: ",
+        item.product.toString() === product.toString(),
+        item.color === color,
+        item.title === title
+      );
+      return (
+        item.product.toString() === product.toString() &&
+        item.color === color &&
+        item.title === title
+      );
+    }
+  });
+  console.log("Body", req.body, "ProductID: ", product);
+  console.log(productAlreadyInCart);
 
   // If yes plus the quantity
   if (productAlreadyInCart) {
@@ -511,10 +543,14 @@ const updateUserCart = asyncHandler(async (req, res) => {
   } else {
     // Else push new product to cart array
     const newProduct = {
-      productId: productId,
+      product: product,
       quantity: quantity,
       color: color,
+      price: price,
+      thumb: thumb,
+      title: title,
     };
+
     user.cart.push(newProduct);
   }
   // Saving the update
@@ -529,36 +565,51 @@ const updateUserCart = asyncHandler(async (req, res) => {
 });
 const removeProductUserCart = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const { productId } = req.params;
-
+  const { pid: product } = req.params;
+  const { color, title } = req.body;
   // Validate req.body
-  if (!productId) {
+  if (!product) {
     throw new Error("Missing Product Id! Check your request params");
   }
   if (!color) {
     throw new Error("Missing Color! Check your request params");
   }
+  if (!title) {
+    throw new Error("Missing title! Check your request params");
+  }
 
   const user = await User.findById(_id);
   const userCart = user.cart;
+  console.log(userCart);
 
-  const alreadyInCart = user?.cart?.findIndex(
-    (item) => item.productId.toString() === productId
-  );
-
+  const itemIndex = userCart?.findIndex((item) => {
+    console.log(
+      "Compare: ",
+      item.product.toString() === product.toString(),
+      item.color === color,
+      item.title === title
+    );
+    return (
+      item.product.toString() === product.toString() &&
+      item.color === color &&
+      item.title === title
+    );
+  });
+  console.log(itemIndex);
   if (itemIndex === -1) {
     return res.status(404).json({
       success: false,
       message: "Product not found in cart!",
     });
   }
-  user.cart.splice(itemIndex, 1);
+  userCart.splice(itemIndex, 1);
   await user.save();
 
   return res.status(200).json({
     success: true,
     message: "Removed product from cart successfully!",
-    cart: user.cart,
+    totalItems: userCart.length,
+    cart: userCart,
   });
 });
 const createUsers = asyncHandler(async (req, res) => {

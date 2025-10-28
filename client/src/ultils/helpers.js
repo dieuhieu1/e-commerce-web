@@ -122,3 +122,13 @@ export const formatCurrency = (value) => {
 export const parseCurrency = (value) => {
   return value.replace(/\./g, "");
 };
+
+import default_avatar_1 from "../assets/default_1.png";
+import default_avatar_2 from "../assets/default_2.png";
+import default_avatar_3 from "../assets/default_3.png";
+
+export const getRandomAvatar = () => {
+  const defaultAvatars = [default_avatar_1, default_avatar_2, default_avatar_3];
+  const randomIndex = Math.floor(Math.random() * defaultAvatars.length);
+  return defaultAvatars[randomIndex];
+};

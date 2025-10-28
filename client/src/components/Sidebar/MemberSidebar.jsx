@@ -1,10 +1,11 @@
 import path from "@/ultils/path";
 import React, { memo, useState } from "react";
 import default_avatar from "../../assets/default_3.png";
-import { adminSidebar, memberSidebar } from "@/ultils/constants";
+import { memberSidebar } from "@/ultils/constants";
 import { useAuthStore } from "@/lib/zustand/useAuthStore";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { AiOutlineCaretDown, AiOutlineCaretLeft } from "react-icons/ai";
+import logo from "../../assets/logo.png";
 
 const MemberSidebar = () => {
   const { user } = useAuthStore();
@@ -26,6 +27,20 @@ const MemberSidebar = () => {
   return (
     <div className="bg-white border-r border-gray-200 w-[260px] h-full flex flex-col shadow-sm">
       {/* Logo */}
+      <div className="flex flex-col items-center justify-center py-6 border-b border-gray-200">
+        <Link to={`/${path.HOME}`}>
+          <img
+            src={logo}
+            alt="logo"
+            className="w-[140px] object-contain drop-shadow-sm"
+          />
+        </Link>
+        <small className="text-gray-500 mt-1 tracking-wide">
+          Admin Workspace
+        </small>
+      </div>
+
+      {/* Avatar */}
       <div className="flex flex-col items-center justify-center py-6 border-b border-gray-200">
         <div>
           <img

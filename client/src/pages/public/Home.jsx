@@ -8,12 +8,15 @@ import BestSeller from "@/components/Home/BestSeller";
 import CustomSlider from "@/components/Common/CustomSlider";
 import FeatureProducts from "@/components/Home/FeatureProducts";
 import { useAuthStore } from "@/lib/zustand/useAuthStore";
+import { Newspaper } from "lucide-react";
 
 const Home = () => {
   const { newArrivals, productCategories, fetchProductsCategory } =
     useProductStore();
+  const { checkAuth } = useAuthStore();
   useEffect(() => {
     fetchProductsCategory();
+    checkAuth();
   }, []);
 
   return (
@@ -76,11 +79,21 @@ const Home = () => {
         </div>
       </div>
       <div className="my-8 w-full">
-        <h3 className="text-[20px] font-semibold py-[15px] border-b-2 border-main">
+        <h3 className="text-[20px] font-semibold py-[15px] border-b-2 border-main uppercase">
           BLOG POSTS
         </h3>
+
+        {/* Placeholder "Coming Soon" */}
+        <div className="flex flex-col items-center justify-center h-[300px] bg-gray-50 rounded-lg mt-4 border border-dashed border-gray-300">
+          <Newspaper size={48} className="text-gray-400 mb-4" />
+          <h4 className="text-xl font-semibold text-gray-700">
+            Blog Posts Coming Soon!
+          </h4>
+          <p className="text-gray-500 mt-2">
+            We're working hard to bring you fresh content.
+          </p>
+        </div>
       </div>
-      <div className="w-full h-[500px]"></div>
     </div>
   );
 };

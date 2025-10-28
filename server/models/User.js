@@ -38,9 +38,12 @@ var userSchema = new mongoose.Schema(
     },
     cart: [
       {
-        productId: { type: mongoose.Types.ObjectId, ref: "Product" },
+        product: { type: mongoose.Types.ObjectId, ref: "Product" },
         quantity: Number,
         color: String,
+        price: Number,
+        thumb: String,
+        title: String,
       },
     ],
     // Save Array of Ids from Address

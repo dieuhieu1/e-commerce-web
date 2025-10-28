@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo } from "react";
+import React, { useEffect, memo } from "react";
 import { BiMinus, BiPlus } from "react-icons/bi";
 
 /**
@@ -9,9 +9,13 @@ import { BiMinus, BiPlus } from "react-icons/bi";
  * @param {number} [props.max=99] - Số lượng tối đa.
  * @param {function(number): void} props.onChange - Callback được gọi khi số lượng thay đổi.
  */
-function QuantitySelection({ initialValue = 1, min = 1, max = 99, onChange }) {
-  const [quantity, setQuantity] = useState(initialValue);
-
+function QuantitySelection({
+  quantity,
+  setQuantity,
+  min = 1,
+  max = 99,
+  onChange,
+}) {
   // Gửi thông báo cho component cha mỗi khi quantity thay đổi
   useEffect(() => {
     if (onChange) {

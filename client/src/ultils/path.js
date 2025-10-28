@@ -27,6 +27,10 @@ const path = {
   HISTORY: "buy-history",
   WISHLIST: "wish-list",
   CHANGE_PASSWORD: "change-password",
+
+  // Cart
+  DETAIL_CART: "detail-cart",
+  CHECK_OUT: "check-out",
 };
 
 export default path;

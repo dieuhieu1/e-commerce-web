@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { useProductStore } from "@/lib/zustand/useProductStore";
 import { formatCurrency, parseCurrency } from "@/ultils/helpers";
+import { colors } from "@/ultils/constants";
 
 const EditProductDialog = ({ product, open, onClose, onSave }) => {
   const { productCategories } = useProductStore();
@@ -343,7 +344,25 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
             {/* Color */}
             <div className="flex flex-col space-y-2">
               <Label>Color</Label>
-              <Input {...register("color")} placeholder="Enter color" />
+              <Controller
+                name="color"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select color" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {colors.map((c, idx) => (
+                        <SelectItem key={idx} value={c.value}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
 
             {/* Price */}
@@ -442,7 +461,7 @@ const EditProductDialog = ({ product, open, onClose, onSave }) => {
                 {imagePreviews.map((img, idx) => (
                   <div key={idx} className="relative w-40 h-40">
                     <img
-                      src={img.image_url}
+                      src={img.image_url || img}
                       alt={`preview-${img._id}`}
                       className="w-full h-full object-cover rounded-md border shadow-sm"
                     />

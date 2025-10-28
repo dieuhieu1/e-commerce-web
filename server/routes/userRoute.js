@@ -35,7 +35,7 @@ userRouter.get("/current", verifyAccessToken, getCurrentUser);
 userRouter.get("/", verifyAccessToken, isAdmin, getAllUsers);
 
 userRouter.put("/current", verifyAccessToken, updateUser);
-userRouter.put("/cart", verifyAccessToken, updateUserCart);
+userRouter.put("/cart/add/:pid", verifyAccessToken, updateUserCart);
 userRouter.put("/cart/remove/:pid", verifyAccessToken, removeProductUserCart);
 
 userRouter.put("/:uid", verifyAccessToken, isAdmin, updateUserByAdmin);

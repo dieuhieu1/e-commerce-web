@@ -103,7 +103,7 @@ const AddVariantDialog = ({ originalVariant, open, onClose, onSave }) => {
         toast.success("✅ Images uploaded successfully!");
       }
     } catch (error) {
-      toast.error("❌ Upload failed!");
+      toast.error("❌ Upload failed!" + error);
     } finally {
       setLoading(false);
       closeConfirm();
@@ -140,8 +140,8 @@ const AddVariantDialog = ({ originalVariant, open, onClose, onSave }) => {
 
         toast.success("🗑️ Image deleted successfully!");
       }
-    } catch {
-      toast.error("❌ Failed to delete image!");
+    } catch (error) {
+      toast.error("❌ Failed to delete image!" + error);
     } finally {
       setLoading(false);
       closeConfirm();

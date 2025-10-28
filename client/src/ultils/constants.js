@@ -38,20 +38,20 @@ export const ProductExtraInformation = [
   { id: 204, title: "Free return", sub: "Within 7 days", icon: BsReplyFill },
   { id: 205, title: "Consultancy", sub: "Lifetime 24/7/365", icon: FaTty },
 ];
-
 export const colors = [
-  "black",
-  "brown",
-  "gray",
-  "white",
-  "pink",
-  "yellow",
-  "orange",
-  "purple",
-  "green",
-  "blue",
+  { name: "BLACK", value: "BLACK" },
+  { name: "BLACK LEATHER", value: "BLACK LEATHER" },
+  { name: "QUITE BLACK", value: "QUITE BLACK" },
+  { name: "MINERAL BLACK", value: "MINERAL BLACK" },
+  { name: "DAZZLING WHITE", value: "DAZZLING WHITE" },
+  { name: "WHITE", value: "WHITE" },
+  { name: "PINK", value: "PINK" },
+  { name: "CARBON GRAY", value: "CARBON GRAY" },
+  { name: "SPACE GRAY", value: "SPACE GRAY" },
+  { name: "SILVER", value: "SILVER" },
+  { name: "GOLD", value: "GOLD" },
+  { name: "RED", value: "RED" },
 ];
-
 export const sorts = [
   { id: 300, value: "", text: "Choose" },
   { id: 301, value: "-sold", text: "Best selling" },

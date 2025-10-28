@@ -23,9 +23,16 @@ export const apiUpdateProfileUser = (data) =>
     method: "put",
     data,
   });
-export const apiUpdateUserCart = (data) =>
+export const apiUpdateUserCart = (pid, data) =>
   axios({
-    url: "/user/cart",
+    url: "/user/cart/add/" + pid,
+    method: "put",
+    data,
+  });
+
+export const apiRemoveProductFromCart = (pid, data) =>
+  axios({
+    url: "/user/cart/remove/" + pid,
     method: "put",
     data,
   });
