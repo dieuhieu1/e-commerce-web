@@ -213,7 +213,7 @@ const History = () => {
                         <div className="text-right">
                           <p className="text-sm text-gray-600">Total Amount</p>
                           <p className="text-xl font-bold text-orange-600">
-                            {formatCurrency(order.total)}
+                            {formatCurrency(total)}
                           </p>
                         </div>
                         <div

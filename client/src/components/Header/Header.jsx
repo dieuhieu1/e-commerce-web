@@ -12,7 +12,6 @@ const Header = () => {
   const { isAuthenticated, user } = useAuthStore();
   const [isSticky, setIsSticky] = useState(false);
 
-  // 🧠 Theo dõi khi người dùng cuộn để bật/tắt sticky
   useEffect(() => {
     const handleScroll = () => {
       setIsSticky(window.scrollY > 50);

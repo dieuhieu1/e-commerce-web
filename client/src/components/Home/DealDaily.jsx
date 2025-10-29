@@ -4,13 +4,16 @@ import React, { useEffect, useState } from "react";
 import { AiFillStar, AiOutlineMenu } from "react-icons/ai";
 import StarRating from "../StarRating";
 import CountDown from "./CountDown";
+import { useNavigate } from "react-router-dom";
 
 const DealDaily = () => {
+  const navigate = useNavigate();
+
   const [dealDaily, setDealDaily] = useState(null);
   const [hour, setHour] = useState(0);
   const [minute, setMinute] = useState(0);
   const [second, setSecond] = useState(0);
-  const [expired, setExpired] = useState(false); // ✅ Thêm state theo dõi hết hạn
+  const [expired, setExpired] = useState(false);
 
   const fetchDaily = async () => {
     const response = await apiGetProducts({
@@ -59,7 +62,28 @@ const DealDaily = () => {
       fetchDaily();
     }
   }, [expired]);
+  // Handle navigation to product detail page
+  const handleNavigate = () => {
+    // Make sure dealDaily and necessary properties exist before navigating
+    if (
+      dealDaily &&
+      dealDaily?._id &&
+      dealDaily?.title &&
+      dealDaily?.category
+    ) {
+      // Construct the path, assuming category is needed as well
+      // Replace spaces in title for URL safety, e.g., using '-'
+      const slugTitle = dealDaily.title.toLowerCase().replace(/\s+/g, "-");
+      const categorySlug = dealDaily.category
+        .toLowerCase()
+        .replace(/\s+/g, "-");
 
+      navigate(`/${categorySlug}/${dealDaily._id}/${slugTitle}`);
+    } else {
+      console.error("Cannot navigate: dealDaily data is missing.");
+      // Optionally show a toast message to the user
+    }
+  };
   return (
     <div className="border border-stone-400 w-full flex-auto ">
       <div className="flex items-center justify-between p-4 w-full">
@@ -75,7 +99,7 @@ const DealDaily = () => {
       <div className="w-full flex flex-col items-center px-4 gap-2 pt-8">
         <img
           src={
-            dealDaily?.thumb ||
+            dealDaily?.thumb?.image_url ||
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKnKnw0MtmVH5_-A-wrEh5OiTSL3lu_5MZZA&s"
           }
           alt="dealDaily.jpg"
@@ -97,6 +121,7 @@ const DealDaily = () => {
         <button
           type="button"
           className="flex gap-2 items-center justify-center w-full bg-main hover:bg-gray-800 text-white font-medium py-2 cursor-pointer"
+          onClick={handleNavigate}
         >
           <AiOutlineMenu />
           <span>Options</span>
