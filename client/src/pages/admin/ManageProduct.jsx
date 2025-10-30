@@ -23,7 +23,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { Badge } from "@/components/ui/badge";
 import Button from "@/components/Common/Button";
 import InputField from "@/components/Input/InputField";
-import Pagination from "@/components/Pagination/Pagination";
+import Pagination from "@/components/Pagination/MangePagination";
 import ConfirmDialog from "@/components/Dialog/ConfirmDialog";
 import EditProductDialog from "@/components/Dialog/EditProductDialog";
 import AddVariantDialog from "@/components/Dialog/AddVariantDialog";

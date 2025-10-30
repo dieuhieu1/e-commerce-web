@@ -107,10 +107,7 @@ const SearchItem = ({
 
   // Sync color filter to URL params
   useEffect(() => {
-    let param = [];
-    for (let i of params.entries()) param.push(i);
-    const queries = {};
-    for (let i of param) queries[i[0]] = i[1];
+    const queries = Object.fromEntries(params.entries());
 
     if (selected.length > 0) {
       queries.color = selected.join(",");

@@ -123,6 +123,7 @@ export const parseCurrency = (value) => {
   return value.replace(/\./g, "");
 };
 
+import { CheckCircle, Clock, Truck, XCircle } from "lucide-react";
 import default_avatar_1 from "../assets/default_1.png";
 import default_avatar_2 from "../assets/default_2.png";
 import default_avatar_3 from "../assets/default_3.png";
@@ -146,4 +147,38 @@ export const formatDate = (dateString) => {
     hour: "2-digit",
     minute: "2-digit",
   });
+};
+
+export const getStatusConfig = (status) => {
+  const configs = {
+    Succeed: {
+      label: "Delivered",
+      icon: CheckCircle,
+      bgColor: "bg-green-100",
+      textColor: "text-green-800",
+      borderColor: "border-green-300",
+    },
+    Processing: {
+      label: "Processing",
+      icon: Truck,
+      bgColor: "bg-blue-100",
+      textColor: "text-blue-800",
+      borderColor: "border-blue-300",
+    },
+    Cancelled: {
+      label: "Cancelled",
+      icon: XCircle,
+      bgColor: "bg-red-100",
+      textColor: "text-red-800",
+      borderColor: "border-red-300",
+    },
+    Pending: {
+      label: "Pending",
+      icon: Clock,
+      bgColor: "bg-yellow-100",
+      textColor: "text-yellow-800",
+      borderColor: "border-yellow-300",
+    },
+  };
+  return configs[status] || configs["Pending"];
 };

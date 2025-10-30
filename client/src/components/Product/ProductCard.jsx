@@ -115,14 +115,15 @@ const ProductCard = ({ productData }) => {
                    transform hover:scale-105 cursor-pointer"
       >
         {/* === IMAGE CONTAINER === */}
-        <div className="relative w-full aspect-square overflow-hidden bg-gray-50">
-          <Link to={productPath}>
-            <img
-              src={thumb?.image_url || "/placeholder-image.png"}
-              alt={title}
-              className="object-contain w-full h-full p-4 transition-transform duration-500 ease-out"
-            />
-          </Link>
+        <div
+          className="relative w-full aspect-square overflow-hidden bg-gray-50"
+          onClick={() => navigate(productPath)}
+        >
+          <img
+            src={thumb?.image_url || "/placeholder-image.png"}
+            alt={title}
+            className="object-contain w-full h-full p-4 transition-transform duration-500 ease-out"
+          />
 
           {/* --- Sale Badge --- */}
           {hasDiscount && (

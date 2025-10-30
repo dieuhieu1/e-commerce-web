@@ -9,6 +9,7 @@ import { GiSmartphone } from "react-icons/gi";
 import { PiTelevisionSimpleFill } from "react-icons/pi";
 import { BiSolidPrinter } from "react-icons/bi";
 import { useProductStore } from "@/lib/zustand/useProductStore";
+
 const icons = {
   Camera: <FaCamera />,
   Laptop: <BsFillLaptopFill />,
@@ -24,28 +25,34 @@ const Sidebar = () => {
   const { productCategories } = useProductStore();
 
   return (
-    <div className="flex flex-col border border-stone-400 h-[537px]">
+    // 1. Ẩn trên di động (hidden) và hiển thị từ breakpoint lg (lg:flex)
+    // 2. Chỉ áp dụng chiều cao cố định trên lg
+    <div className="hidden lg:flex flex-col border border-stone-400 lg:h-[537px]  ">
       <div className="bg-red-700 text-white uppercase flex items-center px-5 py-3 gap-6">
-        {" "}
         <span className="text-2xl">
           <FaListAlt />
         </span>
         all collections
       </div>
-      {productCategories?.map((el) => (
-        <NavLink
-          key={el._id}
-          to={createSlug(el.title)}
-          className={`px-5 pt-[15px] pb-[14px] text-sm hover:text-main ${(
-            isActive
-          ) => (isActive ? "bg-main text-white" : "")}`}
-        >
-          <div className=" flex gap-6 items-center">
-            <span className="text-2xl">{icons[el.title]}</span>
-            {el.title}{" "}
-          </div>
-        </NavLink>
-      ))}
+      <div className="flex justify-center flex-col gap-2">
+        {productCategories?.map((el) => (
+          <NavLink
+            key={el._id}
+            to={createSlug(el.title)}
+            // 3. SỬA LỖI: className phải là một hàm
+            className={({ isActive }) =>
+              `px-5 pt-[15px] pb-[14px] text-sm hover:text-main ${
+                isActive ? "bg-main text-white" : ""
+              }`
+            }
+          >
+            <div className=" flex gap-6 items-center">
+              <span className="text-2xl">{icons[el.title]}</span>
+              {el.title}
+            </div>
+          </NavLink>
+        ))}
+      </div>
     </div>
   );
 };

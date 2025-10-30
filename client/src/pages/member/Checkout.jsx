@@ -17,6 +17,8 @@ import { useAuthStore } from "@/lib/zustand/useAuthStore";
 import Paypal from "@/components/Common/PayPal";
 import { formatCurrencyVND, formatUSD } from "@/ultils/helpers";
 import { Congrat } from "@/components/Common/Congrat";
+import { apiCreateOrder } from "@/apis/order";
+import toast from "react-hot-toast";
 
 const Checkout = () => {
   const { user } = useAuthStore();
@@ -50,7 +52,33 @@ const Checkout = () => {
   const scrollToTop = () => {
     window.scrollTo(0, 0);
   };
+
+  const placeOrderWithCOD = async () => {
+    const orderData = {
+      products: user.cart,
+      total: totalUSD,
+      address: shippingAddress.address,
+      paymentMethod: paymentMethod,
+    };
+    const response = await apiCreateOrder(orderData);
+    if (response.success) {
+      setIsSuccess(true);
+      toast.success("Order placed successfully! Thank you for your purchase.", {
+        duration: 4000,
+        icon: "🎉",
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+          padding: "12px 18px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+        },
+      });
+    }
+  };
   const handlePaymentSuccess = () => {
+    console.log("abc");
+
     scrollToTop();
     channel.postMessage({ type: "CART_CLEARED" });
   };
@@ -388,7 +416,7 @@ const Checkout = () => {
             {/* COD Button */}
             {paymentMethod === "cod" && (
               <button
-                onClick={() => setIsSuccess(true)}
+                onClick={placeOrderWithCOD}
                 className="w-full py-4 bg-gradient-to-r from-orange-600 to-red-600 text-white font-bold rounded-lg hover:from-orange-700 hover:to-red-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
               >
                 Place Order - Cash on Delivery

@@ -18,7 +18,11 @@ const ManagePagination = ({ totalCount, pageSize }) => {
 
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages) return;
-    setParams({ page });
+    setParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set("page", page);
+      return newParams;
+    });
   };
 
   const range = () => {
@@ -26,7 +30,7 @@ const ManagePagination = ({ totalCount, pageSize }) => {
     const end = Math.min(currentPage * pageSize, totalCount);
     return `${start} - ${end}`;
   };
-
+  if (totalCount === 0) return null;
   return (
     <div className="w-full flex justify-between items-center py-4 px-2 border-t border-gray-100 bg-white rounded-b-xl">
       <span className="text-sm text-gray-500 italic">

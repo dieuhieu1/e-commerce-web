@@ -12,7 +12,7 @@ import SearchItem from "@/components/Search/SearchItem";
 import { apiGetProducts } from "@/apis/product";
 import InputSelect from "@/components/Input/InputSelect";
 import { sorts } from "@/ultils/constants";
-import Pagination from "@/components/Pagination/Pagination";
+import Pagination from "@/components/Pagination/MangePagination";
 
 const breakpointColumnsObj = {
   default: 4,

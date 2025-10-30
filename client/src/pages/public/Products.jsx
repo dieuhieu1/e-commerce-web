@@ -11,7 +11,7 @@ import SearchItem from "@/components/Search/SearchItem";
 import { apiGetProducts } from "@/apis/product";
 import InputSelect from "@/components/Input/InputSelect";
 import { sorts } from "@/ultils/constants";
-import Pagination from "@/components/Pagination/Pagination";
+import Pagination from "@/components/Pagination/MangePagination";
 
 const breakpointColumnsObj = {
   default: 4,
@@ -32,6 +32,8 @@ const Products = () => {
 
   useEffect(() => {
     const queries = Object.fromEntries(params.entries());
+    console.log(queries);
+
     let priceQuery = {};
     if (queries.to && queries.from) {
       priceQuery = {

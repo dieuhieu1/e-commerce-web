@@ -20,7 +20,6 @@ const ButtonWrapper = ({
   setIsSuccess,
 }) => {
   const [{ isPending, options }, dispatch] = usePayPalScriptReducer();
-  const { setCheckOut } = useAuthStore();
   useEffect(() => {
     dispatch({
       type: "resetOptions",
@@ -29,10 +28,12 @@ const ButtonWrapper = ({
   }, [currency, showSpinner]);
 
   const handlePaymentSuccess = async () => {
-    const response = await apiCreateOrder({ ...payload, status: "Succeed" });
+    const response = await apiCreateOrder({
+      ...payload,
+      paymentMethod: "paypal",
+    });
     if (response.success) {
       setIsSuccess(true);
-      setCheckOut();
       toast.success("Order placed successfully! Thank you for your purchase.", {
         duration: 4000, // Thời gian hiển thị (4 giây)
         icon: "🎉", // Icon tùy chỉnh

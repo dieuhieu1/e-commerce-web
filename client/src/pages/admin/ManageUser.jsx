@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 import Button from "@/components/Common/Button";
 import InputField from "@/components/Input/InputField";
 import { useDebounce } from "@/hooks/useDebounce";
-import Pagination from "@/components/Pagination/Pagination";
+import Pagination from "@/components/Pagination/MangePagination";
 import { useSearchParams } from "react-router-dom";
 import EditUserDialog from "@/components/Dialog/EditUserDialog";
 import toast from "react-hot-toast";

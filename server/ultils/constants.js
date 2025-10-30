@@ -133,6 +133,163 @@ const forgotPasswordHTML = (resetToken) => {
       </div>
       `;
 };
+/**
+ * @param {object} orderData Dữ liệu đơn hàng
+ * @param {string} orderData.customerName Tên khách hàng
+ * @param {string} orderData.orderId ID đơn hàng (ví dụ: #12345)
+ * @param {string} orderData.totalFormatted Tổng tiền đã format (ví dụ: "2.000.000 VND")
+ * @param {string} orderData.paymentMethod Phương thức thanh toán (ví dụ: "COD")
+ * @param {string} orderData.address Địa chỉ giao hàng
+ * @param {array} orderData.products Mảng sản phẩm trong đơn hàng
+ * - {string} item.title Tên sản phẩm
+ * - {number} item.quantity Số lượng
+ * - {string} item.priceFormatted Giá sản phẩm đã format
+ */
+const orderConfirmationHTML = (orderData) => {
+  // Destructure để dễ đọc hơn
+  const {
+    customerName,
+    orderId,
+    totalFormatted,
+    paymentMethod,
+    address,
+    products,
+  } = orderData;
+
+  // 1. Tạo các hàng cho bảng sản phẩm
+  const productRows = products
+    .map(
+      (item) => `
+    <tr style="border-bottom: 1px solid #eaeaea;">
+      <td style="padding: 12px 15px; text-align: left;">
+        ${item.title || "Product Name"}
+      </td>
+      <td style="padding: 12px 15px; text-align: center;">
+        ${item.quantity || 1}
+      </td>
+      <td style="padding: 12px 15px; text-align: right; white-space: nowrap;">
+        ${item.priceFormatted || "0 VND"}
+      </td>
+    </tr>
+  `
+    )
+    .join(""); // Nối tất cả các hàng <tr> lại
+
+  // 2. Trả về toàn bộ template
+  return `
+    <div style="
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 40px 0;
+    ">
+      <div style="
+        max-width: 600px;
+        background: white;
+        margin: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        overflow: hidden;
+      ">
+        
+        <div style="
+          background: linear-gradient(135deg, #ff7b00, #ffb703);
+          color: white;
+          text-align: center;
+          padding: 30px 20px;
+        ">
+          <h1 style="margin: 0; font-size: 24px;">Order Confirmed!</h1>
+        </div>
+        
+        <div style="padding: 35px; text-align: left; color: #333;">
+          <p style="font-size: 17px; margin-bottom: 20px;">
+            Hello ${customerName || "Customer"} 👋,
+          </p>
+          <p style="font-size: 16px; line-height: 1.6; color: #555;">
+            Cảm ơn bạn đã mua sắm! Đơn hàng của bạn đã được đặt thành công.
+            Chúng tôi đang chuẩn bị hàng để giao cho bạn.
+          </p>
+          
+          <div style="
+            background-color: #fcfcfc;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+            font-size: 14px;
+            line-height: 1.7;
+          ">
+            <h3 style="margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid #ff7b00; display: inline-block; padding-bottom: 4px;">
+              Order Summary
+            </h3>
+            <p style="margin: 8px 0;"><strong>Order ID:</strong> ${
+              orderId || "#"
+            }</p>
+            <p style="margin: 8px 0;"><strong>Payment:</strong> ${
+              paymentMethod || "N/A"
+            }</p>
+            <p style="margin: 8px 0;"><strong>Shipping Address:</strong> ${
+              address || "N/A"
+            }</p>
+          </div>
+
+          <h3 style="font-size: 18px; margin-top: 30px; margin-bottom: 15px;">Order Details</h3>
+          <table style="
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+          ">
+            <thead style="background-color: #f9f9f9;">
+              <tr>
+                <th style="padding: 12px 15px; text-align: left; border-bottom: 2px solid #eee;">Product</th>
+                <th style="padding: 12px 15px; text-align: center; border-bottom: 2px solid #eee;">Quantity</th>
+                <th style="padding: 12px 15px; text-align: right; border-bottom: 2px solid #eee;">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${productRows}
+            </tbody>
+          </table>
+          
+          <div style="text-align: right; margin-top: 20px; font-size: 18px; font-weight: bold; color: #000;">
+            Total: ${totalFormatted || "0 VND"}
+          </div>
+
+          <div style="text-align: center; margin: 35px 0 20px;">
+            <a href="${process.env.CLIENT_URL}/member/buy-history"
+              target="_blank"
+              style="
+                background-color: #ff7b00;
+                color: white;
+                text-decoration: none;
+                padding: 14px 28px;
+                border-radius: 6px;
+                font-size: 16px;
+                display: inline-block;
+                font-weight: 500;
+              ">
+              🚚 View Order Status
+            </a>
+          </div>
+          
+          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0 20px;"/>
+          
+          <p style="font-size: 14px; color: #666;">
+            Cảm ơn bạn một lần nữa!
+            <br/>
+            Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi.
+          </p>
+          
+          <p style="font-size: 12px; color: #999; text-align: center; margin-top: 30px;">
+            © ${new Date().getFullYear()} MyApp Inc. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+// export default orderConfirmationHTML; // Bạn có thể export để sử dụng
 
 const users = [
   {
@@ -312,4 +469,17 @@ const users = [
   },
 ];
 
-module.exports = { verifyEmailHTML, forgotPasswordHTML, users };
+const ORDER_STATUS = {
+  Pending: "Pending",
+  Processing: "Processing",
+  Delivered: "Delivered",
+  Cancelled: "Cancelled",
+};
+
+module.exports = {
+  verifyEmailHTML,
+  forgotPasswordHTML,
+  orderConfirmationHTML,
+  ORDER_STATUS,
+  users,
+};

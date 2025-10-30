@@ -12,7 +12,6 @@ const {
   forgotPasswordHTML,
   users,
 } = require("../ultils/constants");
-const { log } = require("console");
 
 // API Register
 const register = asyncHandler(async (req, res) => {
@@ -516,17 +515,10 @@ const updateUserCart = asyncHandler(async (req, res) => {
   // Find user in DB
   const user = await User.findById(_id);
   const userCart = user.cart;
-  console.log("Cart", userCart);
 
   // Check is product in cart?
   const productAlreadyInCart = userCart.find((item) => {
     {
-      console.log(
-        "Compare: ",
-        item.product.toString() === product.toString(),
-        item.color === color,
-        item.title === title
-      );
       return (
         item.product.toString() === product.toString() &&
         item.color === color &&
@@ -534,8 +526,6 @@ const updateUserCart = asyncHandler(async (req, res) => {
       );
     }
   });
-  console.log("Body", req.body, "ProductID: ", product);
-  console.log(productAlreadyInCart);
 
   // If yes plus the quantity
   if (productAlreadyInCart) {
@@ -583,19 +573,12 @@ const removeProductUserCart = asyncHandler(async (req, res) => {
   console.log(userCart);
 
   const itemIndex = userCart?.findIndex((item) => {
-    console.log(
-      "Compare: ",
-      item.product.toString() === product.toString(),
-      item.color === color,
-      item.title === title
-    );
     return (
       item.product.toString() === product.toString() &&
       item.color === color &&
       item.title === title
     );
   });
-  console.log(itemIndex);
   if (itemIndex === -1) {
     return res.status(404).json({
       success: false,
