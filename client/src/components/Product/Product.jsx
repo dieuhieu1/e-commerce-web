@@ -18,7 +18,7 @@ import QuickViewDialog from "../Dialog/QuickViewDialog";
 import path from "@/ultils/path";
 import { CustomDialog } from "../Dialog/CustomDialog";
 import { useAuthStore } from "@/lib/zustand/useAuthStore";
-import { apiUpdateUserCart } from "@/apis/user";
+import { apiUpdateUserCart, apiUpdateWishlist } from "@/apis/user";
 import toast from "react-hot-toast";
 
 /**
@@ -102,9 +102,16 @@ const Product = ({ productData, isNew, normal }) => {
         setIsLoginModalOpen(true);
         return;
       }
-      // Placeholder for wishlist API call
-      toast.success("Added to wishlist (demo)");
-      // const response = await apiUpdateWishlist...
+      const productId = _id;
+
+      const response = await apiUpdateWishlist(productId);
+
+      if (response.success) {
+        toast.success(response.message);
+        checkAuth(); // Re-fetch user data to update cart state globally
+      } else {
+        toast.error(response.message);
+      }
     }
   };
 

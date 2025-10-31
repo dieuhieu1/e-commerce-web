@@ -1,4 +1,6 @@
 const User = require("../models/User");
+const Product = require("../models/Product");
+
 const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
@@ -146,26 +148,6 @@ const login = asyncHandler(async (req, res) => {
     message: "Login successfully!",
     accessToken,
     userData: userData,
-  });
-});
-
-// API Get Current User
-const getCurrentUser = asyncHandler(async (req, res) => {
-  const { _id } = req.user;
-
-  const user = await User.findById(_id)
-    .select("-refreshToken -password")
-    .populate({
-      path: "cart",
-      populate: {
-        path: "product",
-        select: "title thumb price _id",
-      },
-    });
-
-  return res.status(200).json({
-    success: user ? true : false,
-    result: user ? user : "User not found!",
   });
 });
 
@@ -341,6 +323,7 @@ const changePassword = asyncHandler(async (req, res) => {
   });
 });
 
+// CRUD User
 const getAllUsers = asyncHandler(async (req, res) => {
   const queryObj = { ...req.query };
   const excludeFields = ["page", "sort", "filter", "limit"];
@@ -446,6 +429,8 @@ const updateUserByAdmin = asyncHandler(async (req, res) => {
       : "Something went wrong!",
   });
 });
+
+// Update User Info
 const updateUser = asyncHandler(async (req, res) => {
   const { _id: userId } = req.user;
 
@@ -490,15 +475,34 @@ const updateUser = asyncHandler(async (req, res) => {
   });
 });
 
+// API Get Current User
+const getCurrentUser = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+
+  const user = await User.findById(_id)
+    .select("-refreshToken -password")
+    .populate({
+      path: "cart",
+      populate: {
+        path: "product",
+        select: "title thumb price _id",
+      },
+    });
+
+  return res.status(200).json({
+    success: user ? true : false,
+    result: user ? user : "User not found!",
+  });
+});
+
+// Cart
 const updateUserCart = asyncHandler(async (req, res) => {
   const { _id } = req.user;
 
   const { pid: product } = req.params;
   const { quantity = 1, color, price, thumb, title } = req.body;
   // Validate req.body
-  if (!product) {
-    throw new Error("Missing Product Id! Check your request params");
-  }
+
   if (!color) {
     throw new Error("Missing Color! Check your request params");
   }
@@ -595,6 +599,44 @@ const removeProductUserCart = asyncHandler(async (req, res) => {
     cart: userCart,
   });
 });
+
+const updateUserWishlist = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  const { pid } = req.params;
+
+  const user = User.findById(_id);
+  const userWistList = user.wishlist;
+
+  const alreadyWishlist = userWistList.find(
+    (el) => el.toString() === pid.toString()
+  );
+
+  if (alreadyWishlist) {
+    const updated = await user.updateOne(
+      { $pull: { wishlist: pid } },
+      { new: true }
+    );
+    return res.json({
+      success: updated ? true : false,
+      message: updated
+        ? `Removed product from your wishlist`
+        : "Something went wrong! Cannot remove product out of wishlist",
+    });
+  } else {
+    const added = await user.updateOne(
+      { $push: { wishlist: pid } },
+      { new: true }
+    );
+
+    return res.json({
+      success: added ? true : false,
+      message: added
+        ? `Added product to your wishlist`
+        : "Something went wrong! Cannot add product to wishlist",
+    });
+  }
+});
+
 const createUsers = asyncHandler(async (req, res) => {
   const response = await User.create(users);
   return res.status(200).json({
@@ -602,6 +644,7 @@ const createUsers = asyncHandler(async (req, res) => {
     users: response ? response : "Some thing went wrong",
   });
 });
+
 module.exports = {
   // Authorization
   register,
@@ -620,6 +663,9 @@ module.exports = {
   deleteUser,
   updateUser,
   updateUserByAdmin,
+  // Cart
   updateUserCart,
   removeProductUserCart,
+  // Wishlist
+  updateUserWishlist,
 };

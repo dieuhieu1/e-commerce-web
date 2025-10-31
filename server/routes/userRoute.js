@@ -2,27 +2,32 @@ const userRouter = require("express").Router();
 const userController = require("../controllers/userController");
 const { verifyAccessToken, isAdmin } = require("../middlewares/verifyToken");
 const {
+  // Authorization
   register,
   login,
   getCurrentUser,
   refreshAccessToken,
+  verifyEmail,
   logout,
+  // Change password
   forgotPassword,
   resetPassword,
+  changePassword,
+  // Get User
+  createUsers,
   getAllUsers,
   deleteUser,
   updateUser,
   updateUserByAdmin,
+  // Cart
   updateUserCart,
-  verifyEmail,
-  createUsers,
-  changePassword,
   removeProductUserCart,
+  // Wishlist
+  updateUserWishlist,
 } = userController;
-
-userRouter.post("/register", register);
 userRouter.post("/insert", createUsers);
 
+userRouter.post("/register", register);
 userRouter.get("/verify-email/:token", verifyEmail);
 userRouter.post("/login", login);
 userRouter.post("/refreshtoken", refreshAccessToken);
@@ -30,16 +35,19 @@ userRouter.post("/logout", logout);
 userRouter.post("/forgot-password", forgotPassword);
 userRouter.post("/reset-password", resetPassword);
 userRouter.post("/change-password", verifyAccessToken, changePassword);
-
+// CRUD user for Admin
 userRouter.get("/current", verifyAccessToken, getCurrentUser);
 userRouter.get("/", verifyAccessToken, isAdmin, getAllUsers);
+userRouter.put("/:uid", verifyAccessToken, isAdmin, updateUserByAdmin);
+userRouter.delete("/:uid", verifyAccessToken, isAdmin, deleteUser);
 
+// Update user Info
 userRouter.put("/current", verifyAccessToken, updateUser);
+
+// Udpate Cart
 userRouter.put("/cart/add/:pid", verifyAccessToken, updateUserCart);
 userRouter.put("/cart/remove/:pid", verifyAccessToken, removeProductUserCart);
 
-userRouter.put("/:uid", verifyAccessToken, isAdmin, updateUserByAdmin);
-
-userRouter.delete("/:uid", verifyAccessToken, isAdmin, deleteUser);
-
+// Wishlist
+userRouter.put("/wishlist/:pid", verifyAccessToken, updateUserWishlist);
 module.exports = userRouter;
