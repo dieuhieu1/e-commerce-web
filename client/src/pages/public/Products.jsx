@@ -58,7 +58,8 @@ const Products = () => {
 
     const loadProducts = async () => {
       setIsLoading(true);
-      const response = await apiGetProducts(queryObject);
+      const response = await apiGetProducts({ ...queryObject, limit: 12 });
+      console.log(response.totalCount);
 
       if (response.success) {
         setProductsByCategory(response);
@@ -93,6 +94,7 @@ const Products = () => {
     },
     [sort]
   );
+
   return (
     <div className="w-full">
       <div className="w-main border p-4 flex justify-between mt-8 m-auto">
@@ -163,7 +165,7 @@ const Products = () => {
         )}
       </div>
       <div className="w-main m-auto my-4 flex justify-end">
-        <Pagination totalCount={productsByCategory?.totalCount} pageSize={10} />
+        <Pagination totalCount={productsByCategory.totalCount} pageSize={12} />
       </div>
     </div>
   );

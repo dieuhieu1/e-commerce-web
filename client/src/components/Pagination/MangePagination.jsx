@@ -15,6 +15,7 @@ const ManagePagination = ({ totalCount, pageSize }) => {
   const currentPage = +params.get("page") || 1;
   const paginationRange = usePagination(totalCount, currentPage, pageSize);
   const totalPages = Math.ceil(totalCount / pageSize);
+  console.log(totalCount, pageSize);
 
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages) return;

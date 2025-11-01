@@ -20,6 +20,7 @@ import { CustomDialog } from "../Dialog/CustomDialog";
 import { useAuthStore } from "@/lib/zustand/useAuthStore";
 import { apiUpdateUserCart, apiUpdateWishlist } from "@/apis/user";
 import toast from "react-hot-toast";
+import { FaHeartCircleCheck } from "react-icons/fa6";
 
 /**
  * A single product card component that displays product information
@@ -52,6 +53,7 @@ const Product = ({ productData, isNew, normal }) => {
   const productPath = `/${category?.toLowerCase()}/${_id}/${title}`;
   // Check if this product is already in the user's cart
   const isProductInCart = user?.cart?.some((el) => el?.product?._id === _id);
+  const isProductInWishlist = user?.wishlist?.some((el) => el === _id);
 
   // --- EVENT HANDLERS ---
 
@@ -104,7 +106,7 @@ const Product = ({ productData, isNew, normal }) => {
       }
       const productId = _id;
 
-      const response = await apiUpdateWishlist(productId);
+      const response = await apiUpdateWishlist({ pid: productId });
 
       if (response.success) {
         toast.success(response.message);
@@ -207,16 +209,27 @@ const Product = ({ productData, isNew, normal }) => {
                 <SelectOption icon={<BsCartPlus />} />
               </span>
             )}
-
-            {/* Wishlist Button */}
-            <span
-              title="Add to Wishlist"
-              onClick={(e) => handleClickOpions(e, "WISH_LIST")}
-              // Thêm class transition
-              className="transition-transform duration-200 hover:scale-125 cursor-pointer"
-            >
-              <SelectOption icon={<BsFillSuitHeartFill />} />
-            </span>
+            {isProductInWishlist ? (
+              // Nếu sản phẩm đã có trong wishlist
+              <span
+                title="Added to wishlist"
+                onClick={(e) => e.stopPropagation()}
+                className="cursor-not-allowed transition-transform duration-200 hover:scale-110"
+              >
+                <div className="opacity-60">
+                  <SelectOption icon={<FaHeartCircleCheck color="green" />} />
+                </div>
+              </span>
+            ) : (
+              // Nếu sản phẩm chưa có trong wishlist
+              <span
+                title="Add to Wishlist"
+                onClick={(e) => handleClickOpions(e, "WISH_LIST")}
+                className="transition-transform duration-200 hover:scale-110 cursor-pointer"
+              >
+                <SelectOption icon={<BsFillSuitHeartFill />} />
+              </span>
+            )}
           </div>
 
           {/* "NEW" or "TRENDING" Badge */}

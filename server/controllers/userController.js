@@ -487,7 +487,8 @@ const getCurrentUser = asyncHandler(async (req, res) => {
         path: "product",
         select: "title thumb price _id",
       },
-    });
+    })
+    .populate({ path: "wishlist", select: "title thumb price color" });
 
   return res.status(200).json({
     success: user ? true : false,
@@ -602,37 +603,53 @@ const removeProductUserCart = asyncHandler(async (req, res) => {
 
 const updateUserWishlist = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const { pid } = req.params;
+  const { pid, isClearAll } = req.body;
 
-  const user = User.findById(_id);
-  const userWistList = user.wishlist;
+  const user = await User.findById(_id);
+  if (!user) throw new Error("User not found");
 
-  const alreadyWishlist = userWistList.find(
+  if (isClearAll) {
+    const clearedUser = await User.findByIdAndUpdate(
+      _id,
+      { $set: { wishlist: [] } },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Cleared entire wishlist successfully",
+      wishlist: clearedUser.wishlist,
+    });
+  }
+
+  const userWishlist = user.wishlist || [];
+  const alreadyWishlist = userWishlist.find(
     (el) => el.toString() === pid.toString()
   );
 
+  let updatedUser;
+
   if (alreadyWishlist) {
-    const updated = await user.updateOne(
+    updatedUser = await User.findByIdAndUpdate(
+      _id,
       { $pull: { wishlist: pid } },
       { new: true }
     );
-    return res.json({
-      success: updated ? true : false,
-      message: updated
-        ? `Removed product from your wishlist`
-        : "Something went wrong! Cannot remove product out of wishlist",
+    return res.status(200).json({
+      success: true,
+      message: "Removed product from your wishlist",
+      wishlist: updatedUser.wishlist,
     });
   } else {
-    const added = await user.updateOne(
+    updatedUser = await User.findByIdAndUpdate(
+      _id,
       { $push: { wishlist: pid } },
       { new: true }
     );
-
-    return res.json({
-      success: added ? true : false,
-      message: added
-        ? `Added product to your wishlist`
-        : "Something went wrong! Cannot add product to wishlist",
+    return res.status(200).json({
+      success: true,
+      message: "Added product to your wishlist",
+      wishlist: updatedUser.wishlist,
     });
   }
 });

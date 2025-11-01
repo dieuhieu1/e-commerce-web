@@ -65,7 +65,7 @@ const CategoryPage = () => {
       setIsLoading(true);
       const response = await apiGetProducts({ ...priceQuery, ...queries });
       if (response.success) {
-        setProductsByCategory(response.products);
+        setProductsByCategory(response);
       }
       setIsLoading(false);
     };
@@ -98,6 +98,8 @@ const CategoryPage = () => {
     },
     [sort]
   );
+  console.log();
+
   return (
     <div className="w-full">
       <div className="h-[81px] flex justify-center items-center bg-gray-100">
@@ -163,7 +165,7 @@ const CategoryPage = () => {
             columnClassName="my-masonry-grid_column"
           >
             {productsByCategory &&
-              productsByCategory?.map((el) => (
+              productsByCategory?.products?.map((el) => (
                 <Product
                   key={el._id}
                   pid={el._id}
@@ -175,7 +177,7 @@ const CategoryPage = () => {
         )}
       </div>
       <div className="w-main m-auto my-4 flex justify-end">
-        <Pagination totalCount={productsByCategory?.totalCount} />
+        <Pagination totalCount={productsByCategory?.totalCount} pageSize={12} />
       </div>
     </div>
   );

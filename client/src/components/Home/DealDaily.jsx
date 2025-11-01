@@ -21,8 +21,6 @@ const DealDaily = () => {
     });
 
     if (response.success) {
-      console.log(response);
-
       setDealDaily(response.products[0]);
       setExpired(false); // Reset state when have a new deal
     }
@@ -59,7 +57,6 @@ const DealDaily = () => {
       // Optionally show a toast message to the user
     }
   };
-  console.log(dealDaily);
   return (
     <div className="border border-stone-400 w-full flex-auto ">
       <div className="flex items-center justify-between p-4 w-full">

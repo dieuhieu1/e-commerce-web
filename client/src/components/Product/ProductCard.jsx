@@ -5,7 +5,7 @@ import StarRating from "../StarRating";
 import { FiEye, FiHeart, FiShoppingCart } from "react-icons/fi";
 import { useAuthStore } from "@/lib/zustand/useAuthStore";
 import toast from "react-hot-toast";
-import { apiUpdateUserCart } from "@/apis/user";
+import { apiUpdateUserCart, apiUpdateWishlist } from "@/apis/user";
 import path from "@/ultils/path";
 import {
   createSearchParams,
@@ -15,7 +15,9 @@ import {
 } from "react-router-dom";
 import { CustomDialog } from "../Dialog/CustomDialog";
 import QuickViewDialog from "../Dialog/QuickViewDialog";
-import { BsFillCartCheckFill } from "react-icons/bs";
+import { BsFillCartCheckFill, BsFillSuitHeartFill } from "react-icons/bs";
+import SelectOption from "../Search/SelectOption";
+import { FaHeart, FaHeartCircleCheck } from "react-icons/fa6";
 
 const ProductCard = ({ productData }) => {
   const location = useLocation();
@@ -44,6 +46,7 @@ const ProductCard = ({ productData }) => {
   const hasDiscount = originalPrice && originalPrice > price;
   // Check if this product is already in the user's cart
   const isProductInCart = user?.cart?.some((el) => el?.product?._id === _id);
+  const isProductInWishlist = user?.wishlist?.some((el) => el === _id);
 
   // --- EVENT HANDLERS ---
 
@@ -94,9 +97,15 @@ const ProductCard = ({ productData }) => {
         setIsLoginModalOpen(true);
         return;
       }
-      // Placeholder for wishlist API call
-      toast.success("Added to wishlist (demo)");
-      // const response = await apiUpdateWishlist...
+      const productId = _id;
+      const response = await apiUpdateWishlist({ pid: productId });
+
+      if (response.success) {
+        toast.success(response.message);
+        checkAuth(); // Re-fetch user data to update cart state globally
+      } else {
+        toast.error(response.message);
+      }
     }
   };
   const handleConfirmLoginModal = () => {
@@ -146,15 +155,7 @@ const ProductCard = ({ productData }) => {
             >
               <FiEye size={20} />
             </button>
-            <button
-              className="bg-white p-2 rounded-full text-gray-800 shadow-md 
-                         hover:bg-blue-600 hover:text-white 
-                         transition-all duration-200 hover:scale-150"
-              title="Add to Wishlist"
-              onClick={(e) => handleClickOpions(e, "WISH_LIST")}
-            >
-              <FiHeart size={20} />
-            </button>
+
             {isProductInCart ? (
               <button
                 className="bg-white p-2 rounded-full text-gray-800 shadow-md 
@@ -175,6 +176,31 @@ const ProductCard = ({ productData }) => {
               >
                 <FiShoppingCart size={20} />
               </button>
+            )}
+            {isProductInWishlist ? (
+              // Nếu sản phẩm đã có trong wishlist
+              <span
+                title="Added to wishlist"
+                onClick={(e) => e.stopPropagation()}
+                className="cursor-not-allowed transition-transform duration-200 hover:scale-110"
+              >
+                <div className="opacity-60">
+                  <SelectOption
+                    icon={<FaHeartCircleCheck color="green" size={20} />}
+                  />
+                </div>
+              </span>
+            ) : (
+              // Nếu sản phẩm chưa có trong wishlist
+              <span
+                title="Add to Wishlist"
+                onClick={(e) => handleClickOpions(e, "WISH_LIST")}
+                className="bg-white p-2 rounded-full text-gray-800 shadow-md 
+              hover:bg-blue-600 hover:text-white 
+              transition-all duration-200 hover:scale-150"
+              >
+                <FaHeart size={20} />
+              </span>
             )}
           </div>
         </div>

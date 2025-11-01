@@ -38,16 +38,18 @@ userRouter.post("/change-password", verifyAccessToken, changePassword);
 // CRUD user for Admin
 userRouter.get("/current", verifyAccessToken, getCurrentUser);
 userRouter.get("/", verifyAccessToken, isAdmin, getAllUsers);
-userRouter.put("/:uid", verifyAccessToken, isAdmin, updateUserByAdmin);
-userRouter.delete("/:uid", verifyAccessToken, isAdmin, deleteUser);
+
+userRouter.put("/wishlist", verifyAccessToken, updateUserWishlist);
 
 // Update user Info
 userRouter.put("/current", verifyAccessToken, updateUser);
+
+userRouter.put("/:uid", verifyAccessToken, isAdmin, updateUserByAdmin);
+userRouter.delete("/:uid", verifyAccessToken, isAdmin, deleteUser);
 
 // Udpate Cart
 userRouter.put("/cart/add/:pid", verifyAccessToken, updateUserCart);
 userRouter.put("/cart/remove/:pid", verifyAccessToken, removeProductUserCart);
 
 // Wishlist
-userRouter.put("/wishlist/:pid", verifyAccessToken, updateUserWishlist);
 module.exports = userRouter;
