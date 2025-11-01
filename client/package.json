@@ -45,6 +45,7 @@
     "react-spinners": "^0.17.0",
     "react-toastify": "^11.0.5",
     "react-use": "^17.6.0",
+    "recharts": "^2.15.4",
     "slick-carousel": "^1.8.1",
     "sweetalert2": "^11.26.2",
     "tailwind-merge": "^3.3.1",

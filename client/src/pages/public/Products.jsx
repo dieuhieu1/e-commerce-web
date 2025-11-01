@@ -165,7 +165,7 @@ const Products = () => {
         )}
       </div>
       <div className="w-main m-auto my-4 flex justify-end">
-        <Pagination totalCount={productsByCategory.totalCount} pageSize={12} />
+        <Pagination totalCount={productsByCategory?.totalCount} pageSize={12} />
       </div>
     </div>
   );

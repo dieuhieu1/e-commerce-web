@@ -14,7 +14,7 @@ const BestSeller = () => {
 
   const [activedTab, setActivedTab] = useState(1);
   const [products, setProducts] = useState(null);
-  const [isNew, setIsNew] = useState(true);
+  const [isNew, setIsNew] = useState(false);
 
   useEffect(() => {
     fetchBestSellers();
