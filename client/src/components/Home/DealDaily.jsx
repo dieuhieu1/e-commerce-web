@@ -3,14 +3,14 @@ import { formatMoney } from "@/ultils/helpers";
 import React, { useEffect, useState } from "react";
 import { AiFillStar, AiOutlineMenu } from "react-icons/ai";
 import StarRating from "../StarRating";
-import CountDown from "./CountDown";
 import { useNavigate } from "react-router-dom";
 import CountdownTimer from "./CountDownTimer";
+import { useDealDailyStore } from "@/lib/zustand/useDealDailyStore";
 
 const DealDaily = () => {
   const navigate = useNavigate();
 
-  const [dealDaily, setDealDaily] = useState(null);
+  const { dealDaily, setDealDaily, clearDeal } = useDealDailyStore();
   const [expired, setExpired] = useState(false);
 
   const fetchDaily = async () => {
@@ -21,44 +21,43 @@ const DealDaily = () => {
     });
 
     if (response.success) {
-      setDealDaily(response.products[0]);
-      setExpired(false); // Reset state when have a new deal
+      const endTime = Date.now() + 24 * 60 * 60 * 1000;
+      setDealDaily(response.products[0], endTime);
+      setExpired(false);
     }
   };
 
   useEffect(() => {
-    fetchDaily();
+    if (!dealDaily) {
+      fetchDaily();
+    }
   }, []);
 
   const handleExpire = () => {
     setExpired(true);
-    fetchDaily(); // Tự động gọi deal mới
+    clearDeal();
+    fetchDaily();
   };
 
-  // Handle navigation to product detail page
   const handleNavigate = () => {
-    // Make sure dealDaily and necessary properties exist before navigating
     if (
       dealDaily &&
       dealDaily?._id &&
       dealDaily?.title &&
       dealDaily?.category
     ) {
-      // Construct the path, assuming category is needed as well
-      // Replace spaces in title for URL safety, e.g., using '-'
       const slugTitle = dealDaily.title.toLowerCase().replace(/\s+/g, "-");
       const categorySlug = dealDaily.category
         .toLowerCase()
         .replace(/\s+/g, "-");
-
       navigate(`/${categorySlug}/${dealDaily._id}/${slugTitle}`);
     } else {
       console.error("Cannot navigate: dealDaily data is missing.");
-      // Optionally show a toast message to the user
     }
   };
+
   return (
-    <div className="border border-stone-400 w-full flex-auto ">
+    <div className="border border-stone-400 w-full flex-auto">
       <div className="flex items-center justify-between p-4 w-full">
         <span className="flex justify-center">
           <AiFillStar size={20} color="red" />
@@ -66,7 +65,7 @@ const DealDaily = () => {
         <span className="flex-12 font-semibold text-[20px] flex justify-center uppercase">
           daily deals
         </span>
-        <span className="flex-2"> </span>
+        <span className="flex-2" />
       </div>
 
       {!dealDaily ? (

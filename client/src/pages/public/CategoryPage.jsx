@@ -175,9 +175,14 @@ const CategoryPage = () => {
           <ProductNotFound />
         )}
       </div>
-      <div className="w-main m-auto my-4 flex justify-end">
-        <Pagination totalCount={productsByCategory?.totalCount} pageSize={12} />
-      </div>
+      {productsByCategory?.products?.length > 0 && (
+        <div className="w-main m-auto my-4 flex justify-end">
+          <Pagination
+            totalCount={productsByCategory?.totalCount}
+            pageSize={12}
+          />
+        </div>
+      )}
     </div>
   );
 };

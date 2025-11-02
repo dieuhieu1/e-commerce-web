@@ -8,7 +8,7 @@ const ProductNotFound = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="w-full min-h-screen bg-gray-50">
+    <div className="w-full min-h-screen bg-gray-50 mb-8">
       <div className="w-main">
         <div className="flex flex-col items-center justify-center py-16 px-4">
           {/* Icon with gradient background */}

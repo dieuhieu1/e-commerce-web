@@ -1,26 +1,37 @@
 import React, { useEffect, useState } from "react";
 import CountDown from "./CountDown";
+import { useDealDailyStore } from "@/lib/zustand/useDealDailyStore";
 
 const CountdownTimer = ({ duration, onExpire }) => {
+  const { endTime, setDealDaily, dealDaily } = useDealDailyStore();
   const [timeLeft, setTimeLeft] = useState(duration);
 
   useEffect(() => {
-    const endTime = Date.now() + duration * 1000;
+    let finalEndTime = endTime;
+
+    // Nếu chưa có endTime trong store => tạo mới (tức lần đầu tiên có deal)
+    if (!finalEndTime) {
+      finalEndTime = Date.now() + duration * 1000;
+      setDealDaily(dealDaily, finalEndTime);
+    }
 
     const interval = setInterval(() => {
-      const remaining = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+      const remaining = Math.max(
+        0,
+        Math.floor((finalEndTime - Date.now()) / 1000)
+      );
       setTimeLeft(remaining);
 
       if (remaining <= 0) {
         clearInterval(interval);
-        onExpire?.(); // Gọi callback khi hết thời gian
+        onExpire?.(); // Hết hạn thì gọi callback
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [duration, onExpire]);
+  }, [duration, onExpire, endTime]);
 
-  // Chuyển giây thành h:m:s
+  // Định dạng giờ/phút/giây
   const hours = Math.floor(timeLeft / 3600);
   const minutes = Math.floor((timeLeft % 3600) / 60);
   const seconds = timeLeft % 60;
@@ -33,14 +44,5 @@ const CountdownTimer = ({ duration, onExpire }) => {
     </div>
   );
 };
-
-const TimeBox = ({ unit, number }) => (
-  <div className="bg-gray-800 text-white rounded-md px-3 py-2 text-center">
-    <div className="text-lg font-bold">
-      {number.toString().padStart(2, "0")}
-    </div>
-    <div className="text-xs">{unit}</div>
-  </div>
-);
 
 export default CountdownTimer;
