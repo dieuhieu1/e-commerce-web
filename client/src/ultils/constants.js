@@ -75,7 +75,7 @@ export const adminSidebar = [
   {
     id: 1,
     type: "single",
-    text: "dasboard",
+    text: "Dasboard",
     path: `/${path.ADMIN}/${path.DASHBOARD}`,
     icon: BiSolidDashboard,
   },

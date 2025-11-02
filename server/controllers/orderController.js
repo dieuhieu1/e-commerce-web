@@ -193,36 +193,11 @@ const getOrders = asyncHandler(async (req, res) => {
     (match) => `$${match}`
   );
   const formattedQueries = JSON.parse(queryString);
-  // let colorQueryObject = {};
-
-  // if (queryObj?.title)
-  //   formattedQueries.title = { $regex: queryObj.title, $options: "i" };
-  // if (queryObj?.category)
-  //   formattedQueries.category = { $regex: queryObj.category, $options: "i" };
-  // if (queryObj?.color) {
-  //   delete formattedQueries.color;
-  //   const colorArr = queryObj.color?.split(",");
-  //   const colorQuery = colorArr.map((el) => ({
-  //     color: { $regex: el, $options: "iu" },
-  //   }));
-  //   colorQueryObject = { $or: colorQuery };
-  // }
-  // let queryObject = {};
-  // if (queryObj?.q) {
-  //   delete formattedQueries.q;
-  //   queryObject = {
-  //     $or: [
-  //       { color: { $regex: queryObj.q, $options: "i" } },
-  //       { title: { $regex: queryObj.q, $options: "i" } },
-  //       { category: { $regex: queryObj.q, $options: "i" } },
-  //       { brand: { $regex: queryObj.q, $options: "i" } },
-  //       { description: { $regex: queryObj.q, $options: "i" } },
-  //     ],
-  //   };
-  // }
-  const queries = { formattedQueries };
   // Create query but not execute --> Adding more condition of sorting and pagination
-  let query = Order.find(queries);
+  let query = Order.find(formattedQueries).populate(
+    "orderedBy",
+    "firstname lastname avatar"
+  );
 
   // 2. Sorting
   if (req.query.sort) {
@@ -250,7 +225,7 @@ const getOrders = asyncHandler(async (req, res) => {
   // Execute the query
 
   // Đếm tổng số bản ghi với cùng điều kiện filter
-  const totalCounts = await Order.countDocuments(queries);
+  const totalCounts = await Order.countDocuments(formattedQueries);
   // Execute query
   const response = await query;
 
@@ -314,7 +289,6 @@ const getMyOrder = asyncHandler(async (req, res) => {
   // Skip page, so we need to skip element in 1 page (limit) * value of page
   const skip = (page - 1) * limit;
   query.skip(skip).limit(limit);
-  console.log(queries);
 
   const allOrders = await Order.find(queries);
   // Execute query

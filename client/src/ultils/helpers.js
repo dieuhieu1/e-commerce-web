@@ -182,3 +182,21 @@ export const getStatusConfig = (status) => {
   };
   return configs[status] || configs["Pending"];
 };
+export const getStatusColor = (status) => {
+  const colors = {
+    Completed: "bg-green-100 text-green-700 border-green-200",
+    Processing: "bg-blue-100 text-blue-700 border-blue-200",
+    Pending: "bg-yellow-100 text-yellow-700 border-yellow-200",
+    Cancelled: "bg-red-100 text-red-700 border-red-200",
+  };
+  return colors[status] || colors.pending;
+};
+export const getStatusText = (status) => {
+  const texts = {
+    completed: "Hoàn thành",
+    processing: "Đang xử lý",
+    pending: "Chờ xử lý",
+    cancelled: "Đã hủy",
+  };
+  return texts[status] || status;
+};

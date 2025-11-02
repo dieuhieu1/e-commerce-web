@@ -13,6 +13,7 @@ import { apiGetProducts } from "@/apis/product";
 import InputSelect from "@/components/Input/InputSelect";
 import { sorts } from "@/ultils/constants";
 import Pagination from "@/components/Pagination/MangePagination";
+import ProductNotFound from "@/components/Product/ProductNotFound";
 
 const breakpointColumnsObj = {
   default: 4,
@@ -70,6 +71,7 @@ const CategoryPage = () => {
       setIsLoading(false);
     };
     loadProducts();
+    window.scrollTo(0, 0);
   }, [category, params]);
 
   const changeActiveFilter = useCallback(
@@ -108,35 +110,36 @@ const CategoryPage = () => {
           <Breadcrumbs category={category} />
         </div>
       </div>
-
-      <div className="w-main border p-4 flex justify-between mt-8 m-auto">
-        <div className="w-4/5 flex-auto p-4 flex flex-col gap-3">
-          <span className="font-semibold text-sm">Filter By</span>
-          <div className="flex items-center gap-4">
-            <SearchItem
-              name="Price"
-              type="input"
-              activeClick={activeClick}
-              changeActiveFilter={changeActiveFilter}
-            />
-            <SearchItem
-              name="Color"
-              activeClick={activeClick}
-              changeActiveFilter={changeActiveFilter}
-            />
+      {productsByCategory?.products?.length > 0 && (
+        <div className="w-main border p-4 flex justify-between mt-8 m-auto">
+          <div className="w-4/5 flex-auto p-4 flex flex-col gap-3">
+            <span className="font-semibold text-sm">Filter By</span>
+            <div className="flex items-center gap-4">
+              <SearchItem
+                name="Price"
+                type="input"
+                activeClick={activeClick}
+                changeActiveFilter={changeActiveFilter}
+              />
+              <SearchItem
+                name="Color"
+                activeClick={activeClick}
+                changeActiveFilter={changeActiveFilter}
+              />
+            </div>
+          </div>
+          <div className="w-1/5 flex flex-col gap-3">
+            <span className="font-semibold text-sm">Sort By</span>
+            <div className="w-full">
+              <InputSelect
+                value={sort}
+                options={sorts}
+                changeValue={changeSorts}
+              />
+            </div>
           </div>
         </div>
-        <div className="w-1/5 flex flex-col gap-3">
-          <span className="font-semibold text-sm">Sort By</span>
-          <div className="w-full">
-            <InputSelect
-              value={sort}
-              options={sorts}
-              changeValue={changeSorts}
-            />
-          </div>
-        </div>
-      </div>
+      )}
 
       <div className="mt-8 w-main m-auto">
         {isLoading ? (
@@ -158,22 +161,18 @@ const CategoryPage = () => {
                 </div>
               ))}
           </div>
-        ) : (
+        ) : productsByCategory?.products?.length > 0 ? (
           <Masonry
             breakpointCols={breakpointColumnsObj}
             className="my-masonry-grid"
             columnClassName="my-masonry-grid_column"
           >
-            {productsByCategory &&
-              productsByCategory?.products?.map((el) => (
-                <Product
-                  key={el._id}
-                  pid={el._id}
-                  productData={el}
-                  normal={true}
-                />
-              ))}
+            {productsByCategory.products.map((el) => (
+              <Product key={el._id} pid={el._id} productData={el} normal />
+            ))}
           </Masonry>
+        ) : (
+          <ProductNotFound />
         )}
       </div>
       <div className="w-main m-auto my-4 flex justify-end">

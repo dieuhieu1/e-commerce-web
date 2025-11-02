@@ -62,7 +62,9 @@ export const useAuthStore = create(
             }
           }
         } catch (error) {
-          console.warn("Logout request failed, clearing local data only.");
+          console.warn(
+            "Logout request failed, clearing local data only." + error
+          );
         } finally {
           set({
             user: null,
@@ -83,7 +85,17 @@ export const useAuthStore = create(
         try {
           const response = await apiGetCurrentUser(accessToken);
           const user = response.result;
-          set({ user, isAuthenticated: true });
+          if (response.success) {
+            set({ user, isAuthenticated: true });
+          } else {
+            set({
+              isAuthenticated: false,
+              user: null,
+              accessToken: null,
+              message:
+                "Your session has ended. Please log in again to continue shopping.",
+            });
+          }
           return true;
         } catch {
           set({

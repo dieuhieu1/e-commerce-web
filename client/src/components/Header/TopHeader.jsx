@@ -1,30 +1,34 @@
 import { useAuthStore } from "@/lib/zustand/useAuthStore";
 import path from "@/ultils/path";
-import React, { memo, useEffect } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { AiOutlineLogout } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
+import ConfirmDialog from "../Dialog/ConfirmDialog"; // hoặc CustomDialog, tuỳ bạn
 
 const TopHeader = () => {
   const { user, isAuthenticated, logout, isLoading, checkAuth, message } =
     useAuthStore();
-  const nagivate = useNavigate();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     checkAuth();
   }, []);
+
+  // 🔔 Khi token hết hạn hoặc có message
   useEffect(() => {
     if (message) {
-      Swal.fire({
-        title: "Session expired",
-        text: message,
-        icon: "info",
-        confirmButtonText: "Go to Login",
-      }).then(() => {
-        nagivate(`/${path.LOGIN}`);
-      });
+      setIsLoginModalOpen(true); // mở dialog
     }
-  }, [message, nagivate]);
+  }, [message]);
+
+  // ✅ Hàm xác nhận khi người dùng bấm "Go to Login"
+  const handleConfirmLoginModal = () => {
+    setIsLoginModalOpen(false);
+    navigate(`/${path.LOGIN}`);
+  };
+
   return (
     <div className="w-full h-[60px] bg-gradient-to-r from-[#e63946] via-[#f77f00] to-[#fcbf49] text-white shadow-md flex justify-center items-center">
       <div className="w-main flex items-center justify-between text-sm md:text-base font-medium">
@@ -71,6 +75,22 @@ const TopHeader = () => {
           </Link>
         )}
       </div>
+
+      {/* 🧩 CustomDialog thay Swal */}
+      <ConfirmDialog
+        open={isLoginModalOpen}
+        onOpenChange={setIsLoginModalOpen}
+        title="Session Expired"
+        confirmText="Go to Login"
+        cancelText="Not now"
+        onConfirm={handleConfirmLoginModal}
+        onClose={() => setIsLoginModalOpen(false)}
+        description={
+          <p className="text-gray-700 text-md">
+            Your session has expired. Please login again to continue.
+          </p>
+        }
+      ></ConfirmDialog>
     </div>
   );
 };

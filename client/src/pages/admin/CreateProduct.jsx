@@ -36,7 +36,6 @@ const CreateProduct = () => {
   const [imagePreviews, setImagePreviews] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // ⚙️ State cho Confirm Dialog
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmData, setConfirmData] = useState({
     action: null,
@@ -44,7 +43,6 @@ const CreateProduct = () => {
     onConfirm: null,
   });
   const [displayPrice, setDisplayPrice] = useState("");
-  // 🔄 Mở dialog xác nhận
   const openConfirm = (message, onConfirm) => {
     setConfirmData({ message, onConfirm });
     setConfirmOpen(true);
@@ -59,7 +57,6 @@ const CreateProduct = () => {
   const handleUploadImages = async (files, field) => {
     if (!files || files.length === 0) return;
 
-    // 🧩 Nếu upload thumbnail mới mà có sẵn ảnh → hỏi người dùng
     if (field === "thumb" && thumbPreview) {
       return openConfirm("Replace existing thumbnail?", async () => {
         await apiDeleteImage(thumbPreview);
@@ -69,11 +66,9 @@ const CreateProduct = () => {
       });
     }
 
-    // ✅ Nếu chưa có ảnh thì upload luôn
     uploadNewImages(files, field);
   };
 
-  // 📤 Hàm upload chính
   const uploadNewImages = async (files, field) => {
     const formData = new FormData();
     for (let file of files) formData.append("fileImages", file);
@@ -109,14 +104,12 @@ const CreateProduct = () => {
     }
   };
 
-  // 🗑️ Hỏi trước khi xóa
   const handleAskDelete = (image, field) => {
     openConfirm("Delete this image permanently?", async () => {
       await handleDeleteImage(image, field);
     });
   };
 
-  // 🧹 Xóa ảnh thật sự
   const handleDeleteImage = async (image, field) => {
     if (!image) return;
     try {
@@ -145,7 +138,6 @@ const CreateProduct = () => {
     }
   };
 
-  // ✅ Submit form
   const onSubmit = async (data) => {
     try {
       setLoading(true);
@@ -192,7 +184,7 @@ const CreateProduct = () => {
         </div>
       )}
 
-      <h1 className="h-[75px] flex justify-between items-center text-3xl font-bold px-4 border-b">
+      <h1 className="py-6 flex justify-between items-center text-3xl font-bold px-4 border-b">
         Create New Product
       </h1>
 

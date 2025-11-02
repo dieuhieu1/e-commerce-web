@@ -31,7 +31,7 @@ const Checkout = () => {
     address: user?.address[0]?.value || "",
   });
   const [isSucess, setIsSuccess] = useState(false);
-
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("paypal");
 
   const channel = new BroadcastChannel("cart_sync");
@@ -54,28 +54,45 @@ const Checkout = () => {
   };
 
   const placeOrderWithCOD = async () => {
-    const orderData = {
-      products: user.cart,
-      total: totalUSD,
-      address: shippingAddress.address,
-      paymentMethod: paymentMethod,
-    };
-    const response = await apiCreateOrder(orderData);
-    if (response.success) {
-      setIsSuccess(true);
-      toast.success("Order placed successfully! Thank you for your purchase.", {
-        duration: 4000,
-        icon: "🎉",
-        style: {
-          borderRadius: "10px",
-          background: "#333",
-          color: "#fff",
-          padding: "12px 18px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-        },
-      });
+    if (isPlacingOrder) return; // Ngăn spam nút
+
+    setIsPlacingOrder(true);
+    try {
+      const orderData = {
+        products: user.cart,
+        total: totalUSD,
+        address: shippingAddress.address,
+        paymentMethod: paymentMethod,
+      };
+
+      const response = await apiCreateOrder(orderData);
+      if (response.success) {
+        setIsSuccess(true);
+        toast.success(
+          "Order placed successfully! Thank you for your purchase.",
+          {
+            duration: 4000,
+            icon: "🎉",
+            style: {
+              borderRadius: "10px",
+              background: "#333",
+              color: "#fff",
+              padding: "12px 18px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            },
+          }
+        );
+      } else {
+        toast.error("Failed to place order. Please try again.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("An error occurred while placing the order.");
+    } finally {
+      setIsPlacingOrder(false);
     }
   };
+
   const handlePaymentSuccess = () => {
     console.log("abc");
 
@@ -417,9 +434,21 @@ const Checkout = () => {
             {paymentMethod === "cod" && (
               <button
                 onClick={placeOrderWithCOD}
-                className="w-full py-4 bg-gradient-to-r from-orange-600 to-red-600 text-white font-bold rounded-lg hover:from-orange-700 hover:to-red-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                disabled={isPlacingOrder}
+                className={`w-full py-4 font-bold rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] ${
+                  isPlacingOrder
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-orange-600 to-red-600 text-white hover:from-orange-700 hover:to-red-700"
+                }`}
               >
-                Place Order - Cash on Delivery
+                {isPlacingOrder ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    <span>Processing...</span>
+                  </div>
+                ) : (
+                  "Place Order - Cash on Delivery"
+                )}
               </button>
             )}
 

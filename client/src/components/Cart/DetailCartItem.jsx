@@ -21,6 +21,7 @@ export function DetailCartItem({ item }) {
   // 4. Synchronize state with prop when 'item' from parent changes
   useEffect(() => {
     setQuantity(item.quantity);
+    window.scrollTo(0, 0);
   }, [item.quantity]);
 
   // 5. This function will be called in the 'setTimeout'
@@ -78,8 +79,6 @@ export function DetailCartItem({ item }) {
       quantityDeltaRef.current = 0;
     }, 800); // 800ms delay
   };
-
-  // The old useEffect was removed because we no longer use 'debouncedQuantity'
 
   // Handle item removal (unchanged)
   const handleRemoveItem = async () => {

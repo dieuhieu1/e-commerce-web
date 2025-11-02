@@ -36,8 +36,8 @@ const DetailProduct = () => {
   const [currentImage, setCurrentImage] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState(null);
   const [variant, setVariant] = useState(null);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // Toggles the "Please Login" modal
   const [quantity, setQuantity] = useState(1);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // Toggles the "Please Login" modal
 
   const [currentProduct, setCurrentProduct] = useState({
     title: "",
