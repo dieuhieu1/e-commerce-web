@@ -91,7 +91,7 @@ const Header = () => {
 
           {/* Admin Dashboard */}
           {user?.role === "admin" && (
-            <Link to={`/${path.ADMIN}`}>
+            <Link to={`/${path.ADMIN}/${path.DASHBOARD}`}>
               <div className="cursor-pointer flex items-center gap-3 px-4 py-2 rounded-full border border-gray-200 bg-white hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow-md ml-5">
                 <MdDashboard size={22} className="text-main" />
                 <span className="text-sm font-medium text-main tracking-wide">

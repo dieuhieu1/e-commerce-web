@@ -6,196 +6,108 @@ import {
   Eye,
   Edit,
   Trash2,
-  Package,
   Clock,
   CheckCircle,
   XCircle,
   Truck,
-  Calendar,
   DollarSign,
   User,
   Phone,
   MapPin,
-  ChevronDown,
-  MoreVertical,
   RefreshCw,
-  AlertCircle,
   ArrowUpDown,
 } from "lucide-react";
+import ManagePagination from "@/components/Pagination/MangePagination";
+import { getStatusColor, orderStats } from "@/ultils/constants";
+import {
+  formatCurrency,
+  formatCurrencyVND,
+  formatDate,
+} from "@/ultils/helpers";
+import { apiGetOrders, apiGetOrdersStats } from "@/apis/order";
+import toast from "react-hot-toast";
+import { useSearchParams } from "react-router-dom";
 
 const ManageOrder = () => {
+  const [params, setParams] = useSearchParams();
+
   const [selectedTab, setSelectedTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
+
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-  const [sortBy, setSortBy] = useState("date");
-  const [sortOrder, setSortOrder] = useState("desc");
 
-  // Mock data - replace with API call
-  const stats = [
+  const [orders, setOrders] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [tabs, setTabs] = useState([
+    { id: "all", label: "All Orders", count: 1234, dataKey: "totalOrders" },
+    { id: "Pending", label: "Pending", count: 156, dataKey: "totalPending" },
     {
-      title: "Total Orders",
-      value: "1,234",
-      change: "+12.5%",
-      trend: "up",
-      icon: Package,
-      color: "blue",
+      id: "Processing",
+      label: "Processing",
+      count: 89,
+      dataKey: "totalProcessing",
     },
+    { id: "Shipping", label: "Shipping", count: 67, dataKey: "totalShipping" },
+    { id: "Succeed", label: "Delivered", count: 89, dataKey: "totalSucceed" },
     {
-      title: "Pending",
-      value: "156",
-      change: "+8.2%",
-      trend: "up",
-      icon: Clock,
-      color: "yellow",
+      id: "Cancelled",
+      label: "Cancelled",
+      count: 186,
+      dataKey: "totalCancelled",
     },
-    {
-      title: "Completed",
-      value: "892",
-      change: "+15.3%",
-      trend: "up",
-      icon: CheckCircle,
-      color: "green",
-    },
-    {
-      title: "Cancelled",
-      value: "186",
-      change: "-3.2%",
-      trend: "down",
-      icon: XCircle,
-      color: "red",
-    },
-  ];
+  ]);
 
-  const tabs = [
-    { id: "all", label: "All Orders", count: 1234 },
-    { id: "pending", label: "Pending", count: 156 },
-    { id: "processing", label: "Processing", count: 89 },
-    { id: "shipping", label: "Shipping", count: 67 },
-    { id: "completed", label: "Completed", count: 892 },
-    { id: "cancelled", label: "Cancelled", count: 186 },
-  ];
+  const fetchOrderStats = async () => {
+    try {
+      const response = await apiGetOrdersStats();
+      if (response.success) {
+        const statsData = response.orderStats;
+        const formatedData = orderStats.map((el) => {
+          const value = statsData[el.dataKey];
+          return { ...el, value: value };
+        });
+        const formatedTabs = tabs.map((el) => {
+          const value = statsData[el.dataKey];
 
-  // Mock orders data
-  const orders = [
-    {
-      id: "ORD-001234",
-      customer: {
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "+1 234 567 8900",
-        avatar: "https://ui-avatars.com/api/?name=John+Doe",
-      },
-      products: [
-        {
-          name: "iPhone 14 Pro Max",
-          quantity: 1,
-          price: 1299,
-          image: "https://via.placeholder.com/80",
-        },
-        {
-          name: "AirPods Pro",
-          quantity: 2,
-          price: 249,
-          image: "https://via.placeholder.com/80",
-        },
-      ],
-      total: 1797,
-      status: "processing",
-      paymentMethod: "Credit Card",
-      shippingAddress: "123 Main St, New York, NY 10001",
-      orderDate: "2024-01-15T10:30:00",
-      estimatedDelivery: "2024-01-20",
-    },
-    {
-      id: "ORD-001235",
-      customer: {
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "+1 234 567 8901",
-        avatar: "https://ui-avatars.com/api/?name=Jane+Smith",
-      },
-      products: [
-        {
-          name: 'MacBook Pro 16"',
-          quantity: 1,
-          price: 2499,
-          image: "https://via.placeholder.com/80",
-        },
-      ],
-      total: 2499,
-      status: "completed",
-      paymentMethod: "PayPal",
-      shippingAddress: "456 Oak Ave, Los Angeles, CA 90001",
-      orderDate: "2024-01-14T15:45:00",
-      estimatedDelivery: "2024-01-19",
-    },
-    {
-      id: "ORD-001236",
-      customer: {
-        name: "Mike Johnson",
-        email: "mike@example.com",
-        phone: "+1 234 567 8902",
-        avatar: "https://ui-avatars.com/api/?name=Mike+Johnson",
-      },
-      products: [
-        {
-          name: "Samsung Galaxy S23",
-          quantity: 2,
-          price: 899,
-          image: "https://via.placeholder.com/80",
-        },
-      ],
-      total: 1798,
-      status: "pending",
-      paymentMethod: "Bank Transfer",
-      shippingAddress: "789 Pine Rd, Chicago, IL 60601",
-      orderDate: "2024-01-16T09:15:00",
-      estimatedDelivery: "2024-01-21",
-    },
-  ];
-
-  const getStatusColor = (status) => {
-    const colors = {
-      pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
-      processing: "bg-blue-100 text-blue-800 border-blue-200",
-      shipping: "bg-purple-100 text-purple-800 border-purple-200",
-      completed: "bg-green-100 text-green-800 border-green-200",
-      cancelled: "bg-red-100 text-red-800 border-red-200",
-    };
-    return colors[status] || colors.pending;
+          return { ...el, count: value };
+        });
+        setTabs(formatedTabs);
+        setStats(formatedData);
+      }
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+      toast.error("An unexpected error occurred.");
+    }
   };
 
-  const getStatusIcon = (status) => {
-    const icons = {
-      pending: Clock,
-      processing: RefreshCw,
-      shipping: Truck,
-      completed: CheckCircle,
-      cancelled: XCircle,
-    };
-    const Icon = icons[status] || Clock;
-    return <Icon className="w-4 h-4" />;
+  const fetchOrders = async (queries) => {
+    try {
+      const response = await apiGetOrders({ ...queries, limit: 5 });
+      if (response.success && response.order) {
+        setOrders(response);
+      }
+    } catch (error) {
+      console.error("Failed to fetch recent orders:", error);
+    }
   };
+  useEffect(() => {
+    const queries = Object.fromEntries(params.entries());
+    fetchOrderStats();
+    fetchOrders(queries);
+  }, [params]);
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+  const handleTabChange = (tab) => {
+    setParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set("status", tab.id);
+      newParams.set("page", 1);
+      return newParams;
     });
-  };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
+    setSelectedTab(tab.id);
   };
-
   const handleViewDetails = (order) => {
     setSelectedOrder(order);
     setIsDetailModalOpen(true);
@@ -212,7 +124,17 @@ const ManageOrder = () => {
       // API call here
     }
   };
-
+  const getStatusIcon = (status) => {
+    const icons = {
+      Pending: Clock,
+      Processing: RefreshCw,
+      Shipping: Truck,
+      Succeed: CheckCircle,
+      Cancelled: XCircle,
+    };
+    const Icon = icons[status] || Clock;
+    return <Icon className="w-4 h-4" />;
+  };
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-[1600px] mx-auto">
@@ -241,7 +163,7 @@ const ManageOrder = () => {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {stats.map((stat, index) => {
+            {stats?.map((stat, index) => {
               const Icon = stat.icon;
               const colorClasses = {
                 blue: "bg-blue-50 text-blue-600",
@@ -300,7 +222,7 @@ const ManageOrder = () => {
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setSelectedTab(tab.id)}
+                  onClick={() => handleTabChange(tab)}
                   className={`flex items-center gap-2 px-4 py-4 border-b-2 font-medium transition-colors whitespace-nowrap ${
                     selectedTab === tab.id
                       ? "border-blue-600 text-blue-600"
@@ -370,7 +292,7 @@ const ManageOrder = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {orders.map((order) => (
+                {orders?.order?.map((order) => (
                   <tr
                     key={order.id}
                     className="hover:bg-gray-50 transition-colors"
@@ -383,22 +305,23 @@ const ManageOrder = () => {
                     </td>
                     <td className="px-6 py-4">
                       <span className="font-semibold text-blue-600">
-                        {order.id}
+                        {order._id}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <img
-                          src={order.customer.avatar}
-                          alt={order.customer.name}
+                          src={order.orderedBy.avatar.image_url}
+                          alt={order.orderedBy.firsname}
                           className="w-10 h-10 rounded-full"
                         />
                         <div>
                           <p className="font-semibold text-gray-900">
-                            {order.customer.name}
+                            {order.orderedBy.firstname +
+                              order.orderedBy.lastname}
                           </p>
                           <p className="text-sm text-gray-500">
-                            {order.customer.email}
+                            {order.orderedBy.email}
                           </p>
                         </div>
                       </div>
@@ -409,8 +332,8 @@ const ManageOrder = () => {
                           {order.products.slice(0, 3).map((product, idx) => (
                             <img
                               key={idx}
-                              src={product.image}
-                              alt={product.name}
+                              src={product.thumb}
+                              alt={product.title}
                               className="w-8 h-8 rounded border-2 border-white"
                             />
                           ))}
@@ -422,7 +345,7 @@ const ManageOrder = () => {
                     </td>
                     <td className="px-6 py-4">
                       <span className="font-bold text-gray-900">
-                        {formatCurrency(order.total)}
+                        {formatCurrencyVND(order.total * 25000)}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -439,10 +362,7 @@ const ManageOrder = () => {
                     <td className="px-6 py-4">
                       <div className="text-sm">
                         <p className="text-gray-900 font-medium">
-                          {formatDate(order.orderDate)}
-                        </p>
-                        <p className="text-gray-500 text-xs">
-                          Est: {order.estimatedDelivery}
+                          {formatDate(order.createdAt)}
                         </p>
                       </div>
                     </td>
@@ -478,33 +398,7 @@ const ManageOrder = () => {
           </div>
 
           {/* Pagination */}
-          <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-            <div className="text-sm text-gray-600">
-              Showing <span className="font-semibold">1-10</span> of{" "}
-              <span className="font-semibold">1,234</span> orders
-            </div>
-            <div className="flex items-center gap-2">
-              <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                Previous
-              </button>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                1
-              </button>
-              <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                2
-              </button>
-              <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                3
-              </button>
-              <span className="px-2">...</span>
-              <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                124
-              </button>
-              <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                Next
-              </button>
-            </div>
-          </div>
+          <ManagePagination pageSize={5} totalCount={orders?.totalCount} />
         </div>
 
         {/* Order Detail Modal */}
@@ -688,7 +582,7 @@ const ManageOrder = () => {
         )}
 
         {/* Update Status Modal */}
-        {isStatusModalOpen && selectedOrder && (
+        {/* {isStatusModalOpen && selectedOrder && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl max-w-md w-full">
               <div className="p-6">
@@ -744,7 +638,7 @@ const ManageOrder = () => {
               </div>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

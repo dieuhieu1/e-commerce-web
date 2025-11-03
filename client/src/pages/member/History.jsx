@@ -79,42 +79,39 @@ const History = () => {
     fetchMyOrder();
   }, [params]);
 
-  const handleCancelOrder = async (orderId) => {
-    setLoading(true);
-    try {
-      const response = await apiCancelOrder(orderId);
-
-      if (response.success) {
-        // Update state Orders
-        setOrdersData((prevOrders) =>
-          prevOrders.map((order) =>
-            order._id === orderId ? { ...order, status: "Cancelled" } : order
-          )
-        );
-      } else {
-        toast.error(
-          "An error occured when cancel the order:",
-          response.message
-        );
-      }
-    } catch (error) {
-      console.error("Lỗi API khi hủy đơn hàng:", error);
-    } finally {
-      setConfirmOpen(false);
-      setLoading(false);
-    }
+  const handleClickConfirmCancel = (orderId) => {
+    setOrderIdToCancel(orderId);
+    setConfirmOpen(true);
   };
 
-  const handleClickConfirmCancel = (orderId) => {
-    setConfirmOpen(true);
-    handleCancelOrder(orderId);
+  const handleCancelOrder = async () => {
+    if (!orderIdToCancel) return;
+
+    try {
+      setLoading(true);
+      const response = await apiCancelOrder(orderIdToCancel);
+
+      if (response.success) {
+        toast.success("Order cancelled successfully!");
+        fetchMyOrder();
+      } else {
+        toast.error("Failed to cancel order: " + response.message);
+      }
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+      toast.error("An unexpected error occurred.");
+    } finally {
+      setConfirmOpen(false);
+      setOrderIdToCancel(null);
+      setLoading(false);
+    }
   };
 
   const toggleExpand = (orderId) => {
     setExpandedOrder(expandedOrder === orderId ? null : orderId);
   };
 
-  if (loading || !ordersData.orders) {
+  if (loading) {
     return <LoadingOverlay />;
   }
 
@@ -133,7 +130,7 @@ const History = () => {
         />
 
         {/* Orders List */}
-        {ordersData.orders.length === 0 ? (
+        {ordersData?.orders.length === 0 ? (
           <div className="bg-white rounded-xl shadow-md p-12 text-center">
             <Package size={64} className="mx-auto text-gray-300 mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -145,7 +142,7 @@ const History = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {ordersData.orders.map((order) => {
+            {ordersData?.orders.map((order) => {
               const statusConfig = getStatusConfig(order.status);
               const isExpanded = expandedOrder === order._id;
 
@@ -159,7 +156,7 @@ const History = () => {
                     order={order}
                     isExpanded={expandedOrder === order._id}
                     onToggleExpand={toggleExpand}
-                    onCancelOrder={handleCancelOrder}
+                    onCancelOrder={() => handleClickConfirmCancel(order._id)}
                   />
 
                   {/* Expanded Details */}
@@ -188,13 +185,11 @@ const History = () => {
           open={confirmOpen}
           onOpenChange={(isOpen) => {
             setConfirmOpen(isOpen);
-            if (!isOpen) {
-              setOrderIdToCancel(null);
-            }
+            if (!isOpen) setOrderIdToCancel(null);
           }}
-          title="Confirm Action"
-          description={"Are you sure to cancel this order?"}
-          onConfirm={() => handleClickConfirmCancel(orderIdToCancel)}
+          title="Confirm Cancellation"
+          description="Are you sure you want to cancel this order? This action cannot be undone."
+          onConfirm={handleCancelOrder}
         />
         <div className="w-full flex justify-center py-6 px-5 bg-gray-50 rounded-b-2xl border-t border-gray-100">
           <ManagePagination totalCount={ordersData.totalCount} pageSize={5} />

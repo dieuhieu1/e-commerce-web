@@ -16,14 +16,12 @@ const TopHeader = () => {
     checkAuth();
   }, []);
 
-  // 🔔 Khi token hết hạn hoặc có message
   useEffect(() => {
     if (message) {
       setIsLoginModalOpen(true); // mở dialog
     }
   }, [message]);
 
-  // ✅ Hàm xác nhận khi người dùng bấm "Go to Login"
   const handleConfirmLoginModal = () => {
     setIsLoginModalOpen(false);
     navigate(`/${path.LOGIN}`);

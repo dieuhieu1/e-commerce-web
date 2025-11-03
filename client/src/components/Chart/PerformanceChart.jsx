@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -10,20 +10,38 @@ import {
   Legend,
 } from "recharts";
 import CustomTooltip from "./CustomTooltip";
+import { apiGetDailyRevenue } from "@/apis/order";
+import { formatCurrency } from "@/ultils/helpers";
 
-// Performance Data
-const performanceData = [
-  { category: "Smartphones", sales: 450, target: 400 },
-  { category: "Laptops", sales: 380, target: 350 },
-  { category: "Accessories", sales: 420, target: 380 },
-  { category: "Tablets", sales: 280, target: 300 },
-  { category: "Wearables", sales: 320, target: 280 },
-];
+// Daily Revenue Data
+
 const PerformanceChart = ({
-  data = performanceData,
-  title = "Performance by Category",
-  subtitle = "Compare sales to target",
+  data = null,
+  title = "Daily Revenue",
+  subtitle = "Compare real revenue with target revenue",
 }) => {
+  const [dailyRevenueData, setDailyRevenueData] = useState(null);
+  const fetchDailyRevenue = async () => {
+    try {
+      const response = await apiGetDailyRevenue();
+      if (response.success) {
+        console.log(response);
+        const convertedData = response.data.map((item) => ({
+          ...item,
+          totalRevenue: (item.totalRevenue * 25000).toFixed(1),
+          target: (item.target * 25000).toFixed(1),
+        }));
+        console.log(convertedData);
+
+        setDailyRevenueData(convertedData);
+      }
+    } catch (error) {
+      throw new Error("Something went wrong while fetch daily revenue" + error);
+    }
+  };
+  useEffect(() => {
+    fetchDailyRevenue();
+  }, []);
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
       <div className="mb-6">
@@ -32,23 +50,29 @@ const PerformanceChart = ({
       </div>
       <div className="max-w-full h-[300px]">
         <ResponsiveContainer>
-          <BarChart data={data}>
+          <BarChart data={dailyRevenueData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="category" stroke="#9CA3AF" />
-            <YAxis stroke="#9CA3AF" />
+            <XAxis dataKey="date" stroke="#9CA3AF" />
+            <YAxis
+              width={150}
+              stroke="#9CA3AF"
+              tickFormatter={(value) =>
+                value > 0 ? `${formatCurrency(value)} VND` : ""
+              }
+            />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
             <Bar
-              dataKey="sales"
-              fill="#3B82F6"
-              radius={[4, 4, 0, 0]}
-              name="Actual Sales"
+              dataKey="totalRevenue"
+              fill="#F97316"
+              radius={[8, 8, 0, 0]}
+              name="Real Revenue"
             />
             <Bar
               dataKey="target"
               fill="#10B981"
-              radius={[4, 4, 0, 0]}
-              name="Target"
+              radius={[8, 8, 0, 0]}
+              name="Target Revenue"
             />
           </BarChart>
         </ResponsiveContainer>

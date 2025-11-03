@@ -123,7 +123,7 @@ export const parseCurrency = (value) => {
   return value.replace(/\./g, "");
 };
 
-import { CheckCircle, Clock, Truck, XCircle } from "lucide-react";
+import { CheckCircle, Clock, RefreshCw, Truck, XCircle } from "lucide-react";
 import default_avatar_1 from "../assets/default_1.png";
 import default_avatar_2 from "../assets/default_2.png";
 import default_avatar_3 from "../assets/default_3.png";

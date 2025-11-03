@@ -1,3 +1,5 @@
+import { formatCurrencyVND } from "@/ultils/helpers";
+
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
@@ -5,7 +7,12 @@ const CustomTooltip = ({ active, payload, label }) => {
         <p className="text-sm font-semibold text-gray-700 mb-2">{label}</p>
         {payload.map((entry, index) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
-            {entry.name}: <span className="font-bold">{entry.value}</span>
+            {entry.name}:{" "}
+            <span className="font-bold">
+              {entry.value > 10000
+                ? formatCurrencyVND(entry.value)
+                : entry.value}
+            </span>
           </p>
         ))}
       </div>

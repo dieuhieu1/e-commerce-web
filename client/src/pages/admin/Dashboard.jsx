@@ -19,55 +19,12 @@ import CategoryChart from "@/components/Chart/CategoryChart";
 import PerformanceChart from "@/components/Chart/PerformanceChart";
 import TopSellProduct from "@/components/Statistic/TopSellProduct";
 import RecentOrders from "@/components/Statistic/RecentOrders";
+import StatsCard from "@/components/Statistic/StatsCard";
 
 const AdminDashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("30days");
   const [bestSold, setBestSold] = useState(null);
   const [recentOrders, setRecentOrders] = useState(null);
-
-  // Stats Data
-  const statsCards = [
-    {
-      title: "Total Revenue",
-      value: "₫245,890,000",
-      change: "+12.5%",
-      trend: "up",
-      icon: DollarSign,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-      borderColor: "border-blue-200",
-    },
-    {
-      title: "Orders",
-      value: "1,234",
-      change: "+8.2%",
-      trend: "up",
-      icon: ShoppingCart,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-      borderColor: "border-green-200",
-    },
-    {
-      title: "Customers",
-      value: "8,459",
-      change: "+5.7%",
-      trend: "up",
-      icon: Users,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-      borderColor: "border-purple-200",
-    },
-    {
-      title: "Products",
-      value: "456",
-      change: "-2.3%",
-      trend: "down",
-      icon: Package,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-      borderColor: "border-orange-200",
-    },
-  ];
 
   const fetchBestSold = async () => {
     try {
@@ -80,7 +37,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const fetchCurrentOrders = async () => {
+  const fetchRecentOrders = async () => {
     try {
       const response = await apiGetOrders({ limit: 5 });
       if (response.success && response.order) {
@@ -93,7 +50,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchBestSold();
-    fetchCurrentOrders();
+    fetchRecentOrders();
   }, []);
 
   return (
@@ -148,44 +105,7 @@ const AdminDashboard = () => {
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-8 bg-gray-50">
           {/* Statistic Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {statsCards.map((stat, index) => (
-              <div
-                key={index}
-                className={`bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border ${stat.borderColor} cursor-pointer group`}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div
-                    className={`p-3 ${stat.bgColor} rounded-xl group-hover:scale-110 transition-transform`}
-                  >
-                    <stat.icon className={`w-6 h-6 ${stat.color}`} />
-                  </div>
-                  <div
-                    className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
-                      stat.trend === "up"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
-                  >
-                    {stat.trend === "up" ? (
-                      <TrendingUp className="w-3 h-3" />
-                    ) : (
-                      <TrendingDown className="w-3 h-3" />
-                    )}
-                    {stat.change}
-                  </div>
-                </div>
-                <h3 className="text-gray-600 text-sm font-medium mb-1">
-                  {stat.title}
-                </h3>
-                <p className="text-3xl font-bold text-gray-800">{stat.value}</p>
-                <p className="text-xs text-gray-500 mt-2">
-                  compared to last month
-                </p>
-              </div>
-            ))}
-          </div>
-
+          <StatsCard />
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             {/* Revenue Chart */}

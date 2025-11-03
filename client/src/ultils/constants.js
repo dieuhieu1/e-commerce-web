@@ -12,6 +12,17 @@ import { PiPackageBold } from "react-icons/pi";
 import { BiSolidDashboard } from "react-icons/bi";
 import { FaRegUserCircle } from "react-icons/fa";
 import { TbHistoryToggle } from "react-icons/tb";
+import {
+  ShoppingCart,
+  Users,
+  Package,
+  DollarSign,
+  Clock,
+  CheckCircle,
+  XCircle,
+  RefreshCw,
+  Truck,
+} from "lucide-react";
 
 export const navigation = [
   { id: 101, value: "HOME", path: `/${path.HOME}` },
@@ -144,3 +155,90 @@ export const memberSidebar = [
     icon: BsListColumnsReverse,
   },
 ];
+export const cardConfig = [
+  {
+    dataKey: "totalRevenue",
+    title: "Total Revenue",
+    change: "+12.5%", // (Cái này bạn cũng nên lấy từ API nếu có)
+    trend: "up",
+    icon: DollarSign,
+    color: "text-blue-600",
+    bgColor: "bg-blue-50",
+    borderColor: "border-blue-200",
+  },
+  {
+    dataKey: "totalOrders",
+    title: "Orders",
+    change: "+8.2%",
+    trend: "up",
+    icon: ShoppingCart,
+    color: "text-green-600",
+    bgColor: "bg-green-50",
+    borderColor: "border-green-200",
+  },
+  {
+    dataKey: "totalCustomers",
+    title: "Customers",
+    change: "+5.7%",
+    trend: "up",
+    icon: Users,
+    color: "text-purple-600",
+    bgColor: "bg-purple-50",
+    borderColor: "border-purple-200",
+  },
+  {
+    dataKey: "totalSoldProducts",
+    title: "Products Sold",
+    change: "-2.3%",
+    trend: "down",
+    icon: Package,
+    color: "text-orange-600",
+    bgColor: "bg-orange-50",
+    borderColor: "border-orange-200",
+  },
+];
+export const orderStats = [
+  {
+    dataKey: "totalOrders",
+    title: "Total Orders",
+    change: "+12.5%",
+    trend: "up",
+    icon: Package,
+    color: "blue",
+  },
+  {
+    dataKey: "totalPending",
+    title: "Pending",
+    change: "+8.2%",
+    trend: "up",
+    icon: Clock,
+    color: "yellow",
+  },
+  {
+    dataKey: "totalSucceed",
+    title: "Completed",
+    change: "+15.3%",
+    trend: "up",
+    icon: CheckCircle,
+    color: "green",
+  },
+  {
+    dataKey: "totalCancelled",
+    title: "Cancelled",
+    change: "-3.2%",
+    trend: "down",
+    icon: XCircle,
+    color: "red",
+  },
+];
+
+export const getStatusColor = (status) => {
+  const colors = {
+    Pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    Processing: "bg-blue-100 text-blue-800 border-blue-200",
+    Shipping: "bg-purple-100 text-purple-800 border-purple-200",
+    Succeed: "bg-green-100 text-green-800 border-green-200",
+    Cancelled: "bg-red-100 text-red-800 border-red-200",
+  };
+  return colors[status] || colors.pending;
+};

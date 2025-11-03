@@ -60,10 +60,14 @@ const OrderCard = ({ order, isExpanded, onToggleExpand, onCancelOrder }) => {
             {canCancel && (
               <button
                 onClick={() => onCancelOrder(order._id)}
-                className="flex items-center gap-2 text-red-600 hover:text-red-700 font-medium text-sm transition-colors"
+                className="group relative flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 active:scale-95 overflow-hidden cursor-pointer"
               >
-                <XCircle size={18} />
-                <span>Cancel Order</span>
+                <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                <XCircle
+                  size={18}
+                  className="relative z-10 group-hover:rotate-90 transition-transform duration-300"
+                />
+                <span className="relative z-10">Cancel Order</span>
               </button>
             )}
 

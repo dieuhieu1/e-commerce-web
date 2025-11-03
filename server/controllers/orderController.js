@@ -101,10 +101,7 @@ const cancelUserOrder = asyncHandler(async (req, res) => {
     throw new Error("Order not found");
   }
 
-  if (
-    order.orderedBy.toString() !== userId.toString() ||
-    order.status !== "Pending"
-  ) {
+  if (order.orderedBy.toString() !== userId.toString()) {
     throw new Error("You are not authorized or this order cannot be cancelled");
   }
 
@@ -184,7 +181,16 @@ const getOrders = asyncHandler(async (req, res) => {
   excludeFields.forEach((el) => {
     delete queryObj[el];
   });
-
+  const allowedStatuses = [
+    "Cancelled",
+    "Succeed",
+    "Pending",
+    "Processing",
+    "Shipping",
+  ];
+  if (queryObj.status && !allowedStatuses.includes(queryObj.status)) {
+    delete queryObj.status; // bỏ qua nếu status không hợp lệ
+  }
   // 1. Filtering
   let queryString = JSON.stringify(queryObj);
   // Replace "gte" to "$gte" for the query
@@ -241,7 +247,6 @@ const getOrders = asyncHandler(async (req, res) => {
 
 const getMyOrder = asyncHandler(async (req, res) => {
   const { _id: userId } = req.user;
-  console.log(req.query);
 
   const queryObj = { ...req.query };
   const excludeFields = ["page", "sort", "filter", "limit"];
@@ -251,7 +256,13 @@ const getMyOrder = asyncHandler(async (req, res) => {
     delete queryObj[el];
   });
 
-  const allowedStatuses = ["Cancelled", "Succeed", "Pending", "Processing"];
+  const allowedStatuses = [
+    "Cancelled",
+    "Succeed",
+    "Pending",
+    "Processing",
+    "Shipping",
+  ];
   if (queryObj.status && !allowedStatuses.includes(queryObj.status)) {
     delete queryObj.status; // bỏ qua nếu status không hợp lệ
   }
@@ -315,10 +326,123 @@ const getMyOrder = asyncHandler(async (req, res) => {
   });
 });
 
+const getOrdersStats = asyncHandler(async (req, res) => {
+  const orders = await Order.find({}, "status");
+
+  const stats = {
+    totalOrders: orders.length,
+    totalPending: orders.filter((o) => o.status === "Pending").length,
+    totalSucceed: orders.filter((o) => o.status === "Succeed").length,
+    totalCancelled: orders.filter((o) => o.status === "Cancelled").length,
+    totalShipping: orders.filter((o) => o.status === "Shipping").length,
+    totalProcessing: orders.filter((o) => o.status === "Processing").length,
+  };
+
+  res.status(200).json({
+    success: true,
+    orderStats: stats,
+  });
+});
+
+const getDashboardStats = asyncHandler(async (req, res) => {
+  const orders = await Order.find({ status: { $ne: "Cancelled" } });
+  const totalOrders = orders.length;
+  const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+
+  const totalCustomers = await User.countDocuments();
+
+  const totalSoldProducts = await Product.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalSold: { $sum: "$sold" },
+      },
+    },
+  ]);
+
+  const monthlyRevenue = await Order.aggregate([
+    {
+      $match: {
+        status: { $ne: "Cancelled" },
+      },
+    },
+    {
+      $group: {
+        _id: { $month: "$createdAt" },
+        revenue: { $sum: "$total" },
+        count: { $sum: 1 },
+      },
+    },
+    { $sort: { _id: 1 } },
+  ]);
+
+  return res.status(200).json({
+    success: monthlyRevenue ? true : false,
+    message: monthlyRevenue
+      ? "Monthly Revenue"
+      : "Failed to fetch dashboard stats",
+    stats: {
+      totalRevenue,
+      totalOrders,
+      totalCustomers,
+      totalSoldProducts:
+        totalSoldProducts.length > 0 ? totalSoldProducts[0].totalSold : 0,
+      monthlyRevenue,
+    },
+  });
+});
+
+const getDayRevenue = asyncHandler(async (req, res) => {
+  // Get month and year from req body;
+  const { month, year, target } = req.body;
+
+  // If don't have month, year in req body
+  const now = new Date();
+  // Get current month and current year;
+  const targetMonth = month ? +month - 1 : now.getMonth();
+  const targetYear = year ? +year : now.getFullYear();
+
+  // Specify the start date and end date
+  const startDate = new Date(targetYear, targetMonth - 1, 1);
+  const endDate = new Date(targetYear, targetMonth, 1);
+
+  const dailyRevenue = await Order.aggregate([
+    {
+      $match: {
+        status: { $in: ["Succeed", "Processing", "Pending"] },
+        createdAt: { $gte: startDate, $lt: endDate },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
+        },
+        totalRevenue: { $sum: "$total" },
+      },
+    },
+    { $sort: { _id: 1 } },
+    {
+      $addFields: {
+        target: target ? parseFloat(target) : 1000,
+      },
+    },
+  ]);
+  return res.status(200).json({
+    success: true,
+    message: `Revenue days of ${targetMonth + 1}/${targetYear}`,
+    data: dailyRevenue,
+  });
+});
+
 module.exports = {
   createNewOrder,
   updateOrderStatus,
   getOrders,
   getMyOrder,
   cancelUserOrder,
+  // Statstistic
+  getDashboardStats,
+  getDayRevenue,
+  getOrdersStats,
 };
