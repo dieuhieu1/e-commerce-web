@@ -26,7 +26,6 @@ const createNewOrder = asyncHandler(async (req, res) => {
     if (!isExist) user.address.push(address);
   }
 
-  // ✅ Tự xác định status
   let status = paymentMethod === "cod" ? "Pending" : "Processing";
 
   const orderData = {
@@ -35,10 +34,10 @@ const createNewOrder = asyncHandler(async (req, res) => {
     orderedBy: userId,
     paymentMethod,
     status,
+    shippingAddress: address,
   };
   const newOrder = await Order.create(orderData);
 
-  // ✅ Kiểm tra tồn kho & cập nhật
   await Promise.all(
     products.map(async (item) => {
       const product = await Product.findById(item.product);
@@ -51,12 +50,19 @@ const createNewOrder = asyncHandler(async (req, res) => {
     })
   );
 
-  // ✅ Dọn giỏ hàng
   user.cart = [];
   await user.save();
 
-  // ✅ Gửi email xác nhận
+  // Emit notifications
+  const io = req.app.get("io");
+  io.emit("new-order", {
+    message: `Có đơn hàng mới từ ${req.user.firstname} ${req.user.lastname}`,
+    orderId: newOrder._id,
+    total: newOrder.total,
+  });
+
   const populatedOrder = await newOrder.populate("products.product");
+  // Send Email Notify
   const emailData = {
     customerName: `${user.firstname} ${user.lastname}`,
     orderId: newOrder._id.toString(),
@@ -124,33 +130,23 @@ const cancelUserOrder = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    (Admin) Cập nhật trạng thái đơn hàng
- * @route   PUT /api/orders/:orderId
- * @access  Private/Admin (Đã được check bởi middleware)
- */
 const updateOrderStatus = asyncHandler(async (req, res) => {
-  const { orderId } = req.params;
-  const { status: newStatus } = req.body; // Lấy status mới từ FE
+  const { id: orderId } = req.params;
+  const { status: newStatus } = req.body;
+  console.log(req.body);
 
-  // 1. Kiểm tra xem status gửi lên có hợp lệ không
   if (!newStatus || !Object.values(ORDER_STATUS).includes(newStatus)) {
-    res.status(400); // 400 Bad Request
     throw new Error("Invalid or missing status");
   }
 
-  const order = await Order.findById(orderId);
+  const order = await Order.findById({ _id: orderId });
 
   if (!order) {
     res.status(404);
     throw new Error("Order not found");
   }
 
-  // --- Logic Hủy đơn (Bởi Admin) ---
-  // 2. Nếu status mới là "Cancelled"
-  //    VÀ đơn hàng chưa bị hủy trước đó
   if (newStatus === "Cancelled" && order.status !== "Cancelled") {
-    // Thực hiện hoàn kho
     const productsToRestock = order.products;
 
     const updateProductPromises = productsToRestock.map((item) => {
@@ -162,7 +158,6 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     await Promise.all(updateProductPromises);
   }
 
-  // 3. Cập nhật và lưu đơn hàng
   order.status = newStatus;
   const updatedOrder = await order.save();
 
@@ -202,7 +197,7 @@ const getOrders = asyncHandler(async (req, res) => {
   // Create query but not execute --> Adding more condition of sorting and pagination
   let query = Order.find(formattedQueries).populate(
     "orderedBy",
-    "firstname lastname avatar"
+    "firstname lastname avatar email mobile address"
   );
 
   // 2. Sorting

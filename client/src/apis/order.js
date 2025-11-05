@@ -14,3 +14,5 @@ export const apiGetOrdersStats = () =>
   axios({ url: "/order/stats", method: "get" });
 export const apiGetDailyRevenue = () =>
   axios({ url: "/order/day-revenue", method: "get" });
+export const apiUpdateOrderStatus = (pid, data) =>
+  axios({ url: "/order/status/" + pid, method: "put", data });

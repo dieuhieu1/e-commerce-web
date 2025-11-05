@@ -27,6 +27,8 @@ var orderSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "User",
     },
+    paymentMethod: String,
+    shippingAddress: String,
   },
   { timestamps: true }
 );

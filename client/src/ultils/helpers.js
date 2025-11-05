@@ -140,7 +140,7 @@ export const formatCurrencyVND = (amount) =>
     currency: "VND",
   }).format(amount);
 export const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString("vi-VN", {
+  return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -184,13 +184,15 @@ export const getStatusConfig = (status) => {
 };
 export const getStatusColor = (status) => {
   const colors = {
-    Completed: "bg-green-100 text-green-700 border-green-200",
-    Processing: "bg-blue-100 text-blue-700 border-blue-200",
-    Pending: "bg-yellow-100 text-yellow-700 border-yellow-200",
-    Cancelled: "bg-red-100 text-red-700 border-red-200",
+    Pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    Processing: "bg-blue-100 text-blue-800 border-blue-200",
+    Shipping: "bg-purple-100 text-purple-800 border-purple-200",
+    Succeed: "bg-green-100 text-green-800 border-green-200",
+    Cancelled: "bg-red-100 text-red-800 border-red-200",
   };
-  return colors[status] || colors.pending;
+  return colors[status] || colors.Pending;
 };
+
 export const getStatusText = (status) => {
   const texts = {
     completed: "Hoàn thành",

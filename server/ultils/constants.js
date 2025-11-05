@@ -472,8 +472,9 @@ const users = [
 const ORDER_STATUS = {
   Pending: "Pending",
   Processing: "Processing",
-  Delivered: "Delivered",
+  Delivered: "Succeed",
   Cancelled: "Cancelled",
+  Shipping: "Shipping",
 };
 
 module.exports = {
