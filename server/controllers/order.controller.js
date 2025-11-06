@@ -6,7 +6,10 @@ const asyncHandler = require("express-async-handler");
 const { formatMoney } = require("../ultils/helpers");
 const { orderConfirmationHTML, ORDER_STATUS } = require("../ultils/constants");
 const { sendMail } = require("../ultils/sendMail");
-const { sendNotificationToUser } = require("./socket/socket.controller");
+const {
+  sendNotificationToUser,
+  sendNotificationToAdmin,
+} = require("./socket/socket.controller");
 
 const createNewOrder = asyncHandler(async (req, res) => {
   const { _id: userId } = req.user;

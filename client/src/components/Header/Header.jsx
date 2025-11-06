@@ -7,6 +7,7 @@ import { FaUserCircle } from "react-icons/fa";
 import { useAuthStore } from "@/lib/zustand/useAuthStore";
 import path from "@/ultils/path";
 import { Cart } from "../Cart/Cart";
+import NotificationBell from "../NotificationBell";
 
 const Header = () => {
   const { isAuthenticated, user } = useAuthStore();
@@ -100,6 +101,7 @@ const Header = () => {
               </div>
             </Link>
           )}
+          <NotificationBell />
         </div>
       </div>
     </header>

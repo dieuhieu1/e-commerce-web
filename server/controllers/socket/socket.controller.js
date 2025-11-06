@@ -28,7 +28,7 @@ const setupSocket = (io) => {
 };
 
 const sendNotificationToAdmin = asyncHandler(async (io, notificationData) => {
-  const admins = await User.find({ role: "admin" }).select({ _id });
+  const admins = await User.find({ role: "admin" }).select("_id");
 
   const createNotificationPromises = admins.map((admin) => {
     return new Notification({
@@ -40,7 +40,7 @@ const sendNotificationToAdmin = asyncHandler(async (io, notificationData) => {
   });
   const savedNotifcations = await Promise.all(createNotificationPromises);
 
-  io.to("admin_room").emit("new_notifcation", {
+  io.to("admin_room").emit("new_notification", {
     orderId: notificationData.orderId,
     message: notificationData.message,
     createdAt: Date.now(),
@@ -59,7 +59,7 @@ const sendNotificationToUser = asyncHandler(
       read: false,
     });
     // Emit Real-time data to FE
-    io.to(`user_${userId}`).emit("new_notifcation", {
+    io.to(`user_${userId}`).emit("new_notification", {
       orderId: notificationData.orderId,
       message: notificationData.message,
       status: notificationData.status,

@@ -25,6 +25,7 @@ import History from "./pages/member/History";
 import ChangePassword from "./pages/member/ChangePassword";
 import DetailCart from "./pages/member/DetailCart";
 import Checkout from "./pages/member/Checkout";
+import { Root } from "@radix-ui/react-dialog";
 
 export const router = createBrowserRouter([
   {
@@ -125,5 +126,9 @@ export const router = createBrowserRouter([
   {
     path: "*",
     element: <ErrorPage />,
+  },
+  {
+    path: "/",
+    element: <Root />,
   },
 ]);

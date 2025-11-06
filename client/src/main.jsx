@@ -7,10 +7,13 @@ import "./index.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Toaster } from "react-hot-toast";
+import { SocketProvider } from "./context/socketContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={router} />
-    <Toaster />
+    <SocketProvider>
+      <RouterProvider router={router} />
+      <Toaster />
+    </SocketProvider>
   </StrictMode>
 );

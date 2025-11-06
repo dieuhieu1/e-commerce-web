@@ -48,6 +48,6 @@ dbConnect();
 // Create sub route for the API
 initRoutes(app);
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
