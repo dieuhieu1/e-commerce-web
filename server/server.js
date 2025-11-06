@@ -6,6 +6,7 @@ const cookerParser = require("cookie-parser");
 const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
+const { setupSocket } = require("./controllers/socket/socket.controller");
 
 const port = process.env.PORT || 3000;
 const app = express();
@@ -14,12 +15,10 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: process.env.CLIENT_URL,
-    methods: ["POST", "PUT", "DELETE", "GET"],
+    methods: ["POST", "GET"],
     credentials: true,
   },
 });
-
-app.set("io", io);
 
 // Middleware
 app.use(
@@ -29,6 +28,14 @@ app.use(
     credentials: true,
   })
 );
+
+setupSocket(io);
+
+// Assign Socket IO to req
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
 // Parse Cookie bodies
 app.use(cookerParser());
 // Parse JSON bodies (as sent by API clients)

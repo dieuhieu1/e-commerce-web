@@ -8,7 +8,7 @@ const {
   getDashboardStats,
   getDayRevenue,
   getOrdersStats,
-} = require("../controllers/orderController");
+} = require("../controllers/order.controller");
 const { verifyAccessToken, isAdmin } = require("../middlewares/verifyToken");
 // POST /api/orders/add
 orderRouter.post("/add", verifyAccessToken, createNewOrder);

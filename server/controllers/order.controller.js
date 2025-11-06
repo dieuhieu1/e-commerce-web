@@ -6,6 +6,7 @@ const asyncHandler = require("express-async-handler");
 const { formatMoney } = require("../ultils/helpers");
 const { orderConfirmationHTML, ORDER_STATUS } = require("../ultils/constants");
 const { sendMail } = require("../ultils/sendMail");
+const { sendNotificationToUser } = require("./socket/socket.controller");
 
 const createNewOrder = asyncHandler(async (req, res) => {
   const { _id: userId } = req.user;
@@ -54,11 +55,10 @@ const createNewOrder = asyncHandler(async (req, res) => {
   await user.save();
 
   // Emit notifications
-  const io = req.app.get("io");
-  io.emit("new-order", {
-    message: `Có đơn hàng mới từ ${req.user.firstname} ${req.user.lastname}`,
+
+  await sendNotificationToAdmin(req.io, {
     orderId: newOrder._id,
-    total: newOrder.total,
+    message: `A new order have been placed from ${userId} need you check!`,
   });
 
   const populatedOrder = await newOrder.populate("products.product");
@@ -160,6 +160,13 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
   order.status = newStatus;
   const updatedOrder = await order.save();
+
+  // Emit Notification to FE
+  await sendNotificationToUser(req.io, order.orderedBy, {
+    orderId: orderId,
+    message: `Your order have been updated new status! Come to check it !`,
+    status: newStatus,
+  });
 
   res.status(200).json({
     success: true,
