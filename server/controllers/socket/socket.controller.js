@@ -6,7 +6,6 @@ const userSockets = new Map();
 
 const setupSocket = (io) => {
   io.on("connection", (socket) => {
-    console.log("User Connected:", socket.id);
     socket.on("user_connected", async (userId) => {
       if (userId) {
         userSockets.set(userId, socket.id);

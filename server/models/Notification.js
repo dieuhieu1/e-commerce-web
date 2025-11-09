@@ -9,11 +9,7 @@ const notificationSchema = new mongoose.Schema(
       require: true,
       index: true,
     },
-    orderId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Order",
-      require: true,
-    },
+    orderId: String,
     message: String,
     read: { type: Boolean, default: false },
   },

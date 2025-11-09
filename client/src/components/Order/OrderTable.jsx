@@ -72,7 +72,7 @@ const OrderTable = ({
                 >
                   <td className="px-6 py-4">
                     <span className="font-semibold text-blue-600">
-                      {order._id}
+                      {order.orderId}
                     </span>
                   </td>
                   <td className="px-6 py-4">

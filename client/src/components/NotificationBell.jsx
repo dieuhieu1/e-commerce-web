@@ -1,64 +1,61 @@
 // components/NotificationBell.js
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useSocket } from "@/context/socketContext";
+import { apiGetNotification, apiMarkAsRead } from "@/apis/notification";
+import { useAuthStore } from "@/lib/zustand/useAuthStore";
+import { useNavigate } from "react-router-dom";
 
 const NotificationBell = () => {
+  const { user } = useAuthStore();
   const { notifications, setNotifications, unreadCount, setUnreadCount } =
     useSocket();
   const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const navigate = useNavigate();
   // Load notifications chưa đọc khi component mount
-  // useEffect(() => {
-  //   loadUnreadNotifications();
-  // }, []);
+  useEffect(() => {
+    loadUnreadNotifications();
+  }, []);
 
-  // const loadUnreadNotifications = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const response = await axios.get("/api/notifications/unread", {
-  //       headers: {
-  //         Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //       },
-  //     });
+  const loadUnreadNotifications = async () => {
+    try {
+      setLoading(true);
+      const response = await apiGetNotification();
 
-  //     if (response.data.success) {
-  //       setNotifications(response.data.data);
-  //       setUnreadCount(response.data.count);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error loading notifications:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+      if (response.success) {
+        setNotifications(response.data.notifications);
+        setUnreadCount(response.data.unreadCount);
+      }
+    } catch (error) {
+      console.error("Error loading notifications:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // const handleNotificationClick = async (notification) => {
-  //   try {
-  //     // Đánh dấu đã đọc
-  //     await axios.patch(
-  //       `/api/notifications/${notification._id}/read`,
-  //       {},
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         },
-  //       }
-  //     );
+  const handleNotificationClick = async (notification) => {
+    try {
+      const response = await apiMarkAsRead(notification._id);
+      if (response.success) {
+        // Update local state
+        setNotifications((prev) =>
+          prev.map((n) =>
+            n._id === notification._id ? { ...n, read: true } : n
+          )
+        );
+        setUnreadCount((prev) => Math.max(0, prev - 1));
 
-  //     // Update local state
-  //     setNotifications((prev) =>
-  //       prev.map((n) => (n._id === notification._id ? { ...n, read: true } : n))
-  //     );
-  //     setUnreadCount((prev) => Math.max(0, prev - 1));
-
-  //     // Navigate đến order detail
-  //     window.location.href = `/orders/${notification.orderId}`;
-  //   } catch (error) {
-  //     console.error("Error marking notification as read:", error);
-  //   }
-  // };
+        // Navigate
+        if (user.role === "admin") {
+          navigate(`/admin/manage-order?orderId=${notification.orderId}`);
+        } else if (user.role === "user") {
+          navigate(`/member/buy-history?orderId=${notification.orderId}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
+  };
 
   // const handleMarkAllRead = async () => {
   //   try {
@@ -127,7 +124,7 @@ const NotificationBell = () => {
                   className={`flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition ${
                     !notification.read ? "bg-blue-50" : ""
                   }`}
-                  // onClick={() => handleNotificationClick(notification)}
+                  onClick={() => handleNotificationClick(notification)}
                 >
                   <div className="flex-1">
                     <p

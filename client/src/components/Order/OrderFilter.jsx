@@ -1,28 +1,43 @@
 import { Filter, Search } from "lucide-react";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-const OrderFilters = ({
-  searchQuery,
-  setSearchQuery,
-  statusFilter,
-  setStatusFilter,
-}) => {
+const OrderFilters = () => {
   const [params, setParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(params.get("q") || "");
+  const [statusFilter, setStatusFilter] = useState(
+    params.get("status") || "all"
+  );
 
   const handleStatusChange = (e) => {
+    const value = e.target.value;
     setParams((prev) => {
       const newParams = new URLSearchParams(prev);
-      newParams.set("status", e.target.value);
+      if (value === "all") newParams.delete("status");
+      else newParams.set("status", value);
+      newParams.delete("orderId");
+
       newParams.set("page", 1);
       return newParams;
     });
-
-    setStatusFilter(e.target.value);
+    setStatusFilter(value);
   };
+
+  // const handleSearchChange = (value) => {
+  //   setParams((prev) => {
+  //     const newParams = new URLSearchParams(prev);
+  //     if (value.trim()) newParams.set("q", value);
+  //     else newParams.delete("q");
+  //     newParams.set("page", 1);
+  //     return newParams;
+  //   });
+  //   setSearchQuery(value);
+  // };
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Ô tìm kiếm */}
         <div className="relative">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -32,11 +47,12 @@ const OrderFilters = ({
             type="text"
             placeholder="Search by order ID or product name..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           />
         </div>
 
+        {/* Bộ lọc trạng thái */}
         <div className="relative">
           <Filter
             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -44,7 +60,7 @@ const OrderFilters = ({
           />
           <select
             value={statusFilter}
-            onChange={(e) => handleStatusChange(e)}
+            onChange={handleStatusChange}
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent appearance-none cursor-pointer"
           >
             <option value="all">All Status</option>
@@ -58,4 +74,5 @@ const OrderFilters = ({
     </div>
   );
 };
+
 export default OrderFilters;

@@ -15,9 +15,9 @@ const path = {
   // Admin
   ADMIN: "admin",
   DASHBOARD: "dashboard",
-  MANAGE_USER: "manager-user",
-  MANAGE_PRODUCTS: "manager-products",
-  MANAGE_ORDER: "manager-order",
+  MANAGE_USER: "manage-user",
+  MANAGE_PRODUCTS: "manage-products",
+  MANAGE_ORDER: "manage-order",
   CREATE_PRODUCT: "create-product",
 
   // Member

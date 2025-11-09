@@ -1,0 +1,1309 @@
+[
+  {
+    "_id": "690105a3f6c155a8776eaa70",
+    "products": [],
+    "status": "Cancelled",
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-28T18:04:19.384Z",
+    "updatedAt": "2025-10-28T18:04:19.384Z",
+    "__v": 0
+  },
+  {
+    "_id": "6901062bf6c155a8776eaa72",
+    "products": [],
+    "status": "Cancelled",
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-28T18:06:35.572Z",
+    "updatedAt": "2025-10-28T18:06:35.572Z",
+    "__v": 0
+  },
+  {
+    "_id": "690106aff6c155a8776eaa74",
+    "products": [],
+    "status": "Cancelled",
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-28T18:08:47.865Z",
+    "updatedAt": "2025-10-28T18:08:47.865Z",
+    "__v": 0
+  },
+  {
+    "_id": "6901072c40d3793ca177ea83",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 4,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6900e8091c7f1d1a123cf5a2"
+      }
+    ],
+    "status": "Cancelled",
+    "total": 2.22,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-28T18:10:52.444Z",
+    "updatedAt": "2025-10-28T18:10:52.444Z",
+    "__v": 0
+  },
+  {
+    "_id": "69010b3880b2722334a4f692",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 4,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6900e8091c7f1d1a123cf5a2"
+      }
+    ],
+    "status": "Succeed",
+    "total": 2.22,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-28T18:28:08.354Z",
+    "updatedAt": "2025-10-28T18:28:08.354Z",
+    "__v": 0
+  },
+  {
+    "_id": "69010b6780b2722334a4f695",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 4,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6900e8091c7f1d1a123cf5a2"
+      }
+    ],
+    "status": "Succeed",
+    "total": 2.22,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-28T18:28:55.435Z",
+    "updatedAt": "2025-10-28T18:28:55.435Z",
+    "__v": 0
+  },
+  {
+    "_id": "69010c2c80b2722334a4f698",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 4,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6900e8091c7f1d1a123cf5a2"
+      }
+    ],
+    "status": "Succeed",
+    "total": 2.22,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-28T18:32:12.930Z",
+    "updatedAt": "2025-10-28T18:32:12.930Z",
+    "__v": 0
+  },
+  {
+    "_id": "69010c7280b2722334a4f69b",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 4,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6900e8091c7f1d1a123cf5a2"
+      }
+    ],
+    "status": "Succeed",
+    "total": 2.22,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-28T18:33:22.086Z",
+    "updatedAt": "2025-10-28T18:33:22.086Z",
+    "__v": 0
+  },
+  {
+    "_id": "69010caf80b2722334a4f69e",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 4,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6900e8091c7f1d1a123cf5a2"
+      }
+    ],
+    "status": "Succeed",
+    "total": 2.22,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-28T18:34:23.319Z",
+    "updatedAt": "2025-10-28T18:34:23.319Z",
+    "__v": 0
+  },
+  {
+    "_id": "69010de863582b3d310d3886",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 4,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6900e8091c7f1d1a123cf5a2"
+      }
+    ],
+    "status": "Succeed",
+    "total": 2.22,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-28T18:39:36.298Z",
+    "updatedAt": "2025-10-28T18:39:36.298Z",
+    "__v": 0
+  },
+  {
+    "_id": "690110e2542c6688e014756a",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 4,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6900e8091c7f1d1a123cf5a2"
+      }
+    ],
+    "status": "Succeed",
+    "total": 2.22,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-28T18:52:18.906Z",
+    "updatedAt": "2025-10-28T18:52:18.906Z",
+    "__v": 0
+  },
+  {
+    "_id": "69011111542c6688e0147592",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 3,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690110f3542c6688e0147585"
+      }
+    ],
+    "status": "Succeed",
+    "total": 2.19,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-28T18:53:05.974Z",
+    "updatedAt": "2025-10-28T18:53:05.974Z",
+    "__v": 0
+  },
+  {
+    "_id": "6901135d542c6688e01475c1",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf39a",
+        "quantity": 1,
+        "color": "BLACK",
+        "price": 3555929,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/Photoroom_20250620_75943_CH_1_1024x1024.png?v=1750768886",
+        "title": "JBL CHARGE 3",
+        "_id": "6901131c542c6688e01475b7"
+      }
+    ],
+    "status": "Succeed",
+    "total": 150.25,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-28T19:02:53.175Z",
+    "updatedAt": "2025-10-28T19:02:53.175Z",
+    "__v": 0
+  },
+  {
+    "_id": "690114e5542c6688e0147611",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf3af",
+        "quantity": 1,
+        "color": "BLACK LEATHER",
+        "price": 9222228,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/Kiet-tac-dong-ho-thong-minh-HUAWEI-WATCH-Ultimate-se-duoc-ra-mat-tai-Viet-Nam-5_1_1024x1024.png?v=1750768905",
+        "title": "WATCH ULTIMATE",
+        "_id": "690114d2542c6688e014760a"
+      }
+    ],
+    "status": "Succeed",
+    "total": 386.34,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-28T19:09:25.570Z",
+    "updatedAt": "2025-10-28T19:09:25.570Z",
+    "__v": 0
+  },
+  {
+    "_id": "690114ff542c6688e0147633",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690114f0542c6688e014762c"
+      }
+    ],
+    "status": "Succeed",
+    "total": 2.12,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-28T19:09:51.655Z",
+    "updatedAt": "2025-10-28T19:09:51.655Z",
+    "__v": 0
+  },
+  {
+    "_id": "6901843355bc99a11f27a8a0",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf3a3",
+        "quantity": 1,
+        "color": "PINK",
+        "price": 641358,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/Photoroom_20250620_80443_CH_1_1024x1024.png?v=1750768951",
+        "title": "WIRELESS KEYBOARD",
+        "_id": "690183b655bc99a11f27a7c4"
+      },
+      {
+        "product": "6900ddf31c7f1d1a123cf380",
+        "quantity": 1,
+        "color": "PINK",
+        "price": 23688628,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/IMG_1889_1024x1024.png?v=1750768631",
+        "title": "SAMSUNG GALAXY S7",
+        "_id": "690183ce55bc99a11f27a7f6"
+      },
+      {
+        "product": "6900ddf31c7f1d1a123cf37f",
+        "quantity": 1,
+        "color": "BLACK",
+        "price": 23688628,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/IMG_1882_979b9d6f-d1ee-4e52-b70f-1cb1cf5ba800_1024x1024.png?v=1750768702",
+        "title": "IPHONE 7",
+        "_id": "690183d155bc99a11f27a801"
+      },
+      {
+        "product": "6900ddf31c7f1d1a123cf386",
+        "quantity": 1,
+        "color": "SPACE GRAY",
+        "price": 36889965,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/IMG_1942_1024x1024.png?v=1750768837",
+        "title": "APPLE IPAD PRO",
+        "_id": "690183d955bc99a11f27a834"
+      },
+      {
+        "product": "6900ddf31c7f1d1a123cf391",
+        "quantity": 3,
+        "color": "PINK",
+        "price": 23688628,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/IMG_1878_1024x1024.png?v=1750768645",
+        "title": "DELL INSPIRON 7460",
+        "_id": "690183e855bc99a11f27a871"
+      }
+    ],
+    "status": "Succeed",
+    "total": 6501.02,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "createdAt": "2025-10-29T03:04:19.978Z",
+    "updatedAt": "2025-10-29T03:04:19.978Z",
+    "__v": 0
+  },
+  {
+    "_id": "6901883055bc99a11f27ab07",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690184d555bc99a11f27a8df"
+      },
+      {
+        "product": "6900ddf31c7f1d1a123cf386",
+        "quantity": 1,
+        "color": "SPACE GRAY",
+        "price": 36889965,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/IMG_1942_1024x1024.png?v=1750768837",
+        "title": "APPLE IPAD PRO",
+        "_id": "690187ae55bc99a11f27aabb"
+      }
+    ],
+    "status": "Succeed",
+    "total": 1539.2,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "createdAt": "2025-10-29T03:21:20.828Z",
+    "updatedAt": "2025-10-29T03:21:20.828Z",
+    "__v": 0
+  },
+  {
+    "_id": "6901991a55bc99a11f27adec",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf3ac",
+        "quantity": 1,
+        "color": "PINK",
+        "price": 184186,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/Photoroom_20250620_90635_CH_1_1024x1024.png?v=1750768948",
+        "title": "USB SANDISK",
+        "_id": "690198de55bc99a11f27ade5"
+      }
+    ],
+    "status": "Succeed",
+    "total": 9.76,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "createdAt": "2025-10-29T04:33:30.125Z",
+    "updatedAt": "2025-10-29T04:33:30.125Z",
+    "__v": 0
+  },
+  {
+    "_id": "6901995755bc99a11f27ae0e",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6901994655bc99a11f27ae07"
+      }
+    ],
+    "status": "Succeed",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "createdAt": "2025-10-29T04:34:31.561Z",
+    "updatedAt": "2025-10-29T04:34:31.561Z",
+    "__v": 0
+  },
+  {
+    "_id": "6901997455bc99a11f27ae32",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6901996655bc99a11f27ae2b"
+      }
+    ],
+    "status": "Succeed",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "createdAt": "2025-10-29T04:35:00.897Z",
+    "updatedAt": "2025-10-29T04:35:00.897Z",
+    "__v": 0
+  },
+  {
+    "_id": "69033e4fb2090c13bc4ba9bc",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6901177e542c6688e0147698"
+      },
+      {
+        "product": "690186b555bc99a11f27a9af",
+        "quantity": 1,
+        "color": "DAZZLING WHITE",
+        "price": 30000000,
+        "thumb": "https://res.cloudinary.com/dlf70hwa0/image/upload/v1761707546/Digital%20E-commerce/cmza2k1fezuddqi2zotg.png",
+        "title": "Iphone 17",
+        "_id": "69033b10a93bae06ccf7ea80"
+      },
+      {
+        "product": "6900ddf31c7f1d1a123cf39a",
+        "quantity": 1,
+        "color": "BLACK",
+        "price": 3555929,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/Photoroom_20250620_75943_CH_1_1024x1024.png?v=1750768886",
+        "title": "JBL CHARGE 3",
+        "_id": "69033b10a93bae06ccf7ea89"
+      }
+    ],
+    "status": "Pending",
+    "total": 1400.28,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-30T10:30:39.548Z",
+    "updatedAt": "2025-10-30T10:30:39.548Z",
+    "__v": 0
+  },
+  {
+    "_id": "69033e5ab2090c13bc4ba9cc",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6901177e542c6688e0147698"
+      },
+      {
+        "product": "690186b555bc99a11f27a9af",
+        "quantity": 1,
+        "color": "DAZZLING WHITE",
+        "price": 30000000,
+        "thumb": "https://res.cloudinary.com/dlf70hwa0/image/upload/v1761707546/Digital%20E-commerce/cmza2k1fezuddqi2zotg.png",
+        "title": "Iphone 17",
+        "_id": "69033b10a93bae06ccf7ea80"
+      },
+      {
+        "product": "6900ddf31c7f1d1a123cf39a",
+        "quantity": 1,
+        "color": "BLACK",
+        "price": 3555929,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/Photoroom_20250620_75943_CH_1_1024x1024.png?v=1750768886",
+        "title": "JBL CHARGE 3",
+        "_id": "69033b10a93bae06ccf7ea89"
+      }
+    ],
+    "status": "Pending",
+    "total": 1400.28,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-30T10:30:50.565Z",
+    "updatedAt": "2025-10-30T10:30:50.565Z",
+    "__v": 0
+  },
+  {
+    "_id": "69033f44a0446442d15c7e98",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6901177e542c6688e0147698"
+      },
+      {
+        "product": "690186b555bc99a11f27a9af",
+        "quantity": 1,
+        "color": "DAZZLING WHITE",
+        "price": 30000000,
+        "thumb": "https://res.cloudinary.com/dlf70hwa0/image/upload/v1761707546/Digital%20E-commerce/cmza2k1fezuddqi2zotg.png",
+        "title": "Iphone 17",
+        "_id": "69033b10a93bae06ccf7ea80"
+      },
+      {
+        "product": "6900ddf31c7f1d1a123cf39a",
+        "quantity": 1,
+        "color": "BLACK",
+        "price": 3555929,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/Photoroom_20250620_75943_CH_1_1024x1024.png?v=1750768886",
+        "title": "JBL CHARGE 3",
+        "_id": "69033b10a93bae06ccf7ea89"
+      }
+    ],
+    "status": "Pending",
+    "total": 1400.28,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-30T10:34:44.185Z",
+    "updatedAt": "2025-10-30T10:34:44.185Z",
+    "__v": 0
+  },
+  {
+    "_id": "6903405d25d33079556afedb",
+    "products": [
+      {
+        "product": "690186b555bc99a11f27a9af",
+        "quantity": 1,
+        "color": "DAZZLING WHITE",
+        "price": 30000000,
+        "thumb": "https://res.cloudinary.com/dlf70hwa0/image/upload/v1761707546/Digital%20E-commerce/cmza2k1fezuddqi2zotg.png",
+        "title": "Iphone 17",
+        "_id": "6903405425d33079556afed4"
+      }
+    ],
+    "status": "Succeed",
+    "total": 1252.08,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-30T10:39:25.199Z",
+    "updatedAt": "2025-11-04T02:44:40.640Z",
+    "__v": 0
+  },
+  {
+    "_id": "69034081d617602499a4b62d",
+    "products": [
+      {
+        "product": "690186b555bc99a11f27a9af",
+        "quantity": 1,
+        "color": "DAZZLING WHITE",
+        "price": 30000000,
+        "thumb": "https://res.cloudinary.com/dlf70hwa0/image/upload/v1761707546/Digital%20E-commerce/cmza2k1fezuddqi2zotg.png",
+        "title": "Iphone 17",
+        "_id": "6903407bd617602499a4b626"
+      }
+    ],
+    "status": "Succeed",
+    "total": 1252.08,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-30T10:40:01.469Z",
+    "updatedAt": "2025-11-04T02:45:46.827Z",
+    "__v": 0
+  },
+  {
+    "_id": "690341c2b020534381ae4e91",
+    "products": [
+      {
+        "product": "690186b555bc99a11f27a9af",
+        "quantity": 1,
+        "color": "DAZZLING WHITE",
+        "price": 30000000,
+        "thumb": "https://res.cloudinary.com/dlf70hwa0/image/upload/v1761707546/Digital%20E-commerce/cmza2k1fezuddqi2zotg.png",
+        "title": "Iphone 17",
+        "_id": "69034145d617602499a4b645"
+      }
+    ],
+    "status": "Succeed",
+    "total": 1252.08,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-30T10:45:22.114Z",
+    "updatedAt": "2025-11-04T02:40:10.702Z",
+    "__v": 0
+  },
+  {
+    "_id": "690341e98c4b61dfc7b90d0c",
+    "products": [
+      {
+        "product": "690186b555bc99a11f27a9af",
+        "quantity": 1,
+        "color": "DAZZLING WHITE",
+        "price": 30000000,
+        "thumb": "https://res.cloudinary.com/dlf70hwa0/image/upload/v1761707546/Digital%20E-commerce/cmza2k1fezuddqi2zotg.png",
+        "title": "Iphone 17",
+        "_id": "690341e18c4b61dfc7b90d05"
+      }
+    ],
+    "status": "Succeed",
+    "total": 1252.08,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-30T10:46:01.921Z",
+    "updatedAt": "2025-11-04T02:33:35.984Z",
+    "__v": 0
+  },
+  {
+    "_id": "690341ec8c4b61dfc7b90d16",
+    "products": [
+      {
+        "product": "690186b555bc99a11f27a9af",
+        "quantity": 1,
+        "color": "DAZZLING WHITE",
+        "price": 30000000,
+        "thumb": "https://res.cloudinary.com/dlf70hwa0/image/upload/v1761707546/Digital%20E-commerce/cmza2k1fezuddqi2zotg.png",
+        "title": "Iphone 17",
+        "_id": "690341e18c4b61dfc7b90d05"
+      }
+    ],
+    "status": "Succeed",
+    "total": 1252.08,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-30T10:46:04.009Z",
+    "updatedAt": "2025-11-04T02:33:12.483Z",
+    "__v": 0
+  },
+  {
+    "_id": "6903426cc48a127bb2d1fa7b",
+    "products": [
+      {
+        "product": "690186b555bc99a11f27a9af",
+        "quantity": 1,
+        "color": "DAZZLING WHITE",
+        "price": 30000000,
+        "thumb": "https://res.cloudinary.com/dlf70hwa0/image/upload/v1761707546/Digital%20E-commerce/cmza2k1fezuddqi2zotg.png",
+        "title": "Iphone 17",
+        "_id": "69034264c48a127bb2d1fa74"
+      }
+    ],
+    "status": "Shipping",
+    "total": 1252.08,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-30T10:48:12.853Z",
+    "updatedAt": "2025-11-04T02:32:06.272Z",
+    "__v": 0
+  },
+  {
+    "_id": "690344705f364d82a34ff48e",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690344665f364d82a34ff487"
+      }
+    ],
+    "status": "Cancelled",
+    "total": 2.12,
+    "orderedBy": "68f0c8026d957a595f31022b",
+    "createdAt": "2025-10-30T10:56:48.031Z",
+    "updatedAt": "2025-10-30T11:36:28.992Z",
+    "__v": 0
+  },
+  {
+    "_id": "6906c6e4d8b2fd6b6817284b",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37c",
+        "quantity": 2,
+        "color": "MINERAL BLACK",
+        "price": 18655782,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/IMG_1887_d22d55e1-2764-4f09-af0d-ad5a81d912e9_1024x1024.png?v=1750768769",
+        "title": "SONY XPERIA XA",
+        "_id": "6906c660d8b2fd6b681727e4"
+      }
+    ],
+    "status": "Cancelled",
+    "total": 1556.73,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "createdAt": "2025-11-02T02:50:12.731Z",
+    "updatedAt": "2025-11-03T11:23:09.007Z",
+    "__v": 0
+  },
+  {
+    "_id": "6906c774d8b2fd6b6817292f",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6906c76ed8b2fd6b68172928"
+      }
+    ],
+    "status": "Cancelled",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "createdAt": "2025-11-02T02:52:36.964Z",
+    "updatedAt": "2025-11-03T11:22:19.142Z",
+    "__v": 0
+  },
+  {
+    "_id": "690845d0595e44709563cfa1",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 3,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6908458e595e44709563cf78"
+      },
+      {
+        "product": "6900ddf31c7f1d1a123cf3af",
+        "quantity": 1,
+        "color": "BLACK LEATHER",
+        "price": 9222228,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/Kiet-tac-dong-ho-thong-minh-HUAWEI-WATCH-Ultimate-se-duoc-ra-mat-tai-Viet-Nam-5_1_1024x1024.png?v=1750768905",
+        "title": "WATCH ULTIMATE",
+        "_id": "69084591595e44709563cf80"
+      },
+      {
+        "product": "6900ddf31c7f1d1a123cf38c",
+        "quantity": 1,
+        "color": "PINK",
+        "price": 23161628,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/Photoroom_20250617_74543_CH_35121be2-1db8-46a2-ab63-7f33e80e7942_1024x1024.png?v=1750768819",
+        "title": "DELL VOSTRO 5468",
+        "_id": "69084592595e44709563cf8a"
+      }
+    ],
+    "status": "Cancelled",
+    "total": 1351.52,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "createdAt": "2025-11-03T06:04:00.056Z",
+    "updatedAt": "2025-11-03T11:22:10.455Z",
+    "__v": 0
+  },
+  {
+    "_id": "690891299080e61da96b7343",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690891059080e61da96b733b"
+      }
+    ],
+    "status": "Cancelled",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "createdAt": "2025-11-03T11:25:29.545Z",
+    "updatedAt": "2025-11-03T11:25:41.531Z",
+    "__v": 0
+  },
+  {
+    "_id": "690891529080e61da96b743c",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6908914a9080e61da96b7434"
+      }
+    ],
+    "status": "Cancelled",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "createdAt": "2025-11-03T11:26:10.088Z",
+    "updatedAt": "2025-11-03T11:26:19.459Z",
+    "__v": 0
+  },
+  {
+    "_id": "690891989080e61da96b757c",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6908918f9080e61da96b7574"
+      }
+    ],
+    "status": "Cancelled",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "createdAt": "2025-11-03T11:27:20.212Z",
+    "updatedAt": "2025-11-03T11:27:29.869Z",
+    "__v": 0
+  },
+  {
+    "_id": "690892209080e61da96b7870",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6908921a9080e61da96b7868"
+      }
+    ],
+    "status": "Cancelled",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "createdAt": "2025-11-03T11:29:36.698Z",
+    "updatedAt": "2025-11-03T11:29:49.937Z",
+    "__v": 0
+  },
+  {
+    "_id": "690892ba9080e61da96b79d8",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690892b39080e61da96b79d0"
+      }
+    ],
+    "status": "Cancelled",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "createdAt": "2025-11-03T11:32:10.442Z",
+    "updatedAt": "2025-11-03T11:32:26.107Z",
+    "__v": 0
+  },
+  {
+    "_id": "690893689080e61da96b7b18",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690893629080e61da96b7b10"
+      }
+    ],
+    "status": "Cancelled",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "createdAt": "2025-11-03T11:35:04.056Z",
+    "updatedAt": "2025-11-03T11:35:12.480Z",
+    "__v": 0
+  },
+  {
+    "_id": "690893be9080e61da96b7d12",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690893b79080e61da96b7d0a"
+      }
+    ],
+    "status": "Cancelled",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "createdAt": "2025-11-03T11:36:30.376Z",
+    "updatedAt": "2025-11-03T11:47:00.649Z",
+    "__v": 0
+  },
+  {
+    "_id": "690896819080e61da96b7e55",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "6908967b9080e61da96b7e4d"
+      }
+    ],
+    "status": "Cancelled",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "createdAt": "2025-11-03T11:48:17.387Z",
+    "updatedAt": "2025-11-03T11:48:25.560Z",
+    "__v": 0
+  },
+  {
+    "_id": "690897f19080e61da96b806e",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690897ea9080e61da96b8066"
+      }
+    ],
+    "status": "Cancelled",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "createdAt": "2025-11-03T11:54:25.847Z",
+    "updatedAt": "2025-11-03T11:54:39.590Z",
+    "__v": 0
+  },
+  {
+    "_id": "690cd39140c2d0da74e860b0",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690cd38a40c2d0da74e860a8"
+      }
+    ],
+    "status": "Pending",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "paymentMethod": "cod",
+    "shippingAddress": "nguyen trai",
+    "createdAt": "2025-11-06T16:57:53.136Z",
+    "updatedAt": "2025-11-06T16:57:53.136Z",
+    "__v": 0
+  },
+  {
+    "_id": "690cd39840c2d0da74e860b9",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690cd38a40c2d0da74e860a8"
+      }
+    ],
+    "status": "Pending",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "paymentMethod": "cod",
+    "shippingAddress": "nguyen trai",
+    "createdAt": "2025-11-06T16:58:00.323Z",
+    "updatedAt": "2025-11-06T16:58:00.323Z",
+    "__v": 0
+  },
+  {
+    "_id": "690cd39d40c2d0da74e860c2",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690cd38a40c2d0da74e860a8"
+      }
+    ],
+    "status": "Pending",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "paymentMethod": "cod",
+    "shippingAddress": "nguyen trai",
+    "createdAt": "2025-11-06T16:58:05.992Z",
+    "updatedAt": "2025-11-06T16:58:05.992Z",
+    "__v": 0
+  },
+  {
+    "_id": "690cd3c140f0ef1a9377c709",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690cd38a40c2d0da74e860a8"
+      }
+    ],
+    "status": "Pending",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "paymentMethod": "cod",
+    "shippingAddress": "nguyen trai",
+    "createdAt": "2025-11-06T16:58:41.936Z",
+    "updatedAt": "2025-11-06T16:58:41.936Z",
+    "__v": 0
+  },
+  {
+    "_id": "690cd3c540f0ef1a9377c712",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690cd38a40c2d0da74e860a8"
+      }
+    ],
+    "status": "Pending",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "paymentMethod": "cod",
+    "shippingAddress": "nguyen trai",
+    "createdAt": "2025-11-06T16:58:45.436Z",
+    "updatedAt": "2025-11-06T16:58:45.436Z",
+    "__v": 0
+  },
+  {
+    "_id": "690cd43f40f0ef1a9377c749",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690cd43740f0ef1a9377c741"
+      }
+    ],
+    "status": "Pending",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "paymentMethod": "cod",
+    "shippingAddress": "nguyen trai",
+    "createdAt": "2025-11-06T17:00:47.925Z",
+    "updatedAt": "2025-11-06T17:00:47.925Z",
+    "__v": 0
+  },
+  {
+    "_id": "690cd47177a726f708aa8f48",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690cd43740f0ef1a9377c741"
+      }
+    ],
+    "status": "Pending",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "paymentMethod": "cod",
+    "shippingAddress": "nguyen trai",
+    "createdAt": "2025-11-06T17:01:37.489Z",
+    "updatedAt": "2025-11-06T17:01:37.489Z",
+    "__v": 0
+  },
+  {
+    "_id": "690cd56277a726f708aa9144",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690cd55c77a726f708aa913c"
+      }
+    ],
+    "status": "Pending",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "paymentMethod": "cod",
+    "shippingAddress": "nguyen trai",
+    "createdAt": "2025-11-06T17:05:38.956Z",
+    "updatedAt": "2025-11-06T17:05:38.956Z",
+    "__v": 0
+  },
+  {
+    "_id": "690cd782274b4441f0be5b39",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690cd77d274b4441f0be5b2b"
+      }
+    ],
+    "status": "Pending",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "paymentMethod": "cod",
+    "shippingAddress": "nguyen trai",
+    "createdAt": "2025-11-06T17:14:42.515Z",
+    "updatedAt": "2025-11-06T17:14:42.515Z",
+    "__v": 0
+  },
+  {
+    "_id": "690cd8b6f4ae25ceb2e5f8ca",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf384",
+        "quantity": 1,
+        "color": "SPACE GRAY",
+        "price": 9459641,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/IMG_1946_1024x1024.png?v=1750768872",
+        "title": "APPLE IPAD AIR 2",
+        "_id": "690cd7ca274b4441f0be5bba"
+      },
+      {
+        "product": "6900ddf31c7f1d1a123cf37d",
+        "quantity": 1,
+        "color": "CARBON GRAY",
+        "price": 13622937,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/IMG_1885_e5fe8350-23cd-4709-984b-073887379bf5_1024x1024.png?v=1750768748",
+        "title": "HTC 10",
+        "_id": "690cd7d4274b4441f0be5bc4"
+      }
+    ],
+    "status": "Pending",
+    "total": 963.86,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "paymentMethod": "cod",
+    "shippingAddress": "nguyen trai",
+    "createdAt": "2025-11-06T17:19:50.391Z",
+    "updatedAt": "2025-11-06T17:19:50.391Z",
+    "__v": 0
+  },
+  {
+    "_id": "690cd9d0db5b7674570434fe",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf3af",
+        "quantity": 1,
+        "color": "BLACK LEATHER",
+        "price": 9222228,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/Kiet-tac-dong-ho-thong-minh-HUAWEI-WATCH-Ultimate-se-duoc-ra-mat-tai-Viet-Nam-5_1_1024x1024.png?v=1750768905",
+        "title": "WATCH ULTIMATE",
+        "_id": "690cd9c3db5b7674570434f0"
+      }
+    ],
+    "status": "Pending",
+    "total": 386.34,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "paymentMethod": "cod",
+    "shippingAddress": "nguyen trai",
+    "createdAt": "2025-11-06T17:24:32.374Z",
+    "updatedAt": "2025-11-06T17:24:32.374Z",
+    "__v": 0
+  },
+  {
+    "_id": "690cda82db5b767457043715",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690cda2ddb5b767457043613"
+      }
+    ],
+    "status": "Pending",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "paymentMethod": "cod",
+    "shippingAddress": "nguyen trai",
+    "createdAt": "2025-11-06T17:27:30.810Z",
+    "updatedAt": "2025-11-06T17:27:30.810Z",
+    "__v": 0
+  },
+  {
+    "_id": "690cdafd40cba2495d09c8f0",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690cdaf840cba2495d09c8e2"
+      }
+    ],
+    "status": "Pending",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "paymentMethod": "cod",
+    "shippingAddress": "nguyen trai",
+    "createdAt": "2025-11-06T17:29:33.262Z",
+    "updatedAt": "2025-11-06T17:29:33.262Z",
+    "__v": 0
+  },
+  {
+    "_id": "690cdb1640cba2495d09c97f",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690cdb1140cba2495d09c971"
+      }
+    ],
+    "status": "Pending",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "paymentMethod": "cod",
+    "shippingAddress": "nguyen trai",
+    "createdAt": "2025-11-06T17:29:58.854Z",
+    "updatedAt": "2025-11-06T17:29:58.854Z",
+    "__v": 0
+  },
+  {
+    "_id": "690cdc4340cba2495d09caf9",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "690cdc3940cba2495d09caef"
+      }
+    ],
+    "status": "Pending",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "paymentMethod": "cod",
+    "shippingAddress": "nguyen trai",
+    "createdAt": "2025-11-06T17:34:59.265Z",
+    "updatedAt": "2025-11-06T17:34:59.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "690cdc8540cba2495d09cbf1",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf384",
+        "quantity": 1,
+        "color": "SPACE GRAY",
+        "price": 9459641,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/IMG_1946_1024x1024.png?v=1750768872",
+        "title": "APPLE IPAD AIR 2",
+        "_id": "690cdc7f40cba2495d09cbe7"
+      }
+    ],
+    "status": "Pending",
+    "total": 396.24,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "paymentMethod": "cod",
+    "shippingAddress": "nguyen trai",
+    "createdAt": "2025-11-06T17:36:05.232Z",
+    "updatedAt": "2025-11-06T17:36:05.232Z",
+    "__v": 0
+  },
+  {
+    "_id": "6910180dc80a2cce09e582d1",
+    "products": [
+      {
+        "product": "6900ddf31c7f1d1a123cf37a",
+        "quantity": 1,
+        "color": "QUITE BLACK",
+        "price": 840,
+        "thumb": "https://digital-world-2.myshopify.com/cdn/shop/files/u2_1024x1024.jpg?v=1750768808",
+        "title": "GOOGLE PIXEL",
+        "_id": "69101807c80a2cce09e582c7"
+      }
+    ],
+    "status": "Pending",
+    "total": 2.12,
+    "orderedBy": "69002f197e63c65ccae14f21",
+    "paymentMethod": "cod",
+    "shippingAddress": "nguyen trai",
+    "createdAt": "2025-11-09T04:26:53.518Z",
+    "updatedAt": "2025-11-09T04:26:53.518Z",
+    "__v": 0
+  }
+]

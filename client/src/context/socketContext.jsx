@@ -39,8 +39,6 @@ export const SocketProvider = ({ children }) => {
     // Đánh dấu đang connecting
     isConnectingRef.current = true;
 
-    console.log("Initializing socket connection for user:", user._id);
-
     // Khởi tạo socket connection
     const newSocket = io("http://localhost:5000", {
       withCredentials: true,

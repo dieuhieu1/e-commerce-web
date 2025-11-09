@@ -60,7 +60,7 @@ const createNewOrder = asyncHandler(async (req, res) => {
   // Emit notifications
 
   await sendNotificationToAdmin(req.io, {
-    orderId: newOrder._id,
+    orderId: newOrder.orderId,
     message: `A new order have been placed from ${userId} need you check!`,
   });
 
@@ -68,7 +68,7 @@ const createNewOrder = asyncHandler(async (req, res) => {
   // Send Email Notify
   const emailData = {
     customerName: `${user.firstname} ${user.lastname}`,
-    orderId: newOrder._id.toString(),
+    orderId: newOrder.orderId,
     totalFormatted: formatMoney(newOrder.total) + " VND",
     paymentMethod: newOrder.paymentMethod,
     address: address,
@@ -134,7 +134,7 @@ const cancelUserOrder = asyncHandler(async (req, res) => {
 });
 
 const updateOrderStatus = asyncHandler(async (req, res) => {
-  const { id: orderId } = req.params;
+  const { id: oid } = req.params;
   const { status: newStatus } = req.body;
   console.log(req.body);
 
@@ -142,7 +142,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     throw new Error("Invalid or missing status");
   }
 
-  const order = await Order.findById({ _id: orderId });
+  const order = await Order.findById({ _id: oid });
 
   if (!order) {
     res.status(404);
@@ -166,7 +166,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
   // Emit Notification to FE
   await sendNotificationToUser(req.io, order.orderedBy, {
-    orderId: orderId,
+    orderId: order.orderId,
     message: `Your order have been updated new status! Come to check it !`,
     status: newStatus,
   });
@@ -180,12 +180,13 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
 const getOrders = asyncHandler(async (req, res) => {
   const queryObj = { ...req.query };
-  const excludeFields = ["page", "sort", "filter", "limit"];
+  const excludeFields = ["page", "sort", "filter", "limit", "search"]; // Thêm "search"
 
-  // Delete uneccessary field of query object (sort, page, limit)
+  // Delete unnecessary field of query object (sort, page, limit, search)
   excludeFields.forEach((el) => {
     delete queryObj[el];
   });
+
   const allowedStatuses = [
     "Cancelled",
     "Succeed",
@@ -193,9 +194,11 @@ const getOrders = asyncHandler(async (req, res) => {
     "Processing",
     "Shipping",
   ];
+
   if (queryObj.status && !allowedStatuses.includes(queryObj.status)) {
     delete queryObj.status; // bỏ qua nếu status không hợp lệ
   }
+
   // 1. Filtering
   let queryString = JSON.stringify(queryObj);
   // Replace "gte" to "$gte" for the query
@@ -204,6 +207,17 @@ const getOrders = asyncHandler(async (req, res) => {
     (match) => `$${match}`
   );
   const formattedQueries = JSON.parse(queryString);
+
+  // ===== SEARCH BY ORDERID =====
+  if (req.query.search) {
+    const searchQuery = req.query.search.trim();
+
+    // Search by orderId (case-insensitive, partial match)
+    formattedQueries.$or = [
+      { orderId: { $regex: searchQuery, $options: "i" } },
+    ];
+  }
+
   // Create query but not execute --> Adding more condition of sorting and pagination
   let query = Order.find(formattedQueries).populate(
     "orderedBy",
@@ -219,6 +233,7 @@ const getOrders = asyncHandler(async (req, res) => {
     // Default sortBy
     query = query.sort("-createdAt");
   }
+
   // 3. Field Limiting
   if (req.query.fields) {
     const fields = req.query.fields.split(",").join(" ");
@@ -226,6 +241,7 @@ const getOrders = asyncHandler(async (req, res) => {
   } else {
     query = query.select("-__v");
   }
+
   // 4. Pagination
   const page = req.query.page * 1 || 1;
   const limit = req.query.limit * 1 || process.env.LIMIT_PRODUCTS;
@@ -254,9 +270,9 @@ const getMyOrder = asyncHandler(async (req, res) => {
   const { _id: userId } = req.user;
 
   const queryObj = { ...req.query };
-  const excludeFields = ["page", "sort", "filter", "limit"];
+  const excludeFields = ["page", "sort", "filter", "limit", "search"]; // Thêm "search"
 
-  // Delete uneccessary field of query object (sort, page, limit)
+  // Delete unnecessary field of query object (sort, page, limit, search)
   excludeFields.forEach((el) => {
     delete queryObj[el];
   });
@@ -268,9 +284,11 @@ const getMyOrder = asyncHandler(async (req, res) => {
     "Processing",
     "Shipping",
   ];
+
   if (queryObj.status && !allowedStatuses.includes(queryObj.status)) {
     delete queryObj.status; // bỏ qua nếu status không hợp lệ
   }
+
   // 1. Filtering
   let queryString = JSON.stringify(queryObj);
   // Replace "gte" to "$gte" for the query
@@ -278,8 +296,22 @@ const getMyOrder = asyncHandler(async (req, res) => {
     /\b(gte|gt|lte|lt)\b/g,
     (match) => `$${match}`
   );
+
   const formattedQueries = JSON.parse(queryString);
+
+  // ===== SEARCH BY ORDERID =====
+  if (req.query.search) {
+    const searchQuery = req.query.search.trim();
+
+    // Search by orderId (case-insensitive, partial match)
+    formattedQueries.$or = [
+      { orderId: { $regex: searchQuery, $options: "i" } },
+    ];
+  }
+
+  // Add userId filter
   const queries = { ...formattedQueries, orderedBy: userId };
+
   // Create query but not execute --> Adding more condition of sorting and pagination
   let query = Order.find(queries);
 
@@ -292,6 +324,7 @@ const getMyOrder = asyncHandler(async (req, res) => {
     // Default sortBy
     query = query.sort("-createdAt");
   }
+
   // 3. Field Limiting
   if (req.query.fields) {
     const fields = req.query.fields.split(",").join(" ");
@@ -299,6 +332,7 @@ const getMyOrder = asyncHandler(async (req, res) => {
   } else {
     query = query.select("-__v");
   }
+
   // 4. Pagination
   const page = req.query.page * 1 || 1;
   const limit = req.query.limit * 1 || process.env.LIMIT_PRODUCTS;
@@ -306,11 +340,14 @@ const getMyOrder = asyncHandler(async (req, res) => {
   const skip = (page - 1) * limit;
   query.skip(skip).limit(limit);
 
+  // Get all orders for statistics (with same filter conditions)
   const allOrders = await Order.find(queries);
-  // Execute query
+
+  // Execute paginated query
   const response = await query;
 
   const totalCounts = allOrders.length;
+
   // Total Amount
   const totalAmount = allOrders.reduce((acc, o) => acc + o.total, 0);
 

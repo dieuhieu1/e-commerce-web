@@ -6,6 +6,7 @@ const brandRouter = require("./brandRoute");
 const imageRouter = require("./file-uploader/imageRoute");
 const orderRouter = require("./orderRoute");
 const insertDataRouter = require("./insertDataRoute");
+const notificationRouter = require("./notification.route");
 
 const blogRouter = require("./blogRoute");
 const initRoutes = (app) => {
@@ -22,6 +23,8 @@ const initRoutes = (app) => {
   app.use("/api/images", imageRouter);
 
   app.use("/api/order", orderRouter);
+
+  app.use("/api/notification", notificationRouter);
 
   app.use("/api/insert", insertDataRouter);
   // Middleware handle server error

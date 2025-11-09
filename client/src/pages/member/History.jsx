@@ -24,11 +24,9 @@ const History = () => {
 
   const [loading, setLoading] = useState(true);
   const [expandedOrder, setExpandedOrder] = useState(null);
-  const [statusFilter, setStatusFilter] = useState("");
   const [orderIdToCancel, setOrderIdToCancel] = useState(null);
 
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [summary, setSummary] = useState({
     totalSpent: 0,
     totalOrders: 0,
@@ -38,12 +36,12 @@ const History = () => {
   const fetchMyOrder = async () => {
     try {
       const queries = Object.fromEntries(params.entries());
+      console.log(queries);
 
       const response = await apiGetMyOrders({
         ...queries,
         limit: 5,
       });
-      console.log(response);
       setOrdersData(response || ordersData);
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -122,15 +120,10 @@ const History = () => {
         <OrderStatistics summary={summary} />
 
         {/* Filters */}
-        <OrderFilters
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          statusFilter={statusFilter}
-          setStatusFilter={setStatusFilter}
-        />
+        <OrderFilters />
 
         {/* Orders List */}
-        {ordersData?.orders.length === 0 ? (
+        {ordersData?.orders?.length === 0 ? (
           <div className="bg-white rounded-xl shadow-md p-12 text-center">
             <Package size={64} className="mx-auto text-gray-300 mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -142,7 +135,7 @@ const History = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {ordersData?.orders.map((order) => {
+            {ordersData?.orders?.map((order) => {
               const statusConfig = getStatusConfig(order.status);
               const isExpanded = expandedOrder === order._id;
 

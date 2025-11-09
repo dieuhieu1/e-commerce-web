@@ -1,21 +1,11 @@
 import React, { useState, useEffect } from "react";
 import {
   Search,
-  Filter,
-  Download,
-  Eye,
-  Edit,
-  Trash2,
   Clock,
   CheckCircle,
   XCircle,
   Truck,
-  DollarSign,
-  User,
-  Phone,
-  MapPin,
   RefreshCw,
-  ArrowUpDown,
 } from "lucide-react";
 import { orderStats } from "@/ultils/constants";
 import { apiGetOrders, apiGetOrdersStats } from "@/apis/order";
@@ -24,6 +14,7 @@ import { useSearchParams } from "react-router-dom";
 import OrderTable from "@/components/Order/OrderTable";
 import ViewDetailOrderDialog from "@/components/Dialog/ViewDetailOrderDialog";
 import UpdateStatusDialog from "@/components/Dialog/UpdateStatusDialog";
+import { useDebounce } from "@/hooks/useDebounce";
 const getStatusIcon = (status) => {
   const icons = {
     Pending: Clock,
@@ -38,6 +29,7 @@ const getStatusIcon = (status) => {
 const ManageOrder = () => {
   const [params, setParams] = useSearchParams();
 
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedTab, setSelectedTab] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orders, setOrders] = useState(null);
@@ -65,6 +57,19 @@ const ManageOrder = () => {
       dataKey: "totalCancelled",
     },
   ]);
+
+  const debouncedSearch = useDebounce(searchQuery, 800);
+
+  useEffect(() => {
+    const newParams = new URLSearchParams(params);
+    if (debouncedSearch) newParams.set("search", debouncedSearch);
+    else newParams.delete("search");
+    newParams.set("page", 1);
+
+    if (newParams.toString() !== params.toString()) {
+      setParams(newParams);
+    }
+  }, [debouncedSearch, params, setParams]);
 
   const fetchOrderStats = async () => {
     try {
@@ -119,13 +124,16 @@ const ManageOrder = () => {
   const handleTabChange = (tab) => {
     setParams((prev) => {
       const newParams = new URLSearchParams(prev);
-      newParams.set("status", tab.id);
+      if (tab.id === "all") newParams.delete("status");
+      else newParams.set("status", tab.id);
+      newParams.delete("orderId");
       newParams.set("page", 1);
       return newParams;
     });
 
     setSelectedTab(tab.id);
   };
+
   const handleViewDetails = (order) => {
     setSelectedOrder(order);
     setIsDetailModalOpen(true);
@@ -195,6 +203,18 @@ const ManageOrder = () => {
 
           {/* Search and Tabs */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+            <div className="p-6 border-b border-gray-100">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search by order ID, customer name, email..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
             {/* Tabs */}
             <div className="flex items-center gap-2 px-6 overflow-x-auto">
               {tabs.map((tab) => (
