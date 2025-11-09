@@ -163,11 +163,12 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
   order.status = newStatus;
   const updatedOrder = await order.save();
+  console.log(updatedOrder.orderedBy.toString());
 
   // Emit Notification to FE
-  await sendNotificationToUser(req.io, order.orderedBy, {
+  await sendNotificationToUser(req.io, updatedOrder.orderedBy.toString(), {
     orderId: order.orderId,
-    message: `Your order have been updated new status! Come to check it !`,
+    message: `Your order have been updated new status! ${statusEmoji[newStatus]} Your order ${order.orderId} is now ${newStatus}. Come to check it !`,
     status: newStatus,
   });
 

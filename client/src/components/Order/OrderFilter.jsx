@@ -28,9 +28,13 @@ const OrderFilters = () => {
   };
   useEffect(() => {
     const newParams = new URLSearchParams(params);
-    if (debouncedSearch) newParams.set("search", debouncedSearch);
-    else newParams.delete("search");
-    newParams.delete("orderId");
+    if (debouncedSearch) {
+      newParams.set("search", debouncedSearch);
+      newParams.delete("orderId");
+    } else {
+      newParams.delete("search");
+    }
+
     newParams.set("page", 1);
 
     if (newParams.toString() !== params.toString()) {

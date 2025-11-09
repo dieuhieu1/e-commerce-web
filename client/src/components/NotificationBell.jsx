@@ -1,18 +1,46 @@
-// components/NotificationBell.js
+// components/NotificationBell.jsx
 import React, { useEffect, useState } from "react";
 import { useSocket } from "@/context/socketContext";
 import { apiGetNotification, apiMarkAsRead } from "@/apis/notification";
 import { useAuthStore } from "@/lib/zustand/useAuthStore";
 import { useNavigate } from "react-router-dom";
+import { FaBell } from "react-icons/fa6";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Loader2 } from "lucide-react";
+
+// Helper format thời gian
+const formatTimeAgo = (dateString) => {
+  const now = new Date();
+  const date = new Date(dateString);
+  const seconds = Math.floor((now - date) / 1000);
+  let interval = seconds / 31536000;
+  if (interval > 1) return Math.floor(interval) + " năm trước";
+  interval = seconds / 2592000;
+  if (interval > 1) return Math.floor(interval) + " tháng trước";
+  interval = seconds / 86400;
+  if (interval > 1) return Math.floor(interval) + " ngày trước";
+  interval = seconds / 3600;
+  if (interval > 1) return Math.floor(interval) + " giờ trước";
+  interval = seconds / 60;
+  if (interval > 1) return Math.floor(interval) + " phút trước";
+  return "Vừa xong";
+};
 
 const NotificationBell = () => {
   const { user } = useAuthStore();
   const { notifications, setNotifications, unreadCount, setUnreadCount } =
     useSocket();
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  // Load notifications chưa đọc khi component mount
+
   useEffect(() => {
     loadUnreadNotifications();
   }, []);
@@ -21,145 +49,126 @@ const NotificationBell = () => {
     try {
       setLoading(true);
       const response = await apiGetNotification();
-
       if (response.success) {
         setNotifications(response.data.notifications);
         setUnreadCount(response.data.unreadCount);
       }
     } catch (error) {
-      console.error("Error loading notifications:", error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleNotificationClick = async (notification) => {
-    try {
-      const response = await apiMarkAsRead(notification._id);
-      if (response.success) {
-        // Update local state
-        setNotifications((prev) =>
-          prev.map((n) =>
-            n._id === notification._id ? { ...n, read: true } : n
-          )
-        );
-        setUnreadCount((prev) => Math.max(0, prev - 1));
-
-        // Navigate
-        if (user.role === "admin") {
-          navigate(`/admin/manage-order?orderId=${notification.orderId}`);
-        } else if (user.role === "user") {
-          navigate(`/member/buy-history?orderId=${notification.orderId}`);
-        }
+    setOpen(false);
+    if (!notification.read) {
+      setNotifications((prev) =>
+        prev.map((n) => (n._id === notification._id ? { ...n, read: true } : n))
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+      try {
+        await apiMarkAsRead(notification._id);
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error("Error marking notification as read:", error);
+    }
+    if (user.role === "admin") {
+      navigate(`/admin/manage-order?orderId=${notification.orderId}`);
+    } else {
+      navigate(`/member/buy-history?orderId=${notification.orderId}`);
     }
   };
 
-  // const handleMarkAllRead = async () => {
-  //   try {
-  //     await axios.patch(
-  //       "/api/notifications/mark-all-read",
-  //       {},
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         },
-  //       }
-  //     );
-
-  //     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  //     setUnreadCount(0);
-  //   } catch (error) {
-  //     console.error("Error marking all as read:", error);
-  //   }
-  // };
-
   return (
-    <div className="relative">
-      {/* Bell button */}
-      <button
-        className="relative flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition"
-        onClick={() => setShowDropdown(!showDropdown)}
-      >
-        <span className="text-2xl">🔔</span>
-        {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 bg-red-500 text-white text-xs font-semibold rounded-full px-1.5 py-0.5">
-            {unreadCount > 99 ? "99+" : unreadCount}
-          </span>
-        )}
-      </button>
+    <Popover open={open} onOpenChange={setOpen}>
+      {/* Trigger: dùng div custom thay vì Button */}
+      <PopoverTrigger asChild>
+        <div className="relative cursor-pointer p-1 rounded-full hover:bg-gray-100 transition">
+          <FaBell className="w-9 h-9 text-gray-800" /> {/* icon lớn */}
+          {unreadCount > 0 && (
+            <Badge
+              variant="destructive"
+              className="absolute top-0 right-0 h-5 w-5 flex items-center justify-center rounded-full p-0 text-xs"
+            >
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </Badge>
+          )}
+        </div>
+      </PopoverTrigger>
 
-      {/* Dropdown */}
-      {showDropdown && (
-        <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-2xl shadow-lg z-50">
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-            <h3 className="font-semibold text-gray-800">Thông báo</h3>
-            {unreadCount > 0 && (
-              <button
-                // onClick={handleMarkAllRead}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-              >
-                Đánh dấu tất cả đã đọc
-              </button>
-            )}
-          </div>
+      <PopoverContent className="w-96 p-0 z-50" align="end">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4">
+          <h3 className="font-semibold text-lg">Thông báo</h3>
+          {unreadCount > 0 && (
+            <span className="text-blue-600 text-sm">
+              Đánh dấu tất cả đã đọc
+            </span>
+          )}
+        </div>
+        <Separator />
 
-          {/* List */}
-          <div className="max-h-80 overflow-y-auto">
-            {loading ? (
-              <div className="p-4 text-center text-gray-500 text-sm">
-                Đang tải...
-              </div>
-            ) : notifications?.length === 0 ? (
-              <div className="p-4 text-center text-gray-500 text-sm">
+        {/* List */}
+        <ScrollArea className="h-[300px] max-h-[300px]">
+          {loading ? (
+            <div className="flex justify-center items-center h-full">
+              <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
+            </div>
+          ) : notifications?.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-gray-500 p-4">
+              <FaBell className="w-12 h-12 mb-2" />
+              <span className="text-sm font-medium">
                 Không có thông báo mới
-              </div>
-            ) : (
-              notifications?.map((notification) => (
+              </span>
+            </div>
+          ) : (
+            <div className="flex flex-col">
+              {notifications.map((notification) => (
                 <div
                   key={notification._id}
-                  className={`flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition ${
-                    !notification.read ? "bg-blue-50" : ""
+                  className={`flex gap-3 p-4 cursor-pointer transition-colors ${
+                    !notification.read
+                      ? "bg-blue-50 hover:bg-blue-100"
+                      : "hover:bg-gray-50"
                   }`}
                   onClick={() => handleNotificationClick(notification)}
                 >
-                  <div className="flex-1">
+                  <div className="flex-grow overflow-hidden">
                     <p
                       className={`text-sm ${
-                        notification.read
-                          ? "text-gray-700"
-                          : "text-gray-900 font-medium"
-                      }`}
+                        !notification.read ? "font-semibold" : "font-normal"
+                      } text-gray-900`}
                     >
                       {notification.message}
                     </p>
-                    <span className="text-xs text-gray-500">
-                      {new Date(notification.createdAt).toLocaleString("vi-VN")}
-                    </span>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Order ID: {notification.orderId} •{" "}
+                      {formatTimeAgo(notification.createdAt)}
+                    </p>
                   </div>
                   {!notification.read && (
-                    <span className="w-2 h-2 bg-blue-500 rounded-full mt-1"></span>
+                    <div className="w-2.5 h-2.5 bg-blue-500 rounded-full mt-1.5"></div>
                   )}
                 </div>
-              ))
-            )}
-          </div>
-
-          {/* Footer */}
-          <div className="border-t border-gray-100 text-center py-2">
-            <a
-              href="/notifications"
-              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-            >
-              Xem tất cả thông báo
-            </a>
-          </div>
+              ))}
+            </div>
+          )}
+        </ScrollArea>
+        <Separator />
+        <div className="p-2 bg-gray-50">
+          <span
+            className="text-blue-600 cursor-pointer text-sm w-full block text-center"
+            onClick={() => {
+              navigate("/notifications");
+              setOpen(false);
+            }}
+          >
+            Xem tất cả thông báo
+          </span>
         </div>
-      )}
-    </div>
+      </PopoverContent>
+    </Popover>
   );
 };
 

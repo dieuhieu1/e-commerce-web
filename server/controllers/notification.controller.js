@@ -8,13 +8,12 @@ const getAllNotifications = asyncHandler(async (req, res) => {
   // Find notifications base on userId
   const notifications = await Notification.find({
     userId,
-  });
-
-  // .sort({
-  //   createdAt: -1,
-  // })
-  // .limit(limit * 1)
-  // .skip((page - 1) * limit);
+  })
+    .sort({
+      createdAt: -1,
+    })
+    .limit(limit * 1)
+    .skip((page - 1) * limit);
 
   if (!notifications || notifications.length === 0) {
     return res.status(200).json({

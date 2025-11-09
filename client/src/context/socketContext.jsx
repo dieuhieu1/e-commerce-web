@@ -105,7 +105,7 @@ export const SocketProvider = ({ children }) => {
       isConnectingRef.current = false;
       setIsConnected(false);
     };
-  }, [user?._id]); // Chỉ depend vào user._id
+  }, [user, user._id]);
 
   const showNotificationPopup = (notification) => {
     window.alert("Thong bao moi!");
