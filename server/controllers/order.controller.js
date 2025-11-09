@@ -1,5 +1,5 @@
-const Order = require("../models/Order");
 const User = require("../models/User");
+const Order = require("../models/Order");
 const Product = require("../models/Product");
 
 const asyncHandler = require("express-async-handler");
@@ -104,7 +104,7 @@ const cancelUserOrder = asyncHandler(async (req, res) => {
   if (!orderId) {
     throw new Error("Order not found");
   }
-  const order = await Order.findById(orderId);
+  const order = await Order.findById({ _id: orderId });
 
   if (!order) {
     throw new Error("Order not found");

@@ -64,7 +64,6 @@ const History = () => {
           completedOrders: res.completedOrders,
           orders: res.orders,
         });
-        // setOrdersData(res.orders);
       } catch (err) {
         console.error("Error fetching summary:", err);
       }

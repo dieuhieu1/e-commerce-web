@@ -1,11 +1,10 @@
-const mongoose = require("mongoose"); // Erase if already required
+const mongoose = require("mongoose");
 
 // Declare the Schema of the Mongo model
 var orderSchema = new mongoose.Schema(
   {
     orderId: {
       type: String,
-      required: true,
       unique: true,
     },
     products: [
@@ -37,6 +36,7 @@ var orderSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
 orderSchema.pre("save", async function (next) {
   if (!this.orderId) {
     const date = new Date();
@@ -44,7 +44,7 @@ orderSchema.pre("save", async function (next) {
 
     // Get daily counter
     const today = new Date().setHours(0, 0, 0, 0);
-    const count = await Order.countDocuments({
+    const count = await this.constructor.countDocuments({
       createdAt: { $gte: today },
     });
 

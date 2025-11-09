@@ -26,7 +26,7 @@ const OrderCard = ({ order, isExpanded, onToggleExpand, onCancelOrder }) => {
             </div>
             <div>
               <h3 className="font-semibold text-gray-900">
-                Order #{order._id.slice(-8).toUpperCase()}
+                Order #{order.orderId.slice(-8).toUpperCase()}
               </h3>
               <p className="text-sm text-gray-600 flex items-center gap-2">
                 <Calendar size={14} />

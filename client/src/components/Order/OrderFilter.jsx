@@ -1,13 +1,17 @@
+import { useDebounce } from "@/hooks/useDebounce";
 import { Filter, Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 const OrderFilters = () => {
   const [params, setParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState(params.get("q") || "");
+
+  const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState(
     params.get("status") || "all"
   );
+
+  const debouncedSearch = useDebounce(searchQuery, 800);
 
   const handleStatusChange = (e) => {
     const value = e.target.value;
@@ -22,7 +26,17 @@ const OrderFilters = () => {
     });
     setStatusFilter(value);
   };
+  useEffect(() => {
+    const newParams = new URLSearchParams(params);
+    if (debouncedSearch) newParams.set("search", debouncedSearch);
+    else newParams.delete("search");
+    newParams.delete("orderId");
+    newParams.set("page", 1);
 
+    if (newParams.toString() !== params.toString()) {
+      setParams(newParams);
+    }
+  }, [debouncedSearch, params, setParams]);
   // const handleSearchChange = (value) => {
   //   setParams((prev) => {
   //     const newParams = new URLSearchParams(prev);
@@ -47,7 +61,7 @@ const OrderFilters = () => {
             type="text"
             placeholder="Search by order ID or product name..."
             value={searchQuery}
-            onChange={(e) => handleSearchChange(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           />
         </div>

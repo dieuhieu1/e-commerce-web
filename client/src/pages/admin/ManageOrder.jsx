@@ -64,6 +64,7 @@ const ManageOrder = () => {
     const newParams = new URLSearchParams(params);
     if (debouncedSearch) newParams.set("search", debouncedSearch);
     else newParams.delete("search");
+    newParams.delete("orderId");
     newParams.set("page", 1);
 
     if (newParams.toString() !== params.toString()) {
